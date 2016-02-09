@@ -1,0 +1,45 @@
+notifications:
+  email: false
+
+# Enable C++ support
+language: cpp
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: ""
+
+# Compiler selection
+compiler:
+  - gcc
+
+addons:
+  coverity_scan:
+    project:
+      name: Dllieu/cpp_benchmark
+    build_command_prepend: "cmake ."
+    build_command: "make"
+    branch_pattern: coverity_scan
+
+before_install:
+  - wget --no-check-certificate https://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.sh
+  - sudo sh cmake-3.2.3-Linux-x86_64.sh --skip-license --prefix=/usr
+  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  - sudo apt-get update -qq
+  - sudo apt-get install cppcheck
+  - if [ "$CXX" = "g++" ]; then
+      sudo apt-get install -qq g++-5;
+      export CXX="g++-5" CC="gcc-5";
+    fi
+
+# Build steps
+script:
+  - cppcheck --enable=all --std=c++11 --error-exitcode=0 src/
+  - mkdir build && cd build
+  - cmake -DCMAKE_BUILD_TYPE=Release .. && make
+  - ./cpp_benchmark
+
+branches:
+  only:
+    - coverity_scan
