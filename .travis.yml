@@ -1,18 +1,29 @@
 notifications:
   email: false
 
-# Enable C++ support
 language: cpp
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-5']
+      env: COMPILER=g++-5
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
+          packages: ['clang-3.6']
+      env: COMPILER=clang++-3.6
 
 env:
   global:
-   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
-   #   via the "travis encrypt" command using the project repo's public key
+   # coverity_scan
    - secure: "nW7ETUdp5pbdCQTHsNZVWNnP6ieSv0+7oVPcVkZM73PqT+6rXwsRtpKhWGQX3wd3jNQSswzfvkg7IndvnW029CbhwEXsr+NMa027Y+QME/bEvi2o+jQ9pYkzHk0sj+YB4atiHGM21qcT3OPbs7R+V/m3OJ2+SPnLcbs2CvnD7kY2vVUYqUAdTgo1wFClc8mq/jbDPnqeCP7NsVtutlO5TPRCwoqUTPOSSlOmLRPzl0SVUFqG5Ss/UpaH6GBNrJNAzdTHaGSTM1715NjA8eJHATRc5URIrnbC9MdyOwGaoz9iSoUtk543PqZcWaZ+IQJl9TcCCFSoL1TOCq5GOodCBRFhAkPbCipvlONPf0cG1LElak1kNf7NRkk+Kcy0sOr7NPGVuXj8C7hkFL20rHgHRU72IYjUP4ErUjYwCSvSLT/fX81OaLw7TEg8jlKjPrqZShZPcS8QQp8q2UxE1OM8D7Sj0yEI4+oHuhtmxv9lqLzjz2IKKwleTBA+R3z/dJaB0+QHMLIo7pF4G8SoPUUsMGhtH4fiVHR5k+q9TADXsDGxGcqAE8yq/r8MIn1EnEVBzkk0BX81vTckptXNQk6lX2jArCBysGZCOa6Uk9a15zDcM0snYJ7NWqwfplStReXGURB2/GNMyPV4/t+qOMbPMwK3w/ZqBTRhQhuFMggZC3E="
-
-# Compiler selection
-compiler:
-  - gcc
 
 addons:
   coverity_scan:
@@ -24,14 +35,15 @@ addons:
     branch_pattern: coverity_scan
 
 before_install:
+  - sudo apt-get update
+  
   - wget --no-check-certificate https://www.cmake.org/files/v3.2/cmake-3.2.3-Linux-x86_64.sh
   - sudo sh cmake-3.2.3-Linux-x86_64.sh --skip-license --prefix=/usr
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
-  - if [ "$CXX" = "g++" ]; then
-      sudo apt-get install -qq g++-5;
-      export CXX="g++-5";
-    fi
+  
+  - export CXX=$COMPILER
+  
   - mkdir build && cd build
 
 # Build steps
