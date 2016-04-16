@@ -24,7 +24,7 @@ include_directories("/home/dlieu/projects/CPP-Benchmark/build/external/include")
 # Standard Flags release (might add --gdb  -static-libgcc -static-libstdc++)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++1z -DNDEBUG -D_REENTRANT -D_GNU_SOURCE -fPIC -m64")
 # Warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0 -fext-numeric-literals")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0")
 # Perf flags -fno-exceptions -flto=8 -fno-fat-lto-objects -mfpmath=sse -fno-omit-frame-pointer
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
 if (CMAKE_COMPILER_IS_GNUCXX)
