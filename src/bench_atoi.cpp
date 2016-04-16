@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "utils.h"
+#include "macros.h"
 
 // The aim of the benchmark is to compute atoi for a known size string
 //  - practical use case: receiving a message from exchange: string size is always fixed / known in advance
@@ -40,7 +41,7 @@ namespace
     struct TFixtureATOI : public benchmark::Fixture
     {
     public:
-        void    SetUp() override final
+        TFixtureATOI()
         {
             std::random_device                          rd;
             std::mt19937                                gen( rd() );
@@ -94,7 +95,7 @@ namespace
 }
 
 /*
- * @brief atoi_fast
+ * @brief atoi_vectorization
  */
 namespace
 {
@@ -128,9 +129,10 @@ namespace
      *      -> notOptimize + inlining
      *      -> input size not known at compile time (if std::string input random generated) (no vectorization possible)
      *      -> size of StringType is not a multiple of WORD (limited to no vectorization)
+     *      TODO: Check folly and their compile opti on the array + unroll loop (i.e. power10[s[i]] + power100[s[i+1]] ...)
      */
     template < size_t STRING_SIZE, typename T = uint32_t >
-    uint32_t __attribute__((noinline))  atoi_fast( const StringType< STRING_SIZE >& s )
+    uint32_t __attribute__((noinline))  atoi_vectorization( const StringType< STRING_SIZE >& s )
     {
         static constexpr auto arrayPower10 = Power10Generator< STRING_SIZE, T >();
 
@@ -155,14 +157,14 @@ namespace
         auto resultRef = (uint32_t)atoi(strRef.c_str());
         if ( likely( resultRef == atoi_naive(s)
                      && resultRef == atoi_naive_skip_space(s)
-                     && resultRef == atoi_fast(s) ) )
+                     && resultRef == atoi_vectorization(s) ) )
             return;
 
         std::cerr << "Incorrect conversion for input: " << strRef << '\n'
                   << "atoi_naive: " << atoi_naive(s) << '\n'
                   << "atoi_naive_skip_space: " << atoi_naive_skip_space(s) << '\n'
-                  << "atoi_fast: " << atoi_fast(s) << std::endl;
-        std::terminate();
+                  << "atoi_vectorization: " << atoi_vectorization(s) << std::endl;
+        std::exit(1);
     }
 
     auto lambda_array_traversal = [] ( auto& state, const auto& inputs )
@@ -203,13 +205,13 @@ namespace
         }
     };
 
-    auto lambda_atoi_fast = [] ( auto& state, const auto& inputs )
+    auto lambda_atoi_vectorization = [] ( auto& state, const auto& inputs )
     {
         size_t i = 0;
         while (state.KeepRunning())
         {
             auto& input = inputs[ i++ % inputs.size() ];
-            benchmark::DoNotOptimize( atoi_fast( input ) );
+            benchmark::DoNotOptimize( atoi_vectorization( input ) );
         }
     };
 }
@@ -219,14 +221,14 @@ namespace
  */
 #define DECLARE_FIXTURE_ATOI( N ) \
     using FixtureATOI_##N = TFixtureATOI< N >; \
-    BENCHMARK_F( FixtureATOI_##N, array_traversal )( benchmark::State& state ) { lambda_array_traversal( state, inputs ); } \
+    BENCHMARK_F( FixtureATOI_##N, atoi_array_traversal )( benchmark::State& state ) { lambda_array_traversal( state, inputs ); } \
     BENCHMARK_F( FixtureATOI_##N, atoi_naive )( benchmark::State& state ) { lambda_atoi_naive( state, inputs ); } \
     BENCHMARK_F( FixtureATOI_##N, atoi_naive_skip_space )( benchmark::State& state ) { lambda_atoi_naive_skip_space( state, inputs ); } \
-    BENCHMARK_F( FixtureATOI_##N, atoi_fast )( benchmark::State& state ) { lambda_atoi_fast( state, inputs ); } \
+    BENCHMARK_F( FixtureATOI_##N, atoi_vectorization )( benchmark::State& state ) { lambda_atoi_vectorization( state, inputs ); } \
     BENCHMARK_F( FixtureATOI_##N, atoi )( benchmark::State& state ) { lambda_atoi( state, inputs ); }
 
 DECLARE_FIXTURE_ATOI( 8 );
-DECLARE_FIXTURE_ATOI( 16 );
+DECLARE_FIXTURE_ATOI( 16 ); // Vectorization will start here (2 words)
 DECLARE_FIXTURE_ATOI( 24 );
 DECLARE_FIXTURE_ATOI( 32 ); // Generally, input won't be bigger than 32
 DECLARE_FIXTURE_ATOI( 40 );
