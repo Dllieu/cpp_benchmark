@@ -2,7 +2,7 @@
 *to take with a grain of salt*
 
 |operation|time|
-|:-:|:-:|
+|:--|:--|
 |1 CPU cycle|0.3 ns|
 |Level 1 cache access|0.9 ns|
 |Level 2 cache access|3.1 ns|
