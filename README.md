@@ -8,6 +8,7 @@ Playing with benchmark on various topics
 
 ###Big Picture
 (to take with a grain of salt)
+
 |operation|time|
 |:-:|:-:|
 |1 CPU cycle|0.3 ns|
