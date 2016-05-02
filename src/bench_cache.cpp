@@ -192,7 +192,7 @@ namespace
         ioctl( fd, PERF_EVENT_IOC_ENABLE, 0 );
 
         while ( state.KeepRunning() )
-            benchmark::DoNotOptimize( std::accumulate( std::cbegin( container ), std::cend( container ), 0 ) );
+            benchmark::DoNotOptimize( std::accumulate( std::begin( container ), std::end( container ), 0 ) );
 
         ioctl( fd, PERF_EVENT_IOC_DISABLE, 0 );
 
