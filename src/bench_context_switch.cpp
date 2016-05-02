@@ -4,7 +4,6 @@
 #include <atomic>
 #include <iostream>
 
-#include <sched.h>
 #include <sys/shm.h>
 #include <sys/syscall.h>
 #include <sys/wait.h>
@@ -12,7 +11,7 @@
 #include <linux/futex.h>
 #include <string.h>
 
-#include "cache_information.h"
+#include "utils/cache_information.h"
 
 using namespace cache;
 
@@ -24,12 +23,12 @@ namespace
 
     void    power2_argument( benchmark::internal::Benchmark* b )
     {
-        for ( auto i = 1; i <= 2048; i <<= 1 )
+        for ( size_t i = 1; i <= 2_KB; i <<= 1 )
             b->Arg( i );
     }
 }
 
-// Better be run with and without affinity
+// TODO: run with and without affinity
 namespace
 {
     // i.e. unsafe but that's ok
