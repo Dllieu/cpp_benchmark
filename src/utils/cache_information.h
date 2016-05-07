@@ -1,6 +1,7 @@
 #pragma once
 
-#include "utils.h"
+#include <bits/wordsize.h>
+#include <cstddef>
 
 namespace cache
 {
@@ -9,9 +10,10 @@ namespace cache
     constexpr const auto WORD_SIZE = __WORDSIZE / 8;
 
     constexpr auto operator""_KB( unsigned long long int s ) { return s * 1'024; }
-    constexpr auto operator""_MB( unsigned long long int s ) { return s * 1'024 * 1'024; }
+    constexpr auto operator""_MB( unsigned long long int s ) { return s * 1'024_KB; }
 
     // Max number of segment in L1 = 32KB / 64 = 512
+    // Specific Intel Core i5-4460
     enum class CacheSize
     {
         L1 = 32_KB,
@@ -20,21 +22,10 @@ namespace cache
         DRAM
     };
 
-    template < typename T >
-    CacheSize   byteToAppropriateCacheSize( std::size_t numberElements )
-    {
-        auto byteSize = numberElements * sizeof( T );
-        if ( byteSize < utils::enum_cast( CacheSize::L1 ) )
-            return CacheSize::L1;
-
-        if ( byteSize < utils::enum_cast( CacheSize::L2 ) )
-            return CacheSize::L2;
-
-        if ( byteSize < utils::enum_cast( CacheSize::L3 ) )
-            return CacheSize::L3;
-
-        return CacheSize::DRAM;
-    }
-
     const char* to_string( CacheSize cacheSize );
+
+    template < typename T >
+    CacheSize   byteToAppropriateCacheSize( std::size_t numberElements );
 }
+
+#include "cache_information.hxx"

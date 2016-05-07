@@ -6,10 +6,10 @@
 #include <set>
 #include <unordered_set>
 #include <iostream>
-#include <sstream>
+#include <iomanip>
 
 #include "utils/cache_information.h"
-#include "utils/perf_event.h"
+#include "utils/utils.h"
 
 // Intel Core i5-4460 (4 cores) (give a general idea - most of the benchmark might give different result depending of the architecture (e.g. if running on a VM with appveyor))
 //
@@ -136,7 +136,7 @@ namespace
         return t;
     }
 
-    void    custom_args( benchmark::internal::Benchmark* b )
+    void    cache_args( benchmark::internal::Benchmark* b )
     {
         using namespace cache;
         for ( size_t i = 2_KB; i <= 8_MB; i *= 2 )
@@ -158,19 +158,8 @@ namespace
     template < typename T >
     void    start_traversal( const T& container, benchmark::State& state )
     {
-        // only the last counter is useful
-        perf::PerfEvent counter( PERF_COUNT_HW_CACHE_MISSES );
-        counter.start();
-
-        while ( state.KeepRunning() )
-            benchmark::DoNotOptimize( std::accumulate( std::begin( container ), std::end( container ), 0 ) );
-
-        auto count = counter.stop();
-        std::stringstream ss;
-        ss << cache::to_string( cache::byteToAppropriateCacheSize< typename T::value_type >( state.range_x() ) )
-           << ": (cache misses = " << ( count / state.iterations() ) << ")";
-        // Won't be accurate for node based container
-        state.SetLabel( ss.str() );
+        auto f = [ &container ](){ return std::accumulate( std::begin( container ), std::end( container ), 0 ); };
+        utils::benchmark_with_cache_miss< typename T::value_type >( container.size(), f, state );
     }
 
     void    bench_cache_vector_traversal( benchmark::State& state )
@@ -194,9 +183,9 @@ namespace
     }
 }
 
-BENCHMARK( bench_cache_vector_traversal )->Apply( custom_args );
-BENCHMARK( bench_cache_list_traversal )->Apply( custom_args );
-BENCHMARK( bench_cache_shuffle_list_traversal )->Apply( custom_args );
+BENCHMARK( bench_cache_vector_traversal )->Apply( cache_args );
+BENCHMARK( bench_cache_list_traversal )->Apply( cache_args );
+BENCHMARK( bench_cache_shuffle_list_traversal )->Apply( cache_args );
 
 // Unordered maps can be implemented in a variety of ways, with implications for the memory usage.The fundamental expectation is that there'll be a contiguous array of key/value "buckets",
 // but in real-world implementations the basic design tradeoffs may involve:
@@ -237,16 +226,48 @@ namespace
     }
 }
 
-BENCHMARK( bench_cache_unordered_map_traversal )->Apply( custom_args );
-BENCHMARK( bench_cache_map_traversal )->Apply( custom_args );
+BENCHMARK( bench_cache_unordered_map_traversal )->Apply( cache_args );
+BENCHMARK( bench_cache_map_traversal )->Apply( cache_args );
 
-// TODO: don't want to have a link to boost
-/*
 namespace
 {
+    void    bench_cache_matrix_traversal_column( benchmark::State& state )
+    {
+        auto matrix = create_container_random_values< std::vector< char > >( state.range_x() * state.range_x() );
+        auto f = [ &matrix, dimension = state.range_x() ]()
+        {
+            for ( auto i = 0; i < dimension; ++i )
+                for ( auto j = 0; j < dimension; ++j )
+                    benchmark::DoNotOptimize( matrix[ i * dimension + j ] );
 
+            return 0;
+        };
+
+        utils::benchmark_with_cache_miss< typename decltype( matrix )::value_type >( matrix.size(), f, state );
+    }
+
+    void    bench_cache_matrix_traversal_row( benchmark::State& state )
+    {
+        auto matrix = create_container_random_values< std::vector< char > >( state.range_x() * state.range_x() );
+        auto f = [ &matrix, dimension = state.range_x() ]()
+        {
+            for ( auto j = 0; j < dimension; ++j )
+                for ( auto i = 0; i < dimension; ++i )
+                    benchmark::DoNotOptimize( matrix[ i * dimension + j ] );
+
+            return 0;
+        };
+
+        utils::benchmark_with_cache_miss< typename decltype( matrix )::value_type >( matrix.size(), f, state );
+    }
+
+    void    matrix_args( benchmark::internal::Benchmark* b )
+    {
+        using namespace cache;
+        for ( size_t i = 64; i <= 8_KB; i *= 2 )
+            b->Arg( i );
+    }
 }
 
-BENCHMARK( bench_cache_matrix_traversal_column_first )->Apply( custom_args );
-BENCHMARK( bench_cache_matrix_traversal_row_first )->Apply( custom_args );
- */
+BENCHMARK( bench_cache_matrix_traversal_column )->Apply( matrix_args );
+BENCHMARK( bench_cache_matrix_traversal_row )->Apply( matrix_args );

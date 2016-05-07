@@ -1,15 +1,12 @@
 #pragma once
 
-#include <type_traits>
+namespace benchmark
+{
+    class State;
+}
 
 namespace utils
 {
-    template < typename ENUM_TYPE >
-    constexpr auto enum_cast( ENUM_TYPE v )
-    {
-        return static_cast< std::underlying_type_t< ENUM_TYPE > >( v );
-    }
-
     constexpr std::size_t    round_up_to_word( std::size_t size )
     {
         auto remainder = size % sizeof( std::size_t ); // sizeof( size_t ) == word size
@@ -18,4 +15,9 @@ namespace utils
 
         return size + sizeof( std::size_t ) - remainder;
     }
+
+    template < typename ELEMENT_SIZE, typename F >
+    void    benchmark_with_cache_miss( std::size_t numberElements, F&& f, benchmark::State& state );
 }
+
+#include "utils.hxx"
