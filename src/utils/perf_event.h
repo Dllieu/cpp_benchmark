@@ -1,10 +1,21 @@
 #pragma once
 
-#include <sys/types.h>
+#include <cstdint>
 // Explicit include
 #include <linux/perf_event.h>
 
 namespace perf
 {
-    long int event_open( perf_event_attr& hw_event, pid_t pid, int cpu, int group_fd, unsigned long flags );
+    class PerfEvent
+    {
+    public:
+        PerfEvent( perf_hw_id hardwareEvent );
+        ~PerfEvent();
+
+        bool        start();
+        uint64_t    stop();
+
+    private:
+        int     fd_;
+    };
 }

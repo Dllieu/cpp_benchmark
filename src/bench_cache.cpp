@@ -1,15 +1,12 @@
 #include <benchmark/benchmark.h>
 
-#include <string.h>
-#include <unistd.h>
-#include <sys/ioctl.h>
-
 #include <random>
 #include <list>
-#include <vector>
 #include <algorithm>
 #include <set>
 #include <unordered_set>
+#include <iostream>
+#include <sstream>
 
 #include "utils/cache_information.h"
 #include "utils/perf_event.h"
@@ -33,7 +30,7 @@
 //
 // Data Cache (8-WAY, 64B / line)
 // - L1  (32KB):    1   ns /   4 cycles
-//             * 1 per core (hyperthreading delivers two processing threads per physical core, shared by two HW thread)
+//             * 1 per core (hyper threading delivers two processing threads per physical core, shared by two HW thread)
 //             * 4 cycles for simple access via pointer (p), 5 cycles for access with complex address calculation (p[n])
 // - L2 (256KB):    3.1 ns /  12 cycles (per processor, shared by 2 HW threads)
 // - L3   (6MB):    7.7 ns /  30 cycles (share among all the core (4 core -> 8 HW threads))
@@ -139,36 +136,10 @@ namespace
         return t;
     }
 
-    auto init_perf_event()
-    {
-        perf_event_attr pe;
-
-        memset(&pe, 0, sizeof(perf_event_attr));
-        pe.type = PERF_TYPE_HARDWARE;
-        pe.size = sizeof(perf_event_attr);
-        //pe.config = PERF_COUNT_HW_INSTRUCTIONS;
-        pe.config = PERF_COUNT_HW_CACHE_MISSES;
-
-        //pe.type = PERF_TYPE_HW_CACHE;
-        //pe.config = PERF_COUNT_HW_CACHE_LL;
-
-        pe.disabled = 1;
-        pe.exclude_kernel = 1;
-        pe.exclude_hv = 1;
-
-        // pid == 0 and cpu == -1:  This measures the calling process/thread on any CPU.
-        // pid == 0 and cpu >= 0:   This measures the calling process/thread only when running on the specified CPU.
-        // pid > 0 and cpu == -1:   This measures the specified process/thread on any CPU.
-        // pid > 0 and cpu >= 0:    This measures the specified process/thread only when running on the specified CPU.
-        // pid == -1 and cpu >= 0:  This measures all processes/threads on the specified CPU. This requires CAP_SYS_ADMIN capability or a /proc/sys/kernel/perf_event_paranoid value of less than 1.
-        // pid == -1 and cpu == -1: This setting is invalid and will return an error.
-        return perf::event_open(pe, 0, -1, -1, 0);
-    }
-
     void    custom_args( benchmark::internal::Benchmark* b )
     {
         using namespace cache;
-        for ( size_t i = 32; i <= 1024_KB; i *= 2 )
+        for ( size_t i = 2_KB; i <= 8_MB; i *= 2 )
             b->Arg( i );
     }
 }
@@ -187,37 +158,36 @@ namespace
     template < typename T >
     void    start_traversal( const T& container, benchmark::State& state )
     {
-        auto fd = init_perf_event();
-        ioctl( fd, PERF_EVENT_IOC_RESET, 0 );
-        ioctl( fd, PERF_EVENT_IOC_ENABLE, 0 );
+        // only the last counter is useful
+        perf::PerfEvent counter( PERF_COUNT_HW_CACHE_MISSES );
+        counter.start();
 
         while ( state.KeepRunning() )
             benchmark::DoNotOptimize( std::accumulate( std::begin( container ), std::end( container ), 0 ) );
 
-        ioctl( fd, PERF_EVENT_IOC_DISABLE, 0 );
-
+        auto count = counter.stop();
+        std::stringstream ss;
+        ss << cache::to_string( cache::byteToAppropriateCacheSize< typename T::value_type >( state.range_x() ) )
+           << ": (cache misses = " << ( count / state.iterations() ) << ")";
         // Won't be accurate for node based container
-        state.SetLabel( cache::to_string( cache::byteToAppropriateCacheSize< int >( state.range_x() ) ) );
-
-        // TODO: add fixture and display number of cache miss in label
-        close( fd );
+        state.SetLabel( ss.str() );
     }
 
     void    bench_cache_vector_traversal( benchmark::State& state )
     {
-        auto vector = create_container_random_values< std::vector< int > >( state.range_x() );
+        auto vector = create_container_random_values< std::vector< char > >( state.range_x() );
         start_traversal( vector, state );
     }
 
     void    bench_cache_list_traversal( benchmark::State& state )
     {
-        auto list = create_container_random_values< std::list< int > >( state.range_x() );
+        auto list = create_container_random_values< std::list< char > >( state.range_x() );
         start_traversal( list, state );
     }
 
     void    bench_cache_shuffle_list_traversal( benchmark::State& state )
     {
-        auto shuffleList = create_container_random_values< std::list< int > >( state.range_x() );
+        auto shuffleList = create_container_random_values< std::list< char > >( state.range_x() );
         shuffleList.sort();
 
         start_traversal( shuffleList, state );

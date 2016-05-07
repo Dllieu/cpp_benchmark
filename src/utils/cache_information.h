@@ -5,8 +5,11 @@
 namespace cache
 {
     constexpr const auto PAGE_SIZE = 4'096;
+    // In bytes
+    constexpr const auto WORD_SIZE = __WORDSIZE / 8;
+
     constexpr auto operator""_KB( unsigned long long int s ) { return s * 1'024; }
-    constexpr auto operator""_MB( unsigned long long int s ) { return s * 1'024 * 1'000; }
+    constexpr auto operator""_MB( unsigned long long int s ) { return s * 1'024 * 1'024; }
 
     // Max number of segment in L1 = 32KB / 64 = 512
     enum class CacheSize
