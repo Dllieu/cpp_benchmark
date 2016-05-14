@@ -21,11 +21,10 @@ namespace utils
 
         auto count = counter.stop();
         std::stringstream ss;
-        ss << "Require " << std::setw( 4 ) <<
-        cache::to_string( cache::byteToAppropriateCacheSize< ELEMENT_SIZE >( numberElements ) );
+        ss << "Require " << std::setw( 4 ) << cache::to_string( cache::byteToAppropriateCacheSize< ELEMENT_SIZE >( numberElements ) );
 
         ss << " | CACHE MISSES: ";
-        if ( canCount )
+        if ( canCount && state.iterations() > 0 )
             ss << ( count / state.iterations() );
         else
             ss << "DEACTIVATE";

@@ -236,11 +236,12 @@ namespace
         auto matrix = create_container_random_values< std::vector< char > >( state.range_x() * state.range_x() );
         auto f = [ &matrix, dimension = state.range_x() ]()
         {
+            auto res = 0;
             for ( auto i = 0; i < dimension; ++i )
                 for ( auto j = 0; j < dimension; ++j )
-                    benchmark::DoNotOptimize( matrix[ i * dimension + j ] );
+                    res += matrix[ i * dimension + j ];
 
-            return 0;
+            return res;
         };
 
         utils::benchmark_with_cache_miss< typename decltype( matrix )::value_type >( matrix.size(), f, state );
@@ -251,11 +252,12 @@ namespace
         auto matrix = create_container_random_values< std::vector< char > >( state.range_x() * state.range_x() );
         auto f = [ &matrix, dimension = state.range_x() ]()
         {
+            auto res = 0;
             for ( auto j = 0; j < dimension; ++j )
                 for ( auto i = 0; i < dimension; ++i )
-                    benchmark::DoNotOptimize( matrix[ i * dimension + j ] );
+                    res += matrix[ i * dimension + j ];
 
-            return 0;
+            return res;
         };
 
         utils::benchmark_with_cache_miss< typename decltype( matrix )::value_type >( matrix.size(), f, state );
@@ -271,3 +273,97 @@ namespace
 
 BENCHMARK( bench_cache_matrix_traversal_column )->Apply( matrix_args );
 BENCHMARK( bench_cache_matrix_traversal_row )->Apply( matrix_args );
+
+namespace
+{
+    // Array-Of-Structure vs Structure-Of-Array
+    struct Particle { char x, y, z, dx, dy, dz; };
+    using AOSParticle = std::vector< Particle >;
+
+    struct SOAParticle
+    {
+        SOAParticle( size_t n ) : x( n ), y( n ), z( n ), dx( n ), dy( n ), dz( n ) {}
+        std::vector< char > x, y, z, dx, dy, dz;
+    };
+
+    // 64 / ( 6 / 3 ) / sizeof( char ) = 32 useful values per fetch average (6 / 3 :  only need x, y, z)
+    void    bench_cache_aos_partial( benchmark::State& state )
+    {
+        AOSParticle aos( state.range_x() );
+        auto f = [ &aos, iteration = state.range_x() ]()
+        {
+            auto res = 0;
+            for ( auto i = 0; i < iteration; ++i )
+                res += aos[ i ].x + aos[ i ].y + aos[ i ].z;
+            return res;
+        };
+
+        utils::benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+    }
+
+    // 64 / sizeof( char ) = 64 useful values per fetch
+    void    bench_cache_soa_partial( benchmark::State& state )
+    {
+        SOAParticle soa( state.range_x() );
+        auto f = [ &soa, iteration = state.range_x() ]()
+        {
+            auto res = 0;
+            for ( auto i = 0; i < iteration; ++i )
+                res += soa.x[ i ] + soa.y[ i ] + soa.z[ i ];
+            return res;
+        };
+
+        utils::benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+    }
+}
+
+// SOA is faster (diminishingly as n grows)
+BENCHMARK( bench_cache_aos_partial )->Apply( cache_args );
+BENCHMARK( bench_cache_soa_partial )->Apply( cache_args );
+
+namespace
+{
+    // Both fetch only useful values
+    // SOA is faster (diminishingly as n grows), because CPU can prefetch x, y, z in parallel
+    // (e.g. big picture: aos need to prefetch (stale) every N bytes, but soa only need to prefetch every N * 3 (the is more expensive, but less than the stale depending of the cache layer))
+    struct CompactParticle { char x, y, z; };
+    using AOSCompactParticle = std::vector< CompactParticle >;
+
+    struct SOACompactParticle
+    {
+        SOACompactParticle( size_t n ) : x( n ), y( n ), z( n ) {}
+        std::vector< char > x, y, z;
+    };
+
+    void    bench_cache_aos_full( benchmark::State& state )
+    {
+        AOSCompactParticle aos( state.range_x() );
+        auto f = [ &aos, iteration = state.range_x() ]()
+        {
+            auto res = 0;
+            for ( auto i = 0; i < iteration; ++i )
+                res += aos[ i ].x + aos[ i ].y + aos[ i ].z;
+            return res;
+        };
+
+        utils::benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+    }
+
+    void    bench_cache_soa_full( benchmark::State& state )
+    {
+        SOACompactParticle soa( state.range_x() );
+        auto f = [ &soa, iteration = state.range_x() ]()
+        {
+            auto res = 0;
+            for ( auto i = 0; i < iteration; ++i )
+                res += soa.x[ i ] + soa.y[ i ] + soa.z[ i ];
+            return res;
+        };
+
+        utils::benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+    }
+}
+
+// SOA is faster (diminishingly as n grows), then slower
+BENCHMARK( bench_cache_aos_full )->Apply( cache_args );
+BENCHMARK( bench_cache_soa_full )->Apply( cache_args );
