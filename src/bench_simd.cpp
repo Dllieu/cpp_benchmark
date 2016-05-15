@@ -5,14 +5,15 @@
 #include <algorithm>
 #include <array>
 
+// TODO: test with _mm_stream_si128
+
 namespace
 {
     struct Interval
     {
         Interval()
         {
-            for ( size_t i = 0; i < sizeof( *this ) / sizeof( int ); ++i )
-                reinterpret_cast< uint32_t* >( this )[ i ] = std::numeric_limits< int >::max();
+            std::fill( boundLevel.begin(), boundLevel.end(), std::numeric_limits< int >::max() );
         }
 
         /*
@@ -24,13 +25,13 @@ namespace
             return it - boundLevel.begin(); // last element always ensured to be max int
         }
 
-        int     inBoundIndexSimd( int value ) const
+        int     inBoundIndexWithSimd( int value ) const
         {
-            const __m128i abs0 = _mm_set1_epi32( value ); // [ value, value, value, value ]
+            const __m128i value4 = _mm_set1_epi32( value ); // [ value, value, value, value ]
 
             // compare [ a0, a1, a2, a3 ] [ b0, b1, b2, b3 ] (if a0 > b0 ? -1 : 0) --> [ r0, r1, r2, r3 ]
-            const __m128i cmpFirstLevel  = _mm_cmpgt_epi32( *reinterpret_cast< const __m128i* >( boundLevel.data() ), abs0 );
-            const __m128i cmpSecondLevel = _mm_cmpgt_epi32( *( reinterpret_cast< const __m128i* >( boundLevel.data() ) + 1 ), abs0 );
+            const __m128i cmpFirstLevel  = _mm_cmpgt_epi32( *reinterpret_cast< const __m128i* >( boundLevel.data() ), value4 );
+            const __m128i cmpSecondLevel = _mm_cmpgt_epi32( *( reinterpret_cast< const __m128i* >( boundLevel.data() ) + 1 ), value4 );
 
             // if any of the four ints in boundLevel is less than its corresponding int in abs0 -> return the most significant bit (bit position in a binary number having the greatest value)
             const uint32_t bits0 = _mm_movemask_ps( reinterpret_cast< const __m128& >( cmpFirstLevel ) );
@@ -92,11 +93,9 @@ namespace
 
     void    bench_simd_in_bound( benchmark::State& state )
     {
-        start_bench_in_bound( state, []( Interval& interval, int input ) { return interval.inBoundIndexSimd( input ); } );
+        start_bench_in_bound( state, []( Interval& interval, int input ) { return interval.inBoundIndexWithSimd( input ); } );
     }
 }
 
 BENCHMARK( bench_simd_in_bound_no_simd );
 BENCHMARK( bench_simd_in_bound );
-
-// TODO: test with _mm_stream_si128

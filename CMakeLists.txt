@@ -1,21 +1,10 @@
 cmake_minimum_required(VERSION 3.2)
 project(cpp_benchmark)
 
-include(ExternalProject)
-ExternalProject_Add( google_benchmark
-                     GIT_REPOSITORY https://github.com/google/benchmark.git
-                     GIT_TAG v1.0.0
-                     PREFIX ${CMAKE_CURRENT_BINARY_DIR}/external/tmp/benchmark
-                     CMAKE_ARGS
-                     -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external
-                     -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} )
+option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." OFF)
 
-link_directories(${CMAKE_CURRENT_BINARY_DIR}/external/lib)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/external/include)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
-
-#find_package(Boost 1.60.0 COMPONENTS program_options REQUIRED)
-#include_directories(${Boost_INCLUDE_DIRS})
+set(BENCHMARK_ENABLE_TESTING OFF)
+add_subdirectory(external/benchmark)
 
 ## FLAGS
 # Standard Flags release (might add --gdb  -static-libgcc -static-libstdc++)
@@ -31,9 +20,7 @@ endif()
 aux_source_directory(src SRC_LIST)
 aux_source_directory(src/utils UTILS_LIST)
 add_executable(cpp_benchmark ${SRC_LIST} ${UTILS_LIST})
-
-add_dependencies(cpp_benchmark google_benchmark)
-target_include_directories(cpp_benchmark PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/external/include)
+add_dependencies(cpp_benchmark benchmark)
 
 find_package(Threads REQUIRED)
 target_link_libraries( cpp_benchmark
