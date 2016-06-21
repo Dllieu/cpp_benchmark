@@ -4,7 +4,9 @@
 |operation|time|
 |:--|:--|
 |1 CPU cycle|0.3 ns|
+|DTLB (three linear to physical every cycle)|0.3 ns|
 |Level 1 cache access (48 bytes per cycle in Sandy bridge)|0.9 ns|
+|DTLB miss to STLB hit (s for second)|2.1 ns|
 |Level 2 cache access|3.1 ns|
 |Branch mispredict|5 ns|
 |Level 3 cache access|7.7 ns|
