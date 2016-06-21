@@ -12,9 +12,10 @@
 |Optimal spinlock lock/unlock|16 ns|
 |UserSpace syscall|25 ns|
 |Main Memory access|110 ns|
+|OS network stack (half round-trip) Kernel bypass|1 micro|
 |Roundtrip 100 bytes over 1 Gbps proximity network with Solarflare|3.5 micros|
+|OS network stack (half round-trip)|5 micros|
 |Send 1K bytes over 1 Gbps network|10 micros|
 |Context switch|20-50 micros|
 |Solid-state disk I/O|50-150 micros|
 |Rotational disk I/O|1-10 ms|
-
