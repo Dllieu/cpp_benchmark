@@ -78,3 +78,40 @@ The following two hardware prefetchers fetched data from memory to the L2 cache 
 
 ###Intel® Advanced Digital Media Boost
 - Provides 128-bit shuffler unit to speedup shuffle, pack, unpack operations; adds support for 47 SSE4.1 instructions
+
+##Pipeline
+TODO: image p.68
+
+###Front end components
+- Part of the CPU is the piece of hardware responsible to fetch and decode instructions (convert them to UOPs)
+- The front ends needs to supply decoded instructions (μops) and sustain the stream to a six-issue wide out-of-order engine
+
+####Branch Prediction Unit (BPU)
+- Helps the instruction fetch unit fetch the most likely instruction to be executed by predicting the various branch types:
+ - conditional
+ - indirect
+ - direct
+ - call
+ - return
+- Uses dedicated hardware for each type
+- Performance Challenge
+ - Enables speculative execution
+ - Improves speculative execution efficiency by reducing the amount of code in the “non-architected path” to be fetched into the pipeline
+
+####Instruction Fetch Unit
+- Prefetches instructions that are likely to be executed
+- Caches frequently-used instructions
+- Predecodes and buffers instructions, maintaining a constant bandwidth despite irregularities in the instruction stream 
+- Performance Challenges
+ - Variable length instruction format causes unevenness (bubbles) in decode bandwidth
+ - Taken branches and misaligned targets causes disruptions in the overall bandwidth delivered by the fetch unit
+ 
+####Instruction Queue and Decode Unit
+- Decodes up to four instructions, or up to five with macro-fusion
+- Stack pointer tracker algorithm for efficient procedure entry and exit
+- Implements the Macro-Fusion feature, providing higher performance and efficiency
+- The Instruction Queue is also used as a loop cache, enabling some loops to be executed with both higher bandwidth and lower power
+- Performance Challenges
+ - Varying amounts of work per instruction requires expansion into variable numbers of μops
+ - Prefix adds a dimension of decoding complexity
+ - Length Changing Prefix (LCP) can cause front end bubbles
