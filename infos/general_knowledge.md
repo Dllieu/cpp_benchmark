@@ -127,7 +127,16 @@ the instruction queue. Subsequent fetches can only enter predecoding after the c
  - Taken branches and misaligned targets causes disruptions in the overall bandwidth delivered by the fetch unit
  
 ####Instruction Queue and Decode Unit
-- Decodes up to four instructions, or up to five with macro-fusion
+- The instruction queue is 18 instructions deep. It sits between the instruction predecode unit and the instruction decoders
+- Decodes up to four instructions by cycle, or up to five with macro-fusion (only one by cycle) (allow CPU to join two related instructions into a single one, micro-fusion joins two relates micro-instruction into a single one)
+- It also serves as a loop cache for loops smaller than 18 instructions
+- A Loop Stream Detector (LSD) resides in the BPU. The LSD attempts to detect loops which are candidates for streaming from the instruction queue (IQ). When such a loop is detected, the instruction bytes are locked down and the loop is allowed to stream from the IQ until a misprediction ends it. When the loop plays back from the IQ, it provides higher bandwidth at reduced power
+- The LSD provides the following benefits:
+ - No loss of bandwidth due to taken branches
+ - No loss of bandwidth due to misaligned instructions
+ - No LCP penalties, as the pre-decode stage has already been passed
+ - Reduced front end power consumption, because the instruction cache, BPU and predecode unit can be idle
+ - Software should use the loop cache functionality opportunistically. Loop unrolling and other code optimizations may make the loop too big to fit into the LSD. For high performance code, loop unrolling is generally preferable for performance even when it overflows the loop cache capability
 - Stack pointer tracker algorithm for efficient procedure entry and exit
 - Implements the Macro-Fusion feature, providing higher performance and efficiency
 - The Instruction Queue is also used as a loop cache, enabling some loops to be executed with both higher bandwidth and lower power
