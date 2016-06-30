@@ -105,9 +105,20 @@ TODO: image p.68
  - Improves speculative execution efficiency by reducing the amount of code in the “non-architected path” to be fetched into the pipeline
 
 ####Instruction Fetch Unit
+- An instruction fetch is a 16-byte aligned lookup through the ITLB into the instruction cache and instruction prefetch buffers. A hit in the instruction cache causes 16 bytes to be delivered to the instruction predecoder. Typical programs average slightly less than 4 bytes per instruction, depending on the code being executed
 - Prefetches instructions that are likely to be executed
 - Caches frequently-used instructions
 - Predecodes and buffers instructions, maintaining a constant bandwidth despite irregularities in the instruction stream 
+ - Determine the length of the instructions.
+ - Decode all prefixes associated with instructions.
+ - Mark various properties of instructions for the decoders (for example, "is branch")
+branch.”).
+- The predecode unit can write up to six instructions per cycle into the instruction queue. If a fetch contains more than six instructions, the predecoder continues to decode up to six instructions per cycle until all instructions in the fetch are written to
+the instruction queue. Subsequent fetches can only enter predecoding after the current fetch completes. For a fetch of seven instructions, the predecoder decodes the first six in one cycle, and then only one in the next cycle
+- The following instruction prefixes cause problems during length decoding. These prefixes can dynamically change the length of instructions and are known as length changing prefixes (LCPs):
+ - Operand Size Override (66H) preceding an instruction with a word immediate data
+ - Address Size Override (67H) preceding an instruction with a mod R/M in real, 16-bit protected or 32-bit protected modes
+- When the predecoder encounters an LCP in the fetch line, it must use a slower length decoding algorithm. With the slower length decoding algorithm, the predecoder decodes the fetch in 6 cycles, instead of the usual 1 cycle
 - Performance Challenges
  - Variable length instruction format causes unevenness (bubbles) in decode bandwidth
  - Taken branches and misaligned targets causes disruptions in the overall bandwidth delivered by the fetch unit
