@@ -140,6 +140,12 @@ the instruction queue. Subsequent fetches can only enter predecoding after the c
 - The Intel Core microarchitecture contains four instruction decoders. The first, Decoder 0, can decode Intel 64 and IA-32 instructions up to 4 μops in size. Three other decoders handles single-μop instructions. The microsequencer (Each microinstruction has an 8-bit "next" field, which tells which microinstruction follows, if branch not to be taken, microcode sequence aborts before it finished) can provide up to 3 μops per cycle, and helps decode instructions larger than 4 μops.
 - All decoders support the common cases of single μop flows, including: micro-fusion, stack pointer tracking and macro-fusion. Thus, the three simple decoders are not limited to decoding single-μop instructions. Packing instructions into a 4-1-1-1 template is not necessary and not recommended. Macro-fusion merges two instructions into a single μop. Intel Core microarchitecture is capable of one macro-fusion per cycle in 32-bit operation (including compatibility sub-mode of the Intel 64 architecture), but not in 64-bit mode because code that uses longer instructions (length in bytes) more often is less likely to take advantage of hardware support for macro-fusion. 
 - Stack pointer tracker algorithm for efficient procedure entry and exit
+- The Intel 64 and IA-32 architectures have several commonly used instructions for parameter passing and procedure entry and exit: PUSH, POP, CALL, LEAVE and RET. These instructions implicitly update the stack pointer register (RSP), maintaining a combined control and parameter stack without software intervention The Stack Pointer Tracker moves all these implicit RSP updates to logic contained in
+the decoders themselves. The feature provides the following benefits:
+ - Improves decode bandwidth, as PUSH, POP and RET are single μop instructions in Intel Core microarchitecture
+ - Conserves execution bandwidth as the RSP updates do not compete for execution resources.
+ - Improves parallelism in the out of order execution engine as the implicit serial dependencies between μops are removed
+ - Improves power efficiency as the RSP updates are carried out on small, dedicated hardware.
 - Implements the Macro-Fusion feature, providing higher performance and efficiency
 - The Instruction Queue is also used as a loop cache, enabling some loops to be executed with both higher bandwidth and lower power
 - Performance Challenges
