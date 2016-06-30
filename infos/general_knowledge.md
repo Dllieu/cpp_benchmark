@@ -79,6 +79,10 @@ The following two hardware prefetchers fetched data from memory to the L2 cache 
 ###Intel® Advanced Digital Media Boost
 - Provides 128-bit shuffler unit to speedup shuffle, pack, unpack operations; adds support for 47 SSE4.1 instructions
 
+##Instructions
+http://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-instruction-set-reference-manual-325383.pdf
+p. 31
+
 ##Pipeline
 TODO: image p.68
 
@@ -94,6 +98,8 @@ TODO: image p.68
  - call
  - return
 - Uses dedicated hardware for each type
+- 16-entry Return Stack Buffer (RSB). It enables the BPU to accurately predict RET instructions
+- Front end queuing of BPU lookups. The BPU makes branch predictions for 32 bytes at a time, twice the width of the fetch engine
 - Performance Challenge
  - Enables speculative execution
  - Improves speculative execution efficiency by reducing the amount of code in the “non-architected path” to be fetched into the pipeline
