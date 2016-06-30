@@ -1,24 +1,24 @@
 # Processor Architecture
-###MESIF
+##MESIF
 
 TODO: Images
 *To remember: clean / dirty / request for ownership*
 
-###Store forwarding
+##Store forwarding
 If a load follows a store and reloads the data that the store writes to memory, the data can forward directly from the store operation to the load. This process, called store to load forwarding, saves cycles by enabling the load to obtain the data directly from the store operation instead of through memory.
 
-###Last level cache
+##Last level cache
 The LLC consists of multiple cache slices. The number of slices is equal to the number of IA cores. Each slice has logic portion and data array portion. The logic portion handles data coherency, memory ordering, access to the data array portion, LLC misses and writeback to memory, and more. The data array portion stores cache lines. Each slice contains a full cache port that can supply 32 bytes/cycle.
 
 The physical addresses of data kept in the LLC data arrays are distributed among the cache slices by a hash function, such that addresses are uniformly distributed. The data array in a cache block may have 4/8/12/16 ways corresponding to 0.5M/1M/1.5M/2M block size. However, due to the address distribution among the cache blocks from the software point of view, this does not appear as a normal N-way cache.
 
-###Writing policies
+##Writing policies
 
 TODO: Images (https://en.wikipedia.org/wiki/Cache_(computing))
 - Write-through: write is done synchronously both to the cache and to the backing store.
 - Write-back (also called write-behind): initially, writing is done only to the cache. The write to the backing store is postponed until the cache blocks containing the data are about to be modified/replaced by new content.
 
-###Load prefetch
+##Load prefetch
 ###L1
 Triggered by load operations when the following conditions are met:
 - Load is from writeback memory type.
@@ -34,3 +34,46 @@ Two hardware prefetchers load data to the L1 DCache:
 The following two hardware prefetchers fetched data from memory to the L2 cache and last level cache:
 - Spatial Prefetcher: This prefetcher strives to complete every cache line fetched to the L2 cache with the pair line that completes it to a 128-byte aligned chunk.
 - Streamer: This prefetcher monitors read requests from the L1 cache for ascending and descending sequences of addresses. Monitored read requests include L1 DCache requests initiated by load and store operations and by the hardware prefetchers, and L1 ICache requests for code fetch. When a forward or backward stream of requests is detected, the anticipated cache lines are prefetched. Prefetched cache lines must be in the same 4K page. The streamer and spatial prefetcher prefetch the data to the last level cache. Typically data is brought also to the L2 unless the L2 cache is heavily loaded with missing demand requests.
+
+##Intel Core Ivy bridge Microarchitecture
+###Intel® Wide Dynamic Execution
+- enables each processor core to fetch, dispatch, execute with high bandwidths and retire up to four instructions per cycle.
+- Fourteen-stage efficient pipeline
+- Three arithmetic logical units
+- Four decoders to decode up to five instruction per cycle
+- Macro-fusion and micro-fusion to improve front-end throughput
+- Peak issue rate of dispatching up to six μops per cycle
+- Peak retirement bandwidth of up to four μops per cycle
+- Advanced branch prediction
+- Stack pointer tracker to improve efficiency of executing function/procedure entries and exits
+
+###Intel® Advanced Smart Cache
+- Delivers higher bandwidth from the second level cache to the core, optimal performance and flexibility for single-threaded and multi-threaded applications.
+- Optimized for multicore and single-threaded execution environments
+- 256 bit internal data path to improve bandwidth from L2 to first-level data cache
+- Unified, shared second-level cache of 4 Mbyte, 16 way (or 2 MByte, 8 way)
+
+###Intel® Smart Memory Access
+- prefetches data from memory in response to data access patterns and reduces cache-miss exposure of out-of-order execution.
+- Hardware prefetchers to reduce effective latency of second-level cache misses
+- Hardware prefetchers to reduce effective latency of first-level data cache misses
+- Memory disambiguation to improve efficiency of speculative execution execution engine
+
+###Intel® Advanced Digital Media Boost improves most 128-bit SIMD instructions with single-cycle throughput and floating-point operations. Features include:
+- Single-cycle throughput of most 128-bit SIMD instructions (except 128-bit shuffle, pack, unpack operations)
+- Up to eight floating-point operations per cycle
+- Three issue ports available to dispatching SIMD instructions for execution.
+
+*The Enhanced Intel Core microarchitecture supports all of the features of Intel Core microarchitecture and provides a comprehensive set of enhancements.*
+###Intel® Wide Dynamic Execution includes several enhancements:
+- A radix-16 divider replacing previous radix-4 based divider to speedup longlatency operations such as divisions and square roots.
+- Improved system primitives to speedup long-latency operations such as RDTSC, STI, CLI, and VM exit transitions.
+
+###Intel® Advanced Smart Cache
+- provides up to 6 MBytes of second-level cache shared between two processor cores (quad-core processors have up to 12 MBytes of L2); up to 24 way/set associativity.
+
+###Intel® Smart Memory Access
+- supports high-speed system bus up 1600 MHz and provides more efficient handling of memory operations such as split cache line load and store-to-load forwarding situations.
+
+###Intel® Advanced Digital Media Boost
+- Provides 128-bit shuffler unit to speedup shuffle, pack, unpack operations; adds support for 47 SSE4.1 instructions
