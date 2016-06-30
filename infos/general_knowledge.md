@@ -59,7 +59,8 @@ The following two hardware prefetchers fetched data from memory to the L2 cache 
 - Hardware prefetchers to reduce effective latency of first-level data cache misses
 - Memory disambiguation to improve efficiency of speculative execution execution engine
 
-###Intel® Advanced Digital Media Boost improves most 128-bit SIMD instructions with single-cycle throughput and floating-point operations. Features include:
+###Intel® Advanced Digital Media Boost
+- improves most 128-bit SIMD instructions with single-cycle throughput and floating-point operations.
 - Single-cycle throughput of most 128-bit SIMD instructions (except 128-bit shuffle, pack, unpack operations)
 - Up to eight floating-point operations per cycle
 - Three issue ports available to dispatching SIMD instructions for execution.
