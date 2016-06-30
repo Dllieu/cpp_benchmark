@@ -112,11 +112,10 @@ TODO: image p.68
 - An instruction fetch is a 16-byte aligned lookup through the ITLB into the instruction cache and instruction prefetch buffers. A hit in the instruction cache causes 16 bytes to be delivered to the instruction predecoder. Typical programs average slightly less than 4 bytes per instruction, depending on the code being executed
 - Prefetches instructions that are likely to be executed
 - Caches frequently-used instructions
-- Predecodes and buffers instructions, maintaining a constant bandwidth despite irregularities in the instruction stream 
+- Predecodes and buffers instructions, maintaining a constant bandwidth despite irregularities in the instruction stream, The predecode unit accepts the sixteen bytes from the instruction cache or prefetch buffers and carries out the following tasks:
  - Determine the length of the instructions.
  - Decode all prefixes associated with instructions.
  - Mark various properties of instructions for the decoders (for example, "is branch")
-branch.”).
 - The predecode unit can write up to six instructions per cycle into the instruction queue. If a fetch contains more than six instructions, the predecoder continues to decode up to six instructions per cycle until all instructions in the fetch are written to
 the instruction queue. Subsequent fetches can only enter predecoding after the current fetch completes. For a fetch of seven instructions, the predecoder decodes the first six in one cycle, and then only one in the next cycle
 - The following instruction prefixes cause problems during length decoding. These prefixes can dynamically change the length of instructions and are known as length changing prefixes (LCPs):
