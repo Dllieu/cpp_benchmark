@@ -100,6 +100,10 @@ TODO: image p.68
 - Uses dedicated hardware for each type
 - 16-entry Return Stack Buffer (RSB). It enables the BPU to accurately predict RET instructions
 - Front end queuing of BPU lookups. The BPU makes branch predictions for 32 bytes at a time, twice the width of the fetch engine
+- The BPU makes the following types of predictions:
+ - Direct Calls and Jumps. Targets are read as a target array, without regarding the taken or not-taken prediction.
+ - Indirect Calls and Jumps. These may either be predicted as having a monotonic target or as having targets that vary in accordance with recent program behavior.
+ - Conditional branches. Predicts the branch target and whether or not the branch will be taken.
 - Performance Challenge
  - Enables speculative execution
  - Improves speculative execution efficiency by reducing the amount of code in the “non-architected path” to be fetched into the pipeline
