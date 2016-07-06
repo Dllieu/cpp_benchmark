@@ -18,6 +18,24 @@ TODO: Images (https://en.wikipedia.org/wiki/Cache_(computing))
 - Write-through: write is done synchronously both to the cache and to the backing store.
 - Write-back (also called write-behind): initially, writing is done only to the cache. The write to the backing store is postponed until the cache blocks containing the data are about to be modified/replaced by new content.
 
+- The Intel Core microarchitecture can execute up to one 128-bit load and up to one 128-bit store per cycle, each to different memory locations
+
+###Loads
+- Faulting or uncacheable loads are detected and wait until retirement, when they update the programmer visible state. x87 and floating point SIMD loads add 1 additional clock latency
+- load can
+ - issue before preceding stores when the load address and store address are known not to conflict
+ - be carried out speculatively, before preceding branches are resolved
+ - take cache misses out of order and in an overlapped manner
+ - issue before preceding stores, speculating that the store is not going to be to a conflicting address
+- load cannot
+ - speculatively take any sort of fault or trap
+ - speculatively access the uncacheable memory type
+
+###Stores
+- Executed in two phases
+ - Execution phase: Prepares the store buffers with address and data for store forwarding. Consumes dispatch ports, which are ports 3 and 4
+ - Completion phase: The store is retired to programmer-visible memory. It may compete for cache banks with executing loads. Store retirement is maintained as a background task by the memory order buffer, moving the data from the store buffers to the L1 cache
+
 ##Load prefetch
 ###L1
 Triggered by load operations when the following conditions are met:
