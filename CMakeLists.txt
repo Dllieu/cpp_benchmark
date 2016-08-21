@@ -14,7 +14,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
         # might add -fno-exceptions -flto=8 -fno-fat-lto-objects -mfpmath=sse -fomit-frame-pointer
         # -fomit-frame-pointer: get one more register available for the register allocator, and save 1-3 instructions on entry/exit to functions, not supported by all architecture, should not omit for measurement (e.g. vtune)
         set(COMPILER_FLAG_PERF "-fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations -march=native")
-else
+else()
         set(COMPILER_FLAG_PERF "-march=native")
 endif()
 
