@@ -1,6 +1,14 @@
 #perf
 TODO
 
+##strace
+
+trace system calls and signals
+
+```shell
+strace -fe trace=open,stat,read,write gnome-calculator
+```
+
 ##objdump
 
 Check generated code, specially if assuming auto-vectorization
