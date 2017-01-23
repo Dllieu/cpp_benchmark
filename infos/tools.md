@@ -6,7 +6,7 @@ TODO
 trace system calls and signals
 
 ```shell
-strace -fe trace=open,stat,read,write gnome-calculator
+strace -f -ff -e trace=open,stat,read,write gnome-calculator
 ```
 
 ##objdump
