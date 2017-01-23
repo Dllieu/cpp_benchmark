@@ -9,6 +9,14 @@ trace system calls and signals
 strace -f -ff -e trace=open,stat,read,write gnome-calculator
 ```
 
+##netstat
+
+Check network configuration (i.e. check multicast group)
+
+```shell
+netstat -g
+```
+
 ##objdump
 
 Check generated code, specially if assuming auto-vectorization
