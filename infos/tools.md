@@ -14,7 +14,7 @@ strace -f -ff -e trace=open,stat,read,write gnome-calculator
 Check network configuration (i.e. check multicast group)
 
 ```shell
-netstat -g
+netstat -gn
 ```
 
 ##objdump
