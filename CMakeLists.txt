@@ -7,6 +7,7 @@ set(BENCHMARK_ENABLE_TESTING OFF)
 add_subdirectory(external/benchmark)
 
 # FLAGS
+## might add debug flag -fdump-class-hierarchy for investigating vtables entries
 ## might add --gdb  -static-libgcc -static-libstdc++
 set(COMPILER_FLAG_STANDARD "-O3 -std=c++1z -DNDEBUG -D_REENTRANT -D_GNU_SOURCE -fPIC -m64")
 set(COMPILER_FLAG_WARNING "-Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0")
