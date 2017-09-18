@@ -1,6 +1,22 @@
 #perf
 TODO
 
+##strace
+
+trace system calls and signals
+
+```shell
+strace -f -ff -e trace=open,stat,read,write gnome-calculator
+```
+
+##netstat
+
+Check network configuration (i.e. check multicast group)
+
+```shell
+netstat -gn
+```
+
 ##objdump
 
 Check generated code, specially if assuming auto-vectorization
