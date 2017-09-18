@@ -23,7 +23,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAG_STANDARD} ${COMPILER_FLA
 
 aux_source_directory(src SRC_LIST)
 aux_source_directory(src/utils UTILS_LIST)
-add_executable(cpp_benchmark ${SRC_LIST} ${UTILS_LIST})
+add_executable(cpp_benchmark ${SRC_LIST} ${UTILS_LIST} ${CONTAINERS_LIST})
 add_dependencies(cpp_benchmark benchmark)
 
 find_package(Threads REQUIRED)

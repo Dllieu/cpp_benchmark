@@ -4,6 +4,9 @@
 #include <random>
 #include <algorithm>
 #include <array>
+#include <vector>
+#include <limits>
+#include <stdint.h>
 
 // TODO: test with _mm_stream_si128
 
