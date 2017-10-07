@@ -1,14 +1,10 @@
 cmake_minimum_required(VERSION 3.2)
-project(cpp_benchmark)
-
-option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." OFF)
-
-set(BENCHMARK_ENABLE_TESTING OFF)
-add_subdirectory(external/benchmark)
+# GOOD TO KNOW
+# - to check which flag gcc are used, do make with VERBOSE=1
 
 # FLAGS
 ## might add debug flag -fdump-class-hierarchy for investigating vtables entries
-## might add --gdb  -static-libgcc -static-libstdc++
+## might add --ggdb4  -static-libgcc -static-libstdc++
 set(COMPILER_FLAG_STANDARD "-O3 -std=c++1z -DNDEBUG -D_REENTRANT -D_GNU_SOURCE -fPIC -m64")
 set(COMPILER_FLAG_WARNING "-Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0")
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -22,12 +18,7 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAG_STANDARD} ${COMPILER_FLAG_WARNING} ${COMPILER_FLAG_PERF}")
 # !FLAGS
 
-aux_source_directory(src SRC_LIST)
-aux_source_directory(src/utils UTILS_LIST)
-add_executable(cpp_benchmark ${SRC_LIST} ${UTILS_LIST} ${CONTAINERS_LIST})
-add_dependencies(cpp_benchmark benchmark)
+#set(PATH_LIB_COMMON src/lib_common)
 
-find_package(Threads REQUIRED)
-target_link_libraries( cpp_benchmark
-                       LINK_PRIVATE Threads::Threads
-                       LINK_PRIVATE benchmark )
+add_subdirectory(src/lib_common)
+add_subdirectory(src/benchmarks)

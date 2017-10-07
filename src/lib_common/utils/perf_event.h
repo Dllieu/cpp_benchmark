@@ -16,6 +16,6 @@ namespace perf
         uint64_t    stop();
 
     private:
-        int     fd_;
+        int     m_Fd;
     };
 }

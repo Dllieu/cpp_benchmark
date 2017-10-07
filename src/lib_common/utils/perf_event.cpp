@@ -1,11 +1,11 @@
-#include "perf_event.h"
+#include <utils/perf_event.h>
+#include <utils/macros.h>
 
 #include <sys/syscall.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <cstring>
-
-#include "macros.h"
+#include <string>
 
 namespace
 {
@@ -19,7 +19,7 @@ namespace
     {
         perf_event_attr pe;
 
-        memset( &pe, 0, sizeof( perf_event_attr ) );
+        std::memset( &pe, 0, sizeof( perf_event_attr ) );
 
         pe.type = PERF_TYPE_HARDWARE;
         pe.size = sizeof( perf_event_attr );
@@ -36,35 +36,37 @@ namespace
 using namespace perf;
 
 PerfEvent::PerfEvent( perf_hw_id hardwareEvent )
-    : fd_( perf_event_open( hardwareEvent, 0, -1, -1, 0 ) )
+    : m_Fd( perf_event_open( hardwareEvent, 0, -1, -1, 0 ) )
 {
     // NOTHING
 }
 
 PerfEvent::~PerfEvent()
 {
-    if ( likely( fd_ >= 0 ) )
-        close( fd_ );
+    if ( likely( this->m_Fd >= 0 ) )
+        close( this->m_Fd );
 }
 
 bool    PerfEvent::start()
 {
-    if ( unlikely( fd_ < 0 ) )
+    if ( unlikely( this->m_Fd < 0 ) )
         return false;
 
-    ioctl( fd_, PERF_EVENT_IOC_RESET, 0 );
-    ioctl( fd_, PERF_EVENT_IOC_ENABLE, 0 );
+    ioctl( this->m_Fd, PERF_EVENT_IOC_RESET, 0 );
+    ioctl( this->m_Fd, PERF_EVENT_IOC_ENABLE, 0 );
+
     return true;
 }
 
 uint64_t    PerfEvent::stop()
 {
-    if ( unlikely( fd_ < 0 ) )
+    if ( unlikely( this->m_Fd < 0 ) )
         return 0;
 
-    ioctl( fd_, PERF_EVENT_IOC_DISABLE, 0 );
+    ioctl( this->m_Fd, PERF_EVENT_IOC_DISABLE, 0 );
+
     uint64_t result;
-    if ( unlikely( sizeof( result ) != read( fd_, &result, sizeof( result ) ) ) )
+    if ( unlikely( sizeof( result ) != read( this->m_Fd, &result, sizeof( result ) ) ) )
         return result;
 
     return result;

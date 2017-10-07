@@ -28,4 +28,4 @@ namespace cache
     CacheSize   byteToAppropriateCacheSize( std::size_t numberElements );
 }
 
-#include "cache_information.hxx"
+#include <utils/cache_information.hxx>
