@@ -18,7 +18,9 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAG_STANDARD} ${COMPILER_FLAG_WARNING} ${COMPILER_FLAG_PERF}")
 # !FLAGS
 
-#set(PATH_LIB_COMMON src/lib_common)
+set(PATH_GOOGLE_BENCHMARK "${CMAKE_CURRENT_SOURCE_DIR}/external/benchmark")
+set(PATH_GOOGLE_TEST "${CMAKE_CURRENT_SOURCE_DIR}/external/googletest")
+set(PATH_LIB_COMMON "${CMAKE_CURRENT_SOURCE_DIR}/src/lib_common")
 
 add_subdirectory(src/lib_common)
 add_subdirectory(src/benchmarks)

@@ -1,4 +1,3 @@
-cmake_minimum_required(VERSION 3.2)
 project(lib_common)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

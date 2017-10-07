@@ -12,13 +12,13 @@ matrix:
           packages: ['g++-7']
       env: COMPILER=g++-7
 
-    - os: linux
-      compiler: clang
-      addons:
-        apt:
-          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
-          packages: ['clang-3.6']
-      env: COMPILER=clang++-3.6
+#    - os: linux
+#      compiler: clang
+#      addons:
+#        apt:
+#          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.6']
+#          packages: ['clang-3.6']
+#      env: COMPILER=clang++-3.6
 
 env:
   global:
@@ -52,5 +52,4 @@ script:
       cmake -DCMAKE_BUILD_TYPE=Release ..;
       make;
     fi
-  - ./cpp_benchmark
-  
+  - ./src/benchmarks/cpp_benchmark
