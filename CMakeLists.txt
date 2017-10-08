@@ -23,4 +23,5 @@ set(PATH_GOOGLE_TEST "${CMAKE_CURRENT_SOURCE_DIR}/external/googletest")
 set(PATH_LIB_COMMON "${CMAKE_CURRENT_SOURCE_DIR}/src/lib_common")
 
 add_subdirectory(src/lib_common)
+add_subdirectory(src/tests)
 add_subdirectory(src/benchmarks)

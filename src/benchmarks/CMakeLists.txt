@@ -11,10 +11,11 @@ if (NOT TARGET lib_common)
 endif() 
 
 include_directories(${PATH_LIB_COMMON})
+include_directories("${PATH_GOOGLE_BENCHMARK}/include")
+
 aux_source_directory(benchmarks SRC_BENCHMARKS)
 
 add_executable(cpp_benchmark ${SRC_BENCHMARKS})
-
 find_package(Threads REQUIRED)
 target_link_libraries(cpp_benchmark
                       LINK_PRIVATE Threads::Threads
