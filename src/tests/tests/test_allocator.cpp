@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <allocators/memory_pool_resource.h>
 
 namespace
 {

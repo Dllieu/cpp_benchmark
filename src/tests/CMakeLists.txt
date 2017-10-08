@@ -1,4 +1,4 @@
-project(cpp_test)
+project(experimental_test)
 
 if (NOT TARGET googletest)
     add_subdirectory(${PATH_GOOGLE_TEST} "${CMAKE_CURRENT_BINARY_DIR}/googletest")
@@ -14,9 +14,9 @@ include_directories("${PATH_GOOGLE_TEST}/googlemock/include")
 
 aux_source_directory(tests SRC_TESTS)
 
-add_executable(cpp_test ${SRC_TESTS})
+add_executable(experimental_test ${SRC_TESTS})
 find_package(Threads REQUIRED)
-target_link_libraries(cpp_test
+target_link_libraries(experimental_test
                       LINK_PRIVATE Threads::Threads
                       LINK_PRIVATE gtest
                       LINK_PRIVATE gmock

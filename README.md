@@ -1,6 +1,4 @@
-## CPP-Benchmark
-
-Playing with benchmark on various topics
+## Experimental
 
 |     |  master | coverity_scan | static_analysis | codacy |
 |:---:|:-------:|:-------------:|:---------------:|:------:|

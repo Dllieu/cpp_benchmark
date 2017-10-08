@@ -1,4 +1,4 @@
-project(cpp_benchmark)
+project(experimental_benchmark)
 
 if (NOT TARGET benchmark)
     option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." OFF)
@@ -15,9 +15,9 @@ include_directories("${PATH_GOOGLE_BENCHMARK}/include")
 
 aux_source_directory(benchmarks SRC_BENCHMARKS)
 
-add_executable(cpp_benchmark ${SRC_BENCHMARKS})
+add_executable(experimental_benchmark ${SRC_BENCHMARKS})
 find_package(Threads REQUIRED)
-target_link_libraries(cpp_benchmark
+target_link_libraries(experimental_benchmark
                       LINK_PRIVATE Threads::Threads
                       LINK_PRIVATE benchmark
                       LINK_PRIVATE lib_common)
