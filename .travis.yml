@@ -28,7 +28,7 @@ env:
 addons:
   coverity_scan:
     project:
-      name: Dllieu/cpp_benchmark
+      name: Dllieu/experimental
     notification_email: molina.stephan@gmail.com
     build_command_prepend: "../.configure_coverity.sh"
     build_command: "make"
@@ -52,4 +52,5 @@ script:
       cmake -DCMAKE_BUILD_TYPE=Release ..;
       make;
     fi
-  - ./src/benchmarks/cpp_benchmark
+  - ./bin/experimental_test
+  - ./bin/experimental_benchmark

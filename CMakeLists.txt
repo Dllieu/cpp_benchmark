@@ -22,6 +22,10 @@ set(PATH_GOOGLE_BENCHMARK "${CMAKE_CURRENT_SOURCE_DIR}/external/benchmark")
 set(PATH_GOOGLE_TEST "${CMAKE_CURRENT_SOURCE_DIR}/external/googletest")
 set(PATH_LIB_COMMON "${CMAKE_CURRENT_SOURCE_DIR}/src/lib_common")
 
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 add_subdirectory(src/lib_common)
 add_subdirectory(src/tests)
 add_subdirectory(src/benchmarks)
