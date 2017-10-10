@@ -8,6 +8,8 @@
 #include <list>
 #include <queue>
 #include <unordered_map>
+#include <string>
+#include <deque>
 
 namespace
 {
@@ -23,6 +25,9 @@ namespace
 
         void IgnoreChecks()
         {
+            EXPECT_EQ(true, this->m_ExpectedAllocatedBytes.empty());
+            EXPECT_EQ(true, this->m_ExpectedDeallocatedBytes.empty());
+
             this->m_IgnoreCheck = true;
         }
 
@@ -116,10 +121,10 @@ namespace
     }
 }
 
-TEST(AllocatorTest, AllocatorVectorCpp11)
+TEST(AllocationPatternStlGccTest, Vector)
 {
     // struct : allocator { ptr* start ; ptr* finish ; ptr* endOfStorage }
-    static_assert(24 == sizeof(std::vector<char>)); // because default allocator is stateless
+    static_assert(24 == sizeof(std::vector<char>)); // empty base optimization (stateless allocator)
 
     MemoryChecker memoryChecker;
     std::vector<char, StatsAllocator<char>> v(memoryChecker);
@@ -149,6 +154,69 @@ TEST(AllocatorTest, AllocatorVectorCpp11)
     memoryChecker.IgnoreChecks();
 }
 
+TEST(AllocationPatternStlGccTest, String)
+{
+    // struct { alloc_hider : allocator { ptr* p; } ; std::size_t length ; union { std::size_t capacity ; char[15 + 1] localBuffer } }
+    std::string s;
+    static_assert(32 == sizeof(s)); // empty base optimization (stateless allocator)
+
+    MemoryChecker memoryChecker;
+    std::basic_string<char, std::char_traits<char>, StatsAllocator<char>> bs(memoryChecker);
+    static_assert(40 == sizeof(bs));
+
+    // Small string optimization
+    // - GCC support string of size 15 (union, p point to localBuffer)
+    // - if p == &localBuffer : capacity = 15
+    std::size_t i = 0;
+    for (; i < 16; ++i)
+    {
+        bs = std::string(i, '@');
+    }
+
+    memoryChecker.ExpectAllocate(2 * bs.capacity() + 1);
+    bs = std::string(i, '@');
+
+    memoryChecker.IgnoreChecks();
+}
+
+TEST(AllocationPatternStlGccTest, Deque)
+{
+    // struct : alloc { elt** _M_map ; std::size_t mapSize; iterator start ; iterator finish } (i.e. _M_map[mapSize]* store mapSize ptr to chunk of memory (they call it node))
+    //// with iterator { elt* current ; elt* first ; elt* last ; map_elt* node ; } (i.e. last not used to store an element but to store the address of the next chunk of memory (they call it node))
+    std::deque<char> deque;
+    static_assert(80 == sizeof(deque));
+
+    MemoryChecker memoryChecker;
+
+    using value_type = std::uint64_t;
+
+    // Default constructor always start by allocation _M_map with mapSize == _S_initial_map_size (8) (_M_allocate_map)
+    memoryChecker.ExpectAllocate(8 * sizeof(void*));
+
+    // Number of element per chunk, if value_type too big, we will only able to store one element per chunk
+    std::size_t dequeBufferSize = std::__deque_buf_size(sizeof(value_type));
+
+    // Then it allocate the nodes (_M_create_nodes), by default it create only one node
+    memoryChecker.ExpectAllocate(dequeBufferSize * sizeof(value_type)); // i.e. 512
+
+    std::deque<value_type, StatsAllocator<value_type>> d(memoryChecker);
+
+    // First element can always be inserted in the pre-allocated chunk
+    std::size_t i = 0;
+    d.push_back(i++);
+
+    // If dequeBufferSize > 1, _M_last is set to dequeBufferSize - 1
+    for (; i < dequeBufferSize - 1; ++i)
+    {
+        d.push_back(i);
+    }
+
+    memoryChecker.ExpectAllocate(dequeBufferSize * sizeof(value_type));
+    d.push_back(i);
+
+    memoryChecker.IgnoreChecks();
+}
+
 namespace
 {
     // struct { node* next ; node* prev ; T };
@@ -156,10 +224,10 @@ namespace
     static constexpr const std::size_t ListNodeSize = sizeof(std::_List_node<T>);
 }
 
-TEST(AllocatorTest, AllocatorListCpp11)
+TEST(AllocationPatternStlGccTest, List)
 {
     // struct : allocator { __gnu_cxx::__aligned_membuf<std::size_t> size; node* next ; node* prev ; }
-    static_assert(24 == sizeof(std::list<char>)); // because default allocator is stateless
+    static_assert(24 == sizeof(std::list<char>)); // empty base optimization (stateless allocator)
 
     constexpr const std::size_t nodeSize = ListNodeSize<char>;
     static_assert(24u == nodeSize);
@@ -184,16 +252,9 @@ namespace
     //// struct { node* next ; std::size_t hashCode ; buffer[sizeof(std::pair<const Key, Value)] };
     template <typename Key, typename Value, typename Hash>
     static constexpr const std::size_t UnorderedMapNodeSize = sizeof(std::__detail::_Hash_node<std::pair<const Key, Value>, false == std::__is_fast_hash<Hash>::value || false == std::__detail::__is_noexcept_hash<Key, Hash>::value>);
-
-    // std::__details::_Prime_rehash_policy
-    template <typename RehashPolicy>
-    std::size_t GetBucketRequired(std::size_t iN, RehashPolicy&& iRehashPolicy)
-    {
-        return iRehashPolicy._M_next_bkt(iN);
-    }
 }
 
-TEST(AllocatorTest, AllocatorUnorderedMapCpp11)
+TEST(AllocationPatternStlGccTest, UnorderedMap)
 {
     constexpr const std::size_t nodeSize = UnorderedMapNodeSize<char, char, std::hash<char>>;
     static_assert(16u == nodeSize);

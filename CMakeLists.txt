@@ -5,7 +5,8 @@ cmake_minimum_required(VERSION 3.2)
 # FLAGS
 ## might add debug flag -fdump-class-hierarchy for investigating vtables entries
 ## might add --ggdb4  -static-libgcc -static-libstdc++
-set(COMPILER_FLAG_STANDARD "-O3 -std=c++1z -DNDEBUG -D_REENTRANT -D_GNU_SOURCE -fPIC -m64")
+# -D_GNU_SOURCE
+set(COMPILER_FLAG_STANDARD "-O3 -std=c++1z -DNDEBUG -D_REENTRANT -fPIC -m64")
 set(COMPILER_FLAG_WARNING "-Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0")
 if (CMAKE_COMPILER_IS_GNUCXX)
         # might add -fno-exceptions -flto=8 -fno-fat-lto-objects -mfpmath=sse -fomit-frame-pointer
@@ -20,12 +21,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAG_STANDARD} ${COMPILER_FLA
 
 set(PATH_GOOGLE_BENCHMARK "${CMAKE_CURRENT_SOURCE_DIR}/external/benchmark")
 set(PATH_GOOGLE_TEST "${CMAKE_CURRENT_SOURCE_DIR}/external/googletest")
-set(PATH_LIB_COMMON "${CMAKE_CURRENT_SOURCE_DIR}/src/lib_common")
+set(PATH_LIB_EXPERIMENTAL "${CMAKE_CURRENT_SOURCE_DIR}/experimental/experimental")
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-add_subdirectory(src/lib_common)
-add_subdirectory(src/tests)
-add_subdirectory(src/benchmarks)
+add_subdirectory(experimental/experimental)
+add_subdirectory(experimental/tests)
+add_subdirectory(experimental/benchmarks)

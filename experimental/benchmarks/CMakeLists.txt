@@ -1,4 +1,4 @@
-project(experimental_benchmark)
+project(benchmark_experimental)
 
 if (NOT TARGET benchmark)
     option(BENCHMARK_ENABLE_TESTING "Enable testing of the benchmark library." OFF)
@@ -6,18 +6,18 @@ if (NOT TARGET benchmark)
     add_subdirectory(${PATH_GOOGLE_BENCHMARK} "${CMAKE_CURRENT_BINARY_DIR}/benchmark")
 endif()
 
-if (NOT TARGET lib_common)
-    add_subdirectory(${PATH_LIB_COMMON} "${CMAKE_CURRENT_BINARY_DIR}/lib_common")
+if (NOT TARGET lib_experimental)
+    add_subdirectory(${PATH_LIB_EXPERIMENTAL} "${CMAKE_CURRENT_BINARY_DIR}/experimental")
 endif() 
 
-include_directories(${PATH_LIB_COMMON})
+include_directories(${PATH_LIB_EXPERIMENTAL})
 include_directories("${PATH_GOOGLE_BENCHMARK}/include")
 
 aux_source_directory(benchmarks SRC_BENCHMARKS)
 
-add_executable(experimental_benchmark ${SRC_BENCHMARKS})
+add_executable(benchmark_experimental ${SRC_BENCHMARKS})
 find_package(Threads REQUIRED)
-target_link_libraries(experimental_benchmark
+target_link_libraries(benchmark_experimental
                       LINK_PRIVATE Threads::Threads
                       LINK_PRIVATE benchmark
-                      LINK_PRIVATE lib_common)
+                      LINK_PRIVATE lib_experimental)
