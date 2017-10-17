@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include <allocators/memory_pool_resource.h>
+#include <utils/stats_allocator.h>
+#include <utils/memory_checker.h>
 #include <vector>
 #include <cstddef>
 #include <iostream>
@@ -11,115 +12,7 @@
 #include <string>
 #include <deque>
 
-namespace
-{
-    class MemoryChecker
-    {
-    public:
-        MemoryChecker() noexcept
-            : m_ExpectedAllocatedBytes(),
-              m_ExpectedDeallocatedBytes(),
-              m_IgnoreCheck(false)
-        {
-        }
-
-        void IgnoreChecks()
-        {
-            EXPECT_EQ(true, this->m_ExpectedAllocatedBytes.empty());
-            EXPECT_EQ(true, this->m_ExpectedDeallocatedBytes.empty());
-
-            this->m_IgnoreCheck = true;
-        }
-
-        void ExpectAllocate(std::size_t iExpectedAllocatedBytes)
-        {
-            this->m_ExpectedAllocatedBytes.push(iExpectedAllocatedBytes);
-        }
-
-        void ExpectDeallocate(std::size_t iExpectedDeallocatedBytes)
-        {
-            this->m_ExpectedDeallocatedBytes.push(iExpectedDeallocatedBytes);
-        }
-
-        void CheckAllocate(std::size_t iAllocatedBytes)
-        {
-            if (true == this->m_IgnoreCheck)
-            {
-                return;
-            }
-
-            EXPECT_EQ(false, this->m_ExpectedAllocatedBytes.empty());
-            EXPECT_EQ(iAllocatedBytes, this->m_ExpectedAllocatedBytes.front());
-
-            this->m_ExpectedAllocatedBytes.pop();
-        }
-
-        void CheckDeallocate(std::size_t iDeallocatedBytes)
-        {
-            if (true == this->m_IgnoreCheck)
-            {
-                return;
-            }
-
-            EXPECT_EQ(false, this->m_ExpectedDeallocatedBytes.empty());
-            EXPECT_EQ(iDeallocatedBytes, this->m_ExpectedDeallocatedBytes.front());
-
-            this->m_ExpectedDeallocatedBytes.pop();
-        }
-
-    private:
-        std::queue<std::size_t> m_ExpectedAllocatedBytes;
-        std::queue<std::size_t> m_ExpectedDeallocatedBytes;
-        bool m_IgnoreCheck;
-    };
-
-    template <typename T>
-    class StatsAllocator
-    {
-    public:
-        using value_type = T;
-
-        StatsAllocator(MemoryChecker& iMemoryStats) noexcept
-            : m_MemoryChecker(iMemoryStats)
-        {
-        }
-
-        template <typename U>
-        explicit StatsAllocator(const StatsAllocator<U>& iAllocator)
-            : m_MemoryChecker(iAllocator.m_MemoryChecker)
-        {
-            // Must be careful in case of stateful allocator used in node based container as this constructor might be called for each node allocation
-        }
-
-        value_type* allocate(std::size_t iNumber)
-        {
-            this->m_MemoryChecker.CheckAllocate(iNumber * sizeof(value_type));
-
-            return static_cast<value_type*>(::operator new (iNumber * sizeof(value_type)));
-        }
-
-        void deallocate(value_type* iPointer, std::size_t iNumber) noexcept
-        {
-            this->m_MemoryChecker.CheckDeallocate(iNumber * sizeof(value_type));
-
-            ::operator delete(iPointer);
-        }
-
-        MemoryChecker& m_MemoryChecker;
-    };
-
-    template <typename T, typename U>
-    bool operator==(const StatsAllocator<T>&, const StatsAllocator<U>&) noexcept
-    {
-        return true;
-    }
-
-    template <typename T, typename U>
-    bool operator!=(StatsAllocator<T> const& x, StatsAllocator<U> const& y) noexcept
-    {
-        return false == (x == y);
-    }
-}
+using namespace tests;
 
 TEST(AllocationPatternStlGccTest, Vector)
 {
