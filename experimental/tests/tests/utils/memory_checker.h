@@ -5,6 +5,7 @@
 
 namespace tests
 {
+    // TODO: Would be great to know if Objects of containers are being moved / copied too (e.g. resize vector, ExpectMovedElements(oldSize))
     class MemoryChecker
     {
     public:

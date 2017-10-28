@@ -1,7 +1,7 @@
-#perf
+# perf
 TODO
 
-##strace
+## strace
 
 trace system calls and signals
 
@@ -9,7 +9,7 @@ trace system calls and signals
 strace -f -ff -e trace=open,stat,read,write gnome-calculator
 ```
 
-##netstat
+## netstat
 
 Check network configuration (i.e. check multicast group)
 
@@ -17,7 +17,7 @@ Check network configuration (i.e. check multicast group)
 netstat -gn
 ```
 
-##objdump
+## objdump
 
 Check generated code, specially if assuming auto-vectorization
 
@@ -25,34 +25,34 @@ Check generated code, specially if assuming auto-vectorization
 objdump -M intel -D {object_file.o}
 ```
 
-##ulimit
+## ulimit
 limit system-wide resource use (e.g. avoid forkbomb / limit ram comsumption / ...)
 
 ```shell
 ulimit -a
 ```
 
-##sysctl
+## sysctl
 configure kernel parameters at runtime
 
 ```shell
-#display all variables
+# display all variables
 sysctl -a
 ```
 
-##VTune Amplifier XE 2016+
-###Install GUI (windows)
+## VTune Amplifier XE 2016+
+### Install GUI (windows)
 - Install VTune Amplifier XE GUI on Windows (Analyzer)
  - You need admin right
  - Retrieve the package (VTune_Amplifier_XE_2016_update3_setup.exe)
  - Install all the certificates (should be automatic if firewall is open)
  - Run the setup
 
-###Server (linux)
+### Server (linux)
 - Collector
  - Install VTune + drivers
 
-###Basic Test
+### Basic Test
 - After Installation, run VTune Amplifier GUI
 - Create new project
 - In Analysis Target, select **remote Linux (SSH)**
@@ -60,7 +60,7 @@ sysctl -a
 - In **Advanced**, configure the VTune Amplifier installation directory
 - Start the analysis
 
-###Documentation
+### Documentation
 - Tuning Guides and Performance Analysis Papers
  - [Guides & Tutorials with Samples](https://software.intel.com/en-us/intel-vtune-amplifier-xe-support/training)
  - [Top-down analysis method](https://software.intel.com/en-us/top-down-microarchitecture-analysis-method-win)

@@ -49,6 +49,7 @@ before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   
+  - apt-cache policy libc6
   - export CXX=$COMPILER
   - export CC=gcc-7
 
@@ -61,6 +62,7 @@ script:
       make -j8 VERBOSE=1;
     fi
 
+  - ldd --version
   - ./bin/test_experimental
   - ./bin/benchmark_experimental
   

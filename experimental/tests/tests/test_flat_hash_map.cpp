@@ -35,18 +35,72 @@ TEST(FlatHashMapTest, AllocationPattern)
     static_assert(40 == sizeof(fhm));
     EXPECT_EQ(0.5, fhm.max_load_factor());
 
+    // 1 - Reserve
+
     std::size_t elementToReserve = 10;
-    std::size_t elementToReserveNormalized = static_cast<size_t>(std::ceil(elementToReserve / std::min(0.5, static_cast<double>(fhm.max_load_factor()))));
-    EXPECT_EQ(20u, elementToReserveNormalized);
+    std::size_t numberOfBuckets = static_cast<size_t>(std::ceil(elementToReserve / std::min(0.5, static_cast<double>(fhm.max_load_factor()))));
+    EXPECT_EQ(20u, numberOfBuckets);
 
-    primeNumberHashPolicy.next_size_over(elementToReserveNormalized);
-    EXPECT_EQ(23u, elementToReserveNormalized);
+    // 2 - Then call rehash(numberOfBuckets)
 
-    std::int8_t maximumLookup = std::max(static_cast<std::int8_t>(4), ska::detailv3::log2(elementToReserveNormalized));
+    std::int8_t newPrimeIndex = primeNumberHashPolicy.next_size_over(numberOfBuckets);
+    EXPECT_EQ(8, newPrimeIndex); // 8 -> &mod23 : next time we request the index (i.e. mod_table[newPrimeIndex](hash(key)))
+    EXPECT_EQ(23u, numberOfBuckets);
+
+    // Not sure what the purpose of maximumLookup
+    std::int8_t maximumLookup = std::max(static_cast<std::int8_t>(4), ska::detailv3::log2(numberOfBuckets));
     EXPECT_EQ(4, maximumLookup);
 
-    memoryChecker.ExpectAllocate((maximumLookup + elementToReserveNormalized) * sizeof(BucketEntry));
-    fhm.reserve(10);
+    std::size_t allocatedBucketNumber = maximumLookup + numberOfBuckets;
+    memoryChecker.ExpectAllocate(allocatedBucketNumber * sizeof(BucketEntry));
+    // Init all the BucketEntry.distance_from_desired to -1, except the last one that is reserved and init to 0 (so real BucketEntry available is allocatedBucketNumber - 1, but BufferEntry + maximumLookup)
+    // BucketEntry not used : -1 == distance_from_desired
+    fhm.reserve(10); // Around L647
+
+    std::size_t previousAllocatedBucketNumber = allocatedBucketNumber;
+    EXPECT_EQ(numberOfBuckets, fhm.bucket_count());
+
+    std::size_t i = 0;
+    for (; i < 11; ++i)
+    {
+        // EntryPointer + index
+        // search if key exist -> for (int i = 0; i <= entry->distance_from_desired; ++i, ++entry) // distance_from_desired init with -1, entry cannot dangle as the last entry finish have distance_from_desired 0
+        // if not -> if entry is empty (distance_from_desired = -1) : set the data within entry and return
+        fhm.emplace(i, i);
+    }
+
+    // if key do  not exist -> if (numberOfElement + 1) / numberOfBuckets > max_load_factor -> grow()
+    // (e.g. 12 / 23 > 0.5 -> grow())
+    // rehash with elementToReserve = 2 * bucket_count();
+    numberOfBuckets = 2 * numberOfBuckets;
+    EXPECT_EQ(46u, numberOfBuckets);
+
+    newPrimeIndex = primeNumberHashPolicy.next_size_over(numberOfBuckets);
+    EXPECT_EQ(47u, numberOfBuckets);
+
+    maximumLookup = std::max(static_cast<std::int8_t>(4), ska::detailv3::log2(numberOfBuckets));
+    EXPECT_EQ(5, maximumLookup);
+
+    allocatedBucketNumber = maximumLookup + numberOfBuckets;
+    memoryChecker.ExpectAllocate(allocatedBucketNumber * sizeof(BucketEntry));
+    memoryChecker.ExpectDeallocate(previousAllocatedBucketNumber * sizeof(BucketEntry));
+    fhm.emplace(i, i);
 
     memoryChecker.IgnoreChecks();
+}
+
+TEST(FlatHashMapTest, Retrieval)
+{
+    ska::flat_hash_map<std::uint64_t, std::uint64_t> f;
+
+    std::size_t maximum = 1000000;
+    for (std::uint64_t i = 0; i < maximum; ++i)
+    {
+        f.emplace(i, i);
+    }
+
+    for (std::uint64_t i = 0; i < maximum; ++i)
+    {
+        EXPECT_EQ(i, f[i]);
+    }
 }
