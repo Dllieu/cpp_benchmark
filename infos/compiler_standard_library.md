@@ -5,24 +5,26 @@
 ## Compilers
 
  - Versions
-  - GCC : https://gcc.gnu.org/
-  - CLang : http://releases.llvm.org/download.html
+  - [GCC](https://gcc.gnu.org/)
+  - [CLang](http://releases.llvm.org/download.html)
  - C++ Support Status
-  - GCC : https://gcc.gnu.org/projects/cxx-status.html
-  - CLang : https://clang.llvm.org/cxx_status.html
+  - [GCC](https://gcc.gnu.org/projects/cxx-status.html)
+  - [CLang](https://clang.llvm.org/cxx_status.html)
 
 
 ## libstdc++ (GNU)
 
  - Get source from SVN GCC repo + build it
+ - To know which library of libstdc++ you are using : You could use g++ --version in combination with the [GCC ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/abi.html) docs to find out.
 
 ## libc++ (LLVM)
 
- - Versions : https://libcxx.llvm.org (Build from the head)
+ - [Versions](https://libcxx.llvm.org) (Build from the head)
+ - To be aware : if you want to link to any other libraries written in C++ they will almost certainly have been built with libstdc++ so you'll need to link with that too to use them
 
 ## GLIBC
 
- - Version : https://www.gnu.org/software/libc/
+ - [Versions](https://www.gnu.org/software/libc/)
  - Version installed
 
 ```bash
