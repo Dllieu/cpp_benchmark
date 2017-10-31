@@ -101,7 +101,10 @@ namespace
     static_assert(8u == offsetof(Alignment8, prev));
 
     // Generate warning (Non-standard-layout type) but is not undefined behaviour in C++17, and gcc handle it correctly
-    //static_assert(16u == offsetof(Alignment8Derived, c));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+    static_assert(16u == offsetof(Alignment8Derived, c));
+#pragma GCC diagnostic pop
 }
 
 TEST(AlignmentTest, OffsetOf)
