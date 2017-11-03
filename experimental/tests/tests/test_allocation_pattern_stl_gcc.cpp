@@ -46,20 +46,18 @@ TEST(AllocationPatternStlGccTest, Vector)
     statisticsChecker.IgnoreChecks();
 }
 
+#ifndef TRAVIS_BUILD
+
 TEST(AllocationPatternStlGccTest, String)
 {
     // struct { alloc_hider : allocator { ptr* p; } ; std::size_t length ; union { std::size_t capacity ; char[15 + 1] localBuffer } }
     std::string s;
-#ifndef TRAVIS_BUILD
     static_assert(32 == sizeof(s)); // empty base optimization (stateless allocator)
-#endif
 
     StatisticsChecker statisticsChecker;
     std::basic_string<char, std::char_traits<char>, AllocatorStatisticsChecker<char>> bs(statisticsChecker);
 
-#ifndef TRAVIS_BUILD
     static_assert(40 == sizeof(bs));
-#endif
 
     // Small string optimization
     // - GCC support string of size 15 (union, p point to localBuffer)
@@ -75,6 +73,8 @@ TEST(AllocationPatternStlGccTest, String)
 
     statisticsChecker.IgnoreChecks();
 }
+
+#endif
 
 TEST(AllocationPatternStlGccTest, Deque)
 {
@@ -114,6 +114,8 @@ TEST(AllocationPatternStlGccTest, Deque)
     statisticsChecker.IgnoreChecks();
 }
 
+#ifndef TRAVIS_BUILD
+
 namespace
 {
     // struct { node* next ; node* prev ; T };
@@ -124,15 +126,12 @@ namespace
 TEST(AllocationPatternStlGccTest, List)
 {
     // struct : allocator { __gnu_cxx::__aligned_membuf<std::size_t> size; node* next ; node* prev ; }
-#ifndef TRAVIS_BUILD
     static_assert(24 == sizeof(std::list<char>)); // empty base optimization (stateless allocator)
-#endif
 
     constexpr const std::size_t nodeSize = ListNodeSize<char>;
 
-#ifndef TRAVIS_BUILD
-        static_assert(24u == nodeSize);
-#endif
+    static_assert(24u == nodeSize);
+
 
     StatisticsChecker statisticsChecker;
     std::list<char, AllocatorStatisticsChecker<char>> v(statisticsChecker);
@@ -145,6 +144,8 @@ TEST(AllocationPatternStlGccTest, List)
 
     statisticsChecker.IgnoreChecks();
 }
+
+#endif
 
 namespace
 {
