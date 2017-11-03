@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-#include <utils/stats_allocator.h>
-#include <utils/memory_checker.h>
+#include <utils/allocator_statistics_checker.h>
 #include <flat_hash_map.hpp>
 #include <cstddef>
 #include <iostream>
@@ -10,8 +9,11 @@ using namespace tests;
 namespace
 {
     // Carefull as that map store std::pair<K, V> and not std::pair<const K, V> (not sure why yet)
+//    template <typename K, typename V>
+//    using FlatHashMapWithStatsAllocator = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, StatsAllocator<std::pair<K, V>>>;
+
     template <typename K, typename V>
-    using FlatHashMapWithStatsAllocator = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, StatsAllocator<std::pair<K, V>>>;
+    using FlatHashMapWithAllocatorStatistics = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, AllocatorStatisticsChecker<std::pair<K, V>>>;
 }
 
 TEST(FlatHashMapTest, AllocationPattern)
@@ -23,15 +25,15 @@ TEST(FlatHashMapTest, AllocationPattern)
     using BucketEntry = ska::detailv3::sherwood_v3_entry<std::pair<std::uint64_t, std::uint64_t>>;
     static_assert(24 == sizeof(BucketEntry));
 
-    MemoryChecker memoryChecker;
-
     // Default one : Return index for the hash, or return next size which return the closest prime number in an hardcoded list (superior or =)
     ska::prime_number_hash_policy primeNumberHashPolicy;
 
     // Default one : Return index for the hash, or return next size which return the closest power of 2 in an hardcoded list (superior or =)
     //ska::power_of_two_hash_policy powerOf2HashPolicy;
 
-    FlatHashMapWithStatsAllocator<std::uint64_t, std::uint64_t> fhm(memoryChecker);
+    StatisticsChecker statisticsChecker;
+    FlatHashMapWithAllocatorStatistics<std::uint64_t, std::uint64_t> fhm(statisticsChecker);
+
     static_assert(40 == sizeof(fhm));
     EXPECT_EQ(0.5, fhm.max_load_factor());
 
@@ -52,7 +54,7 @@ TEST(FlatHashMapTest, AllocationPattern)
     EXPECT_EQ(4, maximumLookup);
 
     std::size_t allocatedBucketNumber = maximumLookup + numberOfBuckets;
-    memoryChecker.ExpectAllocate(allocatedBucketNumber * sizeof(BucketEntry));
+    statisticsChecker.ExpectAllocate(allocatedBucketNumber * sizeof(BucketEntry));
     // Init all the BucketEntry.distance_from_desired to -1, except the last one that is reserved and init to 0 (so real BucketEntry available is allocatedBucketNumber - 1, but BufferEntry + maximumLookup)
     // BucketEntry not used : -1 == distance_from_desired
     fhm.reserve(10); // Around L647
@@ -82,11 +84,11 @@ TEST(FlatHashMapTest, AllocationPattern)
     EXPECT_EQ(5, maximumLookup);
 
     allocatedBucketNumber = maximumLookup + numberOfBuckets;
-    memoryChecker.ExpectAllocate(allocatedBucketNumber * sizeof(BucketEntry));
-    memoryChecker.ExpectDeallocate(previousAllocatedBucketNumber * sizeof(BucketEntry));
+    statisticsChecker.ExpectAllocate(allocatedBucketNumber * sizeof(BucketEntry));
+    statisticsChecker.ExpectDeallocate(previousAllocatedBucketNumber * sizeof(BucketEntry));
     fhm.emplace(i, i);
 
-    memoryChecker.IgnoreChecks();
+    statisticsChecker.IgnoreChecks();
 }
 
 TEST(FlatHashMapTest, Retrieval)

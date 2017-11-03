@@ -4,29 +4,29 @@
 
 namespace experimental
 {
-    template <typename T, std::size_t BlockSize>
-    AllocatorMemoryPoolFixedSize<T, BlockSize>::AllocatorMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool) noexcept
+    template <typename T, std::size_t BlockSize, typename DefaultAllocator>
+    AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::AllocatorMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool) noexcept
         : m_MemoryPool(iMemoryPool)
     {
         static_assert(sizeof(T) <= BlockSize, "T is too large for this memory pool");
     }
 
-    template <typename T, std::size_t BlockSize>
+    template <typename T, std::size_t BlockSize, typename DefaultAllocator>
     template <typename U>
-    AllocatorMemoryPoolFixedSize<T, BlockSize>::AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize>& iAllocatorMemoryPoolFixedSize) noexcept
+    AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize, typename DefaultAllocator::template rebind<U>::other>& iAllocatorMemoryPoolFixedSize) noexcept
         : m_MemoryPool(iAllocatorMemoryPoolFixedSize.m_MemoryPool)
     {
         static_assert(sizeof(U) <= BlockSize, "U is too large for this memory pool");
     }
 
-    template <typename T, std::size_t BlockSize>
-    void AllocatorMemoryPoolFixedSize<T, BlockSize>::ResetMemoryPool(std::size_t iNumberOfBlocks)
+    template <typename T, std::size_t BlockSize, typename DefaultAllocator>
+    void AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::ResetMemoryPool(std::size_t iNumberOfBlocks)
     {
         this->m_MemoryPool.ResetMemoryPool(iNumberOfBlocks);
     }
 
-    template <typename T, std::size_t BlockSize>
-    auto AllocatorMemoryPoolFixedSize<T, BlockSize>::allocate(std::size_t iNumberOfElements) -> value_type*
+    template <typename T, std::size_t BlockSize, typename DefaultAllocator>
+    auto AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::allocate(std::size_t iNumberOfElements) -> value_type*
     {
         std::size_t sizeToAllocate = iNumberOfElements * sizeof(T);
 
@@ -37,28 +37,28 @@ namespace experimental
             return pResult;
         }
 
-        return static_cast<value_type*>(::operator new (sizeToAllocate));
+        return DefaultAllocator::allocate(iNumberOfElements);
     }
 
-    template <typename T, std::size_t BlockSize>
-    void AllocatorMemoryPoolFixedSize<T, BlockSize>::deallocate(value_type* iPointer, std::size_t iNumberOfElements) noexcept
+    template <typename T, std::size_t BlockSize, typename DefaultAllocator>
+    void AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::deallocate(value_type* iPointer, std::size_t iNumberOfElements) noexcept
     {
         if (likely(true == this->m_MemoryPool.ReturnBlock(iPointer)))
         {
             return;
         }
 
-        ::operator delete (iPointer);
+        DefaultAllocator::deallocate(iPointer, iNumberOfElements);
     }
 
-    template <typename T, typename U, std::size_t BlockSize>
-    bool operator==(const AllocatorMemoryPoolFixedSize<T, BlockSize>&, const AllocatorMemoryPoolFixedSize<U, BlockSize>&) noexcept
+    template <typename T, typename U, std::size_t BlockSize, typename DefaultAllocator>
+    bool operator==(const AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>&, const AllocatorMemoryPoolFixedSize<U, BlockSize, DefaultAllocator>&) noexcept
     {
         return true;
     }
 
-    template <typename T, typename U, std::size_t BlockSize>
-    bool operator!=(const AllocatorMemoryPoolFixedSize<T, BlockSize>& iAlloc1, const AllocatorMemoryPoolFixedSize<U, BlockSize>& iAlloc2) noexcept
+    template <typename T, typename U, std::size_t BlockSize, typename DefaultAllocator>
+    bool operator!=(const AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>& iAlloc1, const AllocatorMemoryPoolFixedSize<U, BlockSize, DefaultAllocator>& iAlloc2) noexcept
     {
         return false == (iAlloc1 == iAlloc2);
     }

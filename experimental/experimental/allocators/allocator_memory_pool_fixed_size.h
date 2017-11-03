@@ -1,17 +1,18 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 
 namespace experimental
 {
     template <std::size_t BlockSize>
     class MemoryPoolFixedSize;
 
-    template <typename T, std::size_t BlockSize>
-    class AllocatorMemoryPoolFixedSize
+    template <typename T, std::size_t BlockSize, typename DefaultAllocator = std::allocator<T>>
+    class AllocatorMemoryPoolFixedSize : public DefaultAllocator
     {
     public:
-        using value_type = T;
+        using value_type = typename DefaultAllocator::value_type;
 
         AllocatorMemoryPoolFixedSize() = delete;
         AllocatorMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool) noexcept;
@@ -24,11 +25,11 @@ namespace experimental
         template <typename U>
         struct rebind
         {
-            using other = AllocatorMemoryPoolFixedSize<U, BlockSize>;
+            using other = AllocatorMemoryPoolFixedSize<U, BlockSize, typename DefaultAllocator::template rebind<U>::other>;
         };
 
         template <typename U>
-        AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize>& iAllocatorMemoryPoolFixedSize) noexcept;
+        AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize, typename DefaultAllocator::template rebind<U>::other>& iAllocatorMemoryPoolFixedSize) noexcept;
 
         void ResetMemoryPool(std::size_t iNumberOfBlocks);
 
@@ -38,15 +39,15 @@ namespace experimental
     private:
         MemoryPoolFixedSize<BlockSize>& m_MemoryPool;
 
-        template <typename U, std::size_t>
+        template <typename, std::size_t, typename>
         friend class AllocatorMemoryPoolFixedSize;
     };
 
-    template <typename T, typename U, std::size_t BlockSize>
-    bool operator==(const AllocatorMemoryPoolFixedSize<T, BlockSize>&, const AllocatorMemoryPoolFixedSize<U, BlockSize>&) noexcept;
+    template <typename T, typename U, std::size_t BlockSize, typename DefaultAllocator>
+    bool operator==(const AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>&, const AllocatorMemoryPoolFixedSize<U, BlockSize, DefaultAllocator>&) noexcept;
 
-    template <typename T, typename U, std::size_t BlockSize>
-    bool operator!=(const AllocatorMemoryPoolFixedSize<T, BlockSize>&, const AllocatorMemoryPoolFixedSize<U, BlockSize>&) noexcept;
+    template <typename T, typename U, std::size_t BlockSize, typename DefaultAllocator>
+    bool operator!=(const AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>&, const AllocatorMemoryPoolFixedSize<U, BlockSize, DefaultAllocator>&) noexcept;
 }
 
 #include <allocators/allocator_memory_pool_fixed_size.hxx>

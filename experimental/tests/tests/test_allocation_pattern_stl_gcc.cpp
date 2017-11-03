@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
-#include <utils/stats_allocator.h>
-#include <utils/memory_checker.h>
+#include <utils/allocator_statistics_checker.h>
 #include <vector>
 #include <cstddef>
 #include <iostream>
@@ -19,10 +18,10 @@ TEST(AllocationPatternStlGccTest, Vector)
     // struct : allocator { ptr* start ; ptr* finish ; ptr* endOfStorage }
     static_assert(24 == sizeof(std::vector<char>)); // empty base optimization (stateless allocator)
 
-    MemoryChecker memoryChecker;
-    std::vector<char, StatsAllocator<char>> v(memoryChecker);
+    StatisticsChecker statisticsChecker;
+    std::vector<char, AllocatorStatisticsChecker<char>> v(statisticsChecker);
 
-    memoryChecker.ExpectAllocate(10);
+    statisticsChecker.ExpectAllocate(10);
     v.reserve(10);
 
     std::size_t i = 0;
@@ -32,19 +31,19 @@ TEST(AllocationPatternStlGccTest, Vector)
     }
 
     // Call internally _M_check_len to know how much we should allocate which do in this case return size() + std::max(size(), 1)
-    memoryChecker.ExpectAllocate(20);
-    memoryChecker.ExpectDeallocate(10);
+    statisticsChecker.ExpectAllocate(20);
+    statisticsChecker.ExpectDeallocate(10);
 
     for (; i < 20; ++i)
     {
         v.emplace_back(i);
     }
 
-    memoryChecker.ExpectAllocate(40);
-    memoryChecker.ExpectDeallocate(20);
+    statisticsChecker.ExpectAllocate(40);
+    statisticsChecker.ExpectDeallocate(20);
     v.emplace_back(20);
 
-    memoryChecker.IgnoreChecks();
+    statisticsChecker.IgnoreChecks();
 }
 
 TEST(AllocationPatternStlGccTest, String)
@@ -53,8 +52,8 @@ TEST(AllocationPatternStlGccTest, String)
     std::string s;
     static_assert(32 == sizeof(s)); // empty base optimization (stateless allocator)
 
-    MemoryChecker memoryChecker;
-    std::basic_string<char, std::char_traits<char>, StatsAllocator<char>> bs(memoryChecker);
+    StatisticsChecker statisticsChecker;
+    std::basic_string<char, std::char_traits<char>, AllocatorStatisticsChecker<char>> bs(statisticsChecker);
     static_assert(40 == sizeof(bs));
 
     // Small string optimization
@@ -66,10 +65,10 @@ TEST(AllocationPatternStlGccTest, String)
         bs = std::string(i, '@');
     }
 
-    memoryChecker.ExpectAllocate(2 * bs.capacity() + 1);
+    statisticsChecker.ExpectAllocate(2 * bs.capacity() + 1);
     bs = std::string(i, '@');
 
-    memoryChecker.IgnoreChecks();
+    statisticsChecker.IgnoreChecks();
 }
 
 TEST(AllocationPatternStlGccTest, Deque)
@@ -79,20 +78,20 @@ TEST(AllocationPatternStlGccTest, Deque)
     std::deque<char> deque;
     static_assert(80 == sizeof(deque));
 
-    MemoryChecker memoryChecker;
+    StatisticsChecker statisticsChecker;
 
     using value_type = std::uint64_t;
 
     // Default constructor always start by allocation _M_map with mapSize == _S_initial_map_size (8) (_M_allocate_map)
-    memoryChecker.ExpectAllocate(8 * sizeof(void*));
+    statisticsChecker.ExpectAllocate(8 * sizeof(void*));
 
     // Number of element per chunk, if value_type too big, we will only able to store one element per chunk
     std::size_t dequeBufferSize = std::__deque_buf_size(sizeof(value_type));
 
     // Then it allocate the nodes (_M_create_nodes), by default it create only one node
-    memoryChecker.ExpectAllocate(dequeBufferSize * sizeof(value_type)); // i.e. 512
+    statisticsChecker.ExpectAllocate(dequeBufferSize * sizeof(value_type)); // i.e. 512
 
-    std::deque<value_type, StatsAllocator<value_type>> d(memoryChecker);
+    std::deque<value_type, AllocatorStatisticsChecker<value_type>> d(statisticsChecker);
 
     // First element can always be inserted in the pre-allocated chunk
     std::size_t i = 0;
@@ -104,10 +103,10 @@ TEST(AllocationPatternStlGccTest, Deque)
         d.push_back(i);
     }
 
-    memoryChecker.ExpectAllocate(dequeBufferSize * sizeof(value_type));
+    statisticsChecker.ExpectAllocate(dequeBufferSize * sizeof(value_type));
     d.push_back(i);
 
-    memoryChecker.IgnoreChecks();
+    statisticsChecker.IgnoreChecks();
 }
 
 namespace
@@ -125,16 +124,16 @@ TEST(AllocationPatternStlGccTest, List)
     constexpr const std::size_t nodeSize = ListNodeSize<char>;
     static_assert(24u == nodeSize);
 
-    MemoryChecker memoryChecker;
-    std::list<char, StatsAllocator<char>> v(memoryChecker);
+    StatisticsChecker statisticsChecker;
+    std::list<char, AllocatorStatisticsChecker<char>> v(statisticsChecker);
 
-    memoryChecker.ExpectAllocate(nodeSize);
+    statisticsChecker.ExpectAllocate(nodeSize);
     v.push_back(1);
 
-    memoryChecker.ExpectAllocate(nodeSize);
+    statisticsChecker.ExpectAllocate(nodeSize);
     v.push_back(2);
 
-    memoryChecker.IgnoreChecks();
+    statisticsChecker.IgnoreChecks();
 }
 
 namespace
@@ -152,9 +151,9 @@ TEST(AllocationPatternStlGccTest, UnorderedMap)
     constexpr const std::size_t nodeSize = UnorderedMapNodeSize<char, char, std::hash<char>>;
     static_assert(16u == nodeSize);
 
-    MemoryChecker memoryChecker;
+    StatisticsChecker statisticsChecker;
     // No allocation is required at construction, unordered_map use a pre-allocated default node, this is to avoid to add branch (e.g. to avoid branching to check if n != 0 in order to perform modulo)
-    std::unordered_map<char, char, std::hash<char>, std::equal_to<char>, StatsAllocator<std::pair<const char, char>>> v(memoryChecker);
+    std::unordered_map<char, char, std::hash<char>, std::equal_to<char>, AllocatorStatisticsChecker<std::pair<const char, char>>> v(statisticsChecker);
 
     // Max element per bucket ratio (e.g. if max_load_factor / bucket_count >= 1 it will involve a rehash)
     EXPECT_EQ(1.0, v.max_load_factor());
@@ -171,7 +170,7 @@ TEST(AllocationPatternStlGccTest, UnorderedMap)
 
     // Allocate the bucket array (buckets are stored as a pointer)
     std::size_t implicitBucketsCreated = primeRehashPolicy._M_next_bkt(10);
-    memoryChecker.ExpectAllocate(implicitBucketsCreated * sizeof(void*));
+    statisticsChecker.ExpectAllocate(implicitBucketsCreated * sizeof(void*));
     v.reserve(10);
 
     // Always two methods to keep in mind
@@ -181,12 +180,12 @@ TEST(AllocationPatternStlGccTest, UnorderedMap)
     std::size_t i = 0;
     for (; i < 10; ++i)
     {
-        memoryChecker.ExpectAllocate(nodeSize);
+        statisticsChecker.ExpectAllocate(nodeSize);
         v.emplace(i, i);
     }
 
-    memoryChecker.ExpectAllocate(nodeSize);
-    memoryChecker.ExpectDeallocate(nodeSize);
+    statisticsChecker.ExpectAllocate(nodeSize);
+    statisticsChecker.ExpectDeallocate(nodeSize);
     // Emplacing will allocate a node upfront, call _M_bucket_index, then call _M_find_node, if _M_find_node doesn't return nullptr, node will be deallocated
     // i.e. if the key is not unique, it will perform an allocation + deallocation + bkt traversal
     auto [it, couldEmplace] = v.emplace(0, 1);
@@ -194,10 +193,10 @@ TEST(AllocationPatternStlGccTest, UnorderedMap)
     EXPECT_EQ(false, couldEmplace);
     EXPECT_EQ(0, it->second);
 
-    memoryChecker.ExpectAllocate(nodeSize);
-    memoryChecker.ExpectAllocate(primeRehashPolicy._M_next_bkt(implicitBucketsCreated * primeRehashPolicy._S_growth_factor) * sizeof(void*));
-    memoryChecker.ExpectDeallocate(implicitBucketsCreated * sizeof(void*));
+    statisticsChecker.ExpectAllocate(nodeSize);
+    statisticsChecker.ExpectAllocate(primeRehashPolicy._M_next_bkt(implicitBucketsCreated * primeRehashPolicy._S_growth_factor) * sizeof(void*));
+    statisticsChecker.ExpectDeallocate(implicitBucketsCreated * sizeof(void*));
     v.emplace(10, 10);
 
-    memoryChecker.IgnoreChecks();
+    statisticsChecker.IgnoreChecks();
 }
