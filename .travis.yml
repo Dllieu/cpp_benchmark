@@ -63,8 +63,8 @@ before_install:
 # Build steps
 script:
   - if [ "${COVERITY_SCAN_BRANCH}" != 1 ]; then
-      cmake -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_BUILD_TYPE=Release ..;
-      make -j8 VERBOSE=1 -D TRAVIS_BUILD;
+      cmake -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_BUILD_TYPE=Release -DTRAVIS_BUILD ..;
+      make -j8 VERBOSE=1;
     fi
 
   - ldd --version
