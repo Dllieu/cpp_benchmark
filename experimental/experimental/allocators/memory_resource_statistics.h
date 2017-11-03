@@ -9,13 +9,11 @@ namespace pmr = std::experimental::fundamentals_v2::pmr;
 
 namespace experimental
 {
-    template <std::size_t BlockSize>
-    class MemoryResourceMemoryPoolFixedSize : public pmr::memory_resource
+    template <typename StatisticsHandler>
+    class MemoryResourceStatistics : public pmr::memory_resource
     {
     public:
-        explicit MemoryResourceMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool, pmr::memory_resource* iDefaultResource = pmr::get_default_resource());
-
-        void ResetMemoryPool(std::size_t iNumberOfBlocks);
+        explicit MemoryResourceStatistics(StatisticsHandler& iStatisticsHandler, pmr::memory_resource* iDefaultResource = pmr::get_default_resource());
 
     protected:
          virtual void* do_allocate(std::size_t iBytes, std::size_t iAlignment) override;
@@ -23,9 +21,9 @@ namespace experimental
          virtual bool do_is_equal(const pmr::memory_resource& iMemoryResource) const noexcept override;
 
     private:
-         MemoryPoolFixedSize<BlockSize>& m_MemoryPool;
+         StatisticsHandler& m_StatisticsHandler;
          pmr::memory_resource* m_DefaultResource;
     };
 }
 
-#include <allocators/memory_resource_memory_pool_fixed_size.hxx>
+#include <allocators/memory_resource_statistics.hxx>

@@ -10,35 +10,25 @@
 namespace pmr = std::experimental::fundamentals_v2::pmr;
 using namespace tests;
 
-TEST(AllocatorMemoryPool, Cpp11Way)
-{
-    constexpr const std::size_t BlockSize = 32;
-    experimental::MemoryPoolFixedSize<BlockSize> memoryPool;
-
-    memoryPool.ResetMemoryPool(64);
-
-    StatisticsChecker statisticsChecker;
-    //std::list<std::uint64_t, experimental::AllocatorMemoryPoolFixedSize<std::uint64_t, BlockSize, AllocatorStatisticsChecker<std::uint64_t>>> l(memoryPool);
-    std::list<std::uint64_t, experimental::AllocatorMemoryPoolFixedSize<std::uint64_t, BlockSize>> l(memoryPool);
-
-    l.emplace_back(0);
-}
-
-namespace std::experimental::fundamentals_v2::pmr
+namespace
 {
     template <typename T>
-    using list = std::list<T, pmr::polymorphic_allocator<T>>;
+    static constexpr const std::size_t ListNodeSize = sizeof(std::_List_node<T>);
+
+    constexpr const std::size_t BlockSize = 32;
 }
 
-// TODO : Transform
-TEST(AllocatorMemoryPool, Cpp17Way)
+TEST(AllocatorMemoryPool, Cpp11Way)
 {
-    constexpr const std::size_t BlockSize = 32;
-    experimental::MemoryResourceMemoryPoolFixedSize<BlockSize> memoryPool;
+    StatisticsChecker statisticsChecker;
+    AllocatorStatisticsChecker<std::uint64_t> alloc(statisticsChecker);
+
+    experimental::MemoryPoolFixedSize<BlockSize> memoryPool;
+    experimental::AllocatorMemoryPoolFixedSize<std::uint64_t, BlockSize, AllocatorStatisticsChecker<std::uint64_t>> allocMemoryPool(memoryPool, statisticsChecker);
 
     memoryPool.ResetMemoryPool(64);
 
-    pmr::list<std::uint64_t> l(&memoryPool);
+    std::list<std::uint64_t, decltype(allocMemoryPool)> l(allocMemoryPool);
 
     std::size_t i = 0;
 
@@ -48,6 +38,44 @@ TEST(AllocatorMemoryPool, Cpp17Way)
         l.emplace_back(i);
     }
 
+    statisticsChecker.ExpectAllocate(ListNodeSize<std::uint64_t>);
+
     // Will call ::new (No block available)
     l.emplace_back(i);
+
+    statisticsChecker.IgnoreChecks();
+}
+
+namespace std::experimental::fundamentals_v2::pmr
+{
+    template <typename T>
+    using list = std::list<T, pmr::polymorphic_allocator<T>>;
+}
+
+TEST(AllocatorMemoryPool, Cpp17Way)
+{
+    StatisticsChecker statisticsChecker;
+    MemoryResourceStatisticsChecker memoryResourceStatisticsChecker(statisticsChecker);
+
+    experimental::MemoryPoolFixedSize<BlockSize> memoryPool;
+    experimental::MemoryResourceMemoryPoolFixedSize<BlockSize> memoryResourceMemoryPool(memoryPool, &memoryResourceStatisticsChecker);
+
+    memoryPool.ResetMemoryPool(64);
+
+    pmr::list<std::uint64_t> l(&memoryResourceMemoryPool);
+
+    std::size_t i = 0;
+
+    // Reuse Block from the MemoryPool
+    for (; i < 64; ++i)
+    {
+        l.emplace_back(i);
+    }
+
+    statisticsChecker.ExpectAllocate(ListNodeSize<std::uint64_t>);
+
+    // Will call ::new (No block available)
+    l.emplace_back(i);
+
+    statisticsChecker.IgnoreChecks();
 }

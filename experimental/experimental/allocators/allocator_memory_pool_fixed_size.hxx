@@ -5,8 +5,9 @@
 namespace experimental
 {
     template <typename T, std::size_t BlockSize, typename DefaultAllocator>
-    AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::AllocatorMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool) noexcept
-        : m_MemoryPool(iMemoryPool)
+    AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::AllocatorMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool, DefaultAllocator&& iDefaultAllocator) noexcept
+        : DefaultAllocator(std::move(iDefaultAllocator)),
+          m_MemoryPool(iMemoryPool)
     {
         static_assert(sizeof(T) <= BlockSize, "T is too large for this memory pool");
     }
@@ -14,7 +15,8 @@ namespace experimental
     template <typename T, std::size_t BlockSize, typename DefaultAllocator>
     template <typename U>
     AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize, typename DefaultAllocator::template rebind<U>::other>& iAllocatorMemoryPoolFixedSize) noexcept
-        : m_MemoryPool(iAllocatorMemoryPoolFixedSize.m_MemoryPool)
+        : DefaultAllocator(iAllocatorMemoryPoolFixedSize),
+          m_MemoryPool(iAllocatorMemoryPoolFixedSize.m_MemoryPool)
     {
         static_assert(sizeof(U) <= BlockSize, "U is too large for this memory pool");
     }

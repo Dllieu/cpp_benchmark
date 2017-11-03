@@ -15,7 +15,7 @@ namespace experimental
         using value_type = typename DefaultAllocator::value_type;
 
         AllocatorMemoryPoolFixedSize() = delete;
-        AllocatorMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool) noexcept;
+        AllocatorMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool, DefaultAllocator&& iDefaultAllocator = DefaultAllocator()) noexcept;
         AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize&) = default;
         AllocatorMemoryPoolFixedSize(AllocatorMemoryPoolFixedSize&&) noexcept = default;
         AllocatorMemoryPoolFixedSize& operator=(const AllocatorMemoryPoolFixedSize&) = delete;
