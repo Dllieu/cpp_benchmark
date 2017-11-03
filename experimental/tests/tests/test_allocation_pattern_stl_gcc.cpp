@@ -13,6 +13,15 @@
 
 using namespace tests;
 
+namespace
+{
+#ifdef TRAVIS_BUILD
+    constexpr const bool IsTravisBuild = true;
+#else
+    constexpr const bool IsTravisBuild = false;
+#endif
+}
+
 TEST(AllocationPatternStlGccTest, Vector)
 {
     // struct : allocator { ptr* start ; ptr* finish ; ptr* endOfStorage }
@@ -50,11 +59,18 @@ TEST(AllocationPatternStlGccTest, String)
 {
     // struct { alloc_hider : allocator { ptr* p; } ; std::size_t length ; union { std::size_t capacity ; char[15 + 1] localBuffer } }
     std::string s;
-    static_assert(32 == sizeof(s)); // empty base optimization (stateless allocator)
+    if constexpr (false == IsTravisBuild)
+    {
+        static_assert(32 == sizeof(s)); // empty base optimization (stateless allocator)
+    }
 
     StatisticsChecker statisticsChecker;
     std::basic_string<char, std::char_traits<char>, AllocatorStatisticsChecker<char>> bs(statisticsChecker);
-    static_assert(40 == sizeof(bs));
+
+    if constexpr (false == IsTravisBuild)
+    {
+        static_assert(40 == sizeof(bs));
+    }
 
     // Small string optimization
     // - GCC support string of size 15 (union, p point to localBuffer)
@@ -119,10 +135,17 @@ namespace
 TEST(AllocationPatternStlGccTest, List)
 {
     // struct : allocator { __gnu_cxx::__aligned_membuf<std::size_t> size; node* next ; node* prev ; }
-    static_assert(24 == sizeof(std::list<char>)); // empty base optimization (stateless allocator)
+    if constexpr (false == IsTravisBuild)
+    {
+        static_assert(24 == sizeof(std::list<char>)); // empty base optimization (stateless allocator)
+    }
 
     constexpr const std::size_t nodeSize = ListNodeSize<char>;
-    static_assert(24u == nodeSize);
+
+    if constexpr (false == IsTravisBuild)
+    {
+        static_assert(24u == nodeSize);
+    }
 
     StatisticsChecker statisticsChecker;
     std::list<char, AllocatorStatisticsChecker<char>> v(statisticsChecker);
