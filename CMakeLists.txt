@@ -17,6 +17,12 @@ else()
 endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAG_STANDARD} ${COMPILER_FLAG_WARNING} ${COMPILER_FLAG_PERF}")
+
+option(TRAVIS_BUILD "Disable libstdc++ ABI tests" ON)
+
+if (${TRAVIS_BUILD})
+    add_definitions(-DTRAVIS_BUILD)
+endif()
 # !FLAGS
 
 set(PATH_FLAT_HASH_MAP "${CMAKE_CURRENT_SOURCE_DIR}/external/flat_hash_map")
