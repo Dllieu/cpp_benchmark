@@ -149,12 +149,12 @@ TEST(AllocationPatternStlGccTest, List)
 
 namespace
 {
-    // IF __fast_hash and __is_noexcept_hash
-    //// struct { node* next ; buffer[sizeof(std::pair<const Key, Value)] };
+    // IF __fast_hash and __is_noexcept_hash (Mandatory to have erase not throwing)
+    //// struct { node* next ; buffer[sizeof(std::pair<const Key, Value>)] };
     // ELSE
     //// struct { node* next ; std::size_t hashCode ; buffer[sizeof(std::pair<const Key, Value)] };
     template <typename Key, typename Value, typename Hash>
-    static constexpr const std::size_t UnorderedMapNodeSize = sizeof(std::__detail::_Hash_node<std::pair<const Key, Value>, false == std::__is_fast_hash<Hash>::value || false == std::__detail::__is_noexcept_hash<Key, Hash>::value>);
+    static constexpr const std::size_t UnorderedMapNodeSize = sizeof(std::__detail::_Hash_node<std::pair<const Key, Value>, false == std::__is_fast_hash<Hash>::value || false == std::__is_nothrow_invocable<const Hash&, const Key&>::value>);
 }
 
 TEST(AllocationPatternStlGccTest, UnorderedMap)

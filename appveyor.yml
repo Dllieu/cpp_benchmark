@@ -1,0 +1,25 @@
+version: '1.0.{build}'
+
+image: ubuntu
+
+matrix:
+  fast_finish: true
+
+configuration:
+  - Debug
+  - Release
+
+build: off
+test: off
+
+install:
+  - ls -al
+  - sudo apt-get update
+  - sudo apt-get install gcc-8 g++-8
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+  - ldd --version
+  - g++ -v
+
+  - mkdir build && cd build
+  - cmake -DCMAKE_CXX_COMPILER="$CXX" -DCMAKE_BUILD_TYPE=Release -DTRAVIS_BUILD=ON ..
+  - make -j8 VERBOSE=1

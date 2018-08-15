@@ -11,13 +11,13 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages:
-            - gcc-7
-            - g++-7
-            - libstdc++-7-dev
+            - gcc-8
+            - g++-8
+            - libstdc++-8-dev
       env:
-        - COMPILER=g++-7
-        - CC=gcc-7
-        - CXX=g++-7
+        - COMPILER=g++-8
+        - CC=gcc-8
+        - CXX=g++-8
 
 #    - os: linux
 #      compiler: clang
@@ -51,8 +51,8 @@ before_install:
   
   - apt-cache policy libc6
   - export CXX=$COMPILER
-  - export CC=gcc-7
-  - export LD_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/7
+  - export CC=gcc-8
+  - export LD_LIBRARY_PATH=/usr/lib/gcc/x86_64-linux-gnu/8
 
   # Fail on travis
   #- locate libstdc++
