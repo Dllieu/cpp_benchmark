@@ -35,7 +35,11 @@ install:
 
   - ldd --version
   - g++ -v
+  # Debug
+  - env
 
+  # Appveyor limitation
+  - git submodule update --init --recursive
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=Release ..
+  - cmake -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
   - make -j8 VERBOSE=1
