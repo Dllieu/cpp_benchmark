@@ -15,7 +15,6 @@ test: off
 install:
   # Ubuntu 16.04 (required for cleaning: 18.04)
   - lsb_release -a
-  - ls -al
 
   # Remove once appveyor move to the required version
   # Break appveyor (anyway, it's too slow and not needed)
@@ -30,8 +29,9 @@ install:
   - sudo apt-get install gcc-8 g++-8 -y
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
 
-  - sudo update-alternatives --config gcc
-  - select gcc-8
+  # Selected automatically as there's no alternative
+  # - sudo update-alternatives --config gcc
+  # - select gcc-8
 
   - ldd --version
   - g++ -v
