@@ -9,15 +9,17 @@ configuration:
   - Debug
   - Release
 
+environment:
+  GCC_MAJOR_VERSION_TARGET: 8
+  UPDATE_ALTERNATIVE_PRIORITY: 9999
+
 install:
   # Ubuntu 16.04 (required for cleaning: 18.04)
   - lsb_release -a
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-
-  # gcc 8
   - sudo apt-get update -y
-  - sudo apt-get install gcc-8 g++-8 -y
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800 --slave /usr/bin/g++ g++ /usr/bin/g++-8
+  - sudo apt-get install gcc-${GCC_MAJOR_VERSION_TARGET} g++-${GCC_MAJOR_VERSION_TARGET} -y
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_MAJOR_VERSION_TARGET} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_MAJOR_VERSION_TARGET}
   # Selected automatically as there's no alternative
   # - sudo update-alternatives --config gcc
   # - select gcc-8
