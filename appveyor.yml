@@ -14,30 +14,30 @@ environment:
 
   matrix:
     - COMPILER: gcc
-      COMPILER_CPP_NAME: g++
-      COMPILER_VERSION_TARGET: 8
+      COMPILER_CPP: g++
+      COMPILER_VERSION: 8
 
     - COMPILER: clang
-      COMPILER_CPP_NAME: clang++
-      COMPILER_VERSION_TARGET: 6.0
+      COMPILER_CPP: clang++
+      COMPILER_VERSION: 6.0
 
 install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -y
-  - sudo apt-get install ${COMPILER}-${COMPILER_VERSION_TARGET} ${COMPILER_CPP_NAME}-${COMPILER_VERSION_TARGET} -y
-  - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION_TARGET} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP_NAME} ${COMPILER_CPP_NAME} /usr/bin/${COMPILER_CPP_NAME}-${COMPILER_VERSION_TARGET}
+  - sudo apt-get install ${COMPILER}-${COMPILER_VERSION} ${COMPILER_CPP}-${COMPILER_VERSION} -y
+  - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP} ${COMPILER_CPP} /usr/bin/${COMPILER_CPP}-${COMPILER_VERSION}
 
 before_build:
   # Debug logs
   - lsb_release -a
   - ldd --version
-  - ${COMPILER_CPP_NAME} -v
+  - ${COMPILER_CPP} -v
   - env
 
   # Appveyor limitation
   - git submodule update --init --recursive
   - mkdir build && cd build
-  - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER_CPP_NAME} -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
+  - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER_CPP} -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
 
 build_script:
   - make -j8 VERBOSE=1
@@ -50,3 +50,6 @@ test_script:
 
 # TODOOOOOOOOOOOOOOOOOOOOOOOOOOO:
 # sanitizers + debug flag?
+# add benchmark from the presentation
+# report test
+# report benchmark + graph

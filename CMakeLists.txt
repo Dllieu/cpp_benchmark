@@ -1,30 +1,31 @@
 cmake_minimum_required(VERSION 3.2)
 
-# FLAGS
-## might add debug flag -fdump-class-hierarchy for investigating vtables entries
-## might add --ggdb4  -static-libgcc -static-libstdc++
-# -D_GNU_SOURCE
-set(COMPILER_FLAG_STANDARD "-O3 -std=c++1z -DNDEBUG -D_REENTRANT -fPIC -m64")
-set(COMPILER_FLAG_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0")
+## might add -static-libgcc -static-libstdc++
+set(COMPILER_FLAGS_STANDARD "-std=c++1z -g -D_REENTRANT -fPIC -m64")
+set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0")
+
+set(CMAKE_CXX_FLAGS_DEBUG "-O1")
+# Disable '-fomit-frame-pointer' during profiling
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -fomit-frame-pointer")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        # might add -fno-exceptions -flto=8 -fno-fat-lto-objects -mfpmath=sse -fomit-frame-pointer
-        # -fomit-frame-pointer: get one more register available for the register allocator, and save 1-3 instructions on entry/exit to functions, not supported by all architecture, should not omit for measurement (e.g. vtune)
-        set(COMPILER_FLAG_PERF "-fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations -march=native")
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fdump-class-hierarchy")
+        
+        # TODO: -flto (gcc: ar / ranlib / nm)
+        # might add -flto=8 -fno-fat-lto-objects -mfpmath=sse -finline-limit=???
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations \
+                                                                -static-libstdc++")
+
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        # Clang is only used for additionals warnings and usage of the sanitizers
         # (Not interested by llvm libc++ at the moment)
         set(COMPILER_FLAG_STANDARD "${COMPILER_FLAG_STANDARD} -stdlib=libstdc++")
-        set(COMPILER_FLAG_PERF "-march=native")
+
+        # TODO: Sanitizers
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAG_STANDARD} ${COMPILER_FLAG_WARNING} ${COMPILER_FLAG_PERF}")
-
-option(TRAVIS_BUILD "Disable libstdc++ ABI tests" ON)
-
-if (${TRAVIS_BUILD})
-    add_definitions(-DTRAVIS_BUILD)
-endif()
-# !FLAGS
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_STANDARD} ${COMPILER_FLAGS_WARNING}")
 
 set(PATH_FLAT_HASH_MAP "${CMAKE_CURRENT_SOURCE_DIR}/external/flat_hash_map")
 set(PATH_GOOGLE_BENCHMARK "${CMAKE_CURRENT_SOURCE_DIR}/external/benchmark")
