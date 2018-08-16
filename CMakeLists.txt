@@ -4,7 +4,7 @@ set(COMPILER_FLAGS_STANDARD "-std=c++1z -g -D_REENTRANT -fPIC -m64 -fmessage-len
 set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wstrict-aliasing -Wno-unused-local-typedefs -Wno-unused-parameter \
                             -Wshadow -Wdouble-promotion -Wdeprecated-declarations")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-O1")
+set(CMAKE_CXX_FLAGS_DEBUG "-O1 -fsanitize=address -fsanitize=leak -fsanitize=undefined -fno-sanitize=alignment")
 # Disable '-fomit-frame-pointer' during profiling
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -fomit-frame-pointer")
 
@@ -21,9 +21,6 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # Clang is only used for additionals warnings and usage of the sanitizers
         # (Not interested by llvm libc++ at the moment)
         set(COMPILER_FLAG_STANDARD "${COMPILER_FLAG_STANDARD} -stdlib=libstdc++")
-
-        # TODO: Sanitizers
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 endif()
 
 set(CMAKE_CXX_FLAGS "${COMPILER_FLAGS_STANDARD} ${COMPILER_FLAGS_WARNING}")
