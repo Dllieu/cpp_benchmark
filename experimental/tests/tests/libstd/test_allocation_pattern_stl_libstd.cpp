@@ -159,7 +159,7 @@ TEST(AllocationPatternStlLibStdTest, UnorderedMap)
     std::unordered_map<char, char, std::hash<char>, std::equal_to<char>, AllocatorStatisticsChecker<std::pair<const char, char>>> v(statisticsChecker);
 
     // Max element per bucket ratio (e.g. if max_load_factor / bucket_count >= 1 it will involve a rehash)
-    EXPECT_EQ(1.0, v.max_load_factor());
+    EXPECT_EQ(1.0f, v.max_load_factor());
 
     // Default rehashing policy used by unordered_map, _M_next_bkt will return the next prime from std::__detail::__prime_list[256]
     //                                                 _M_need_rehash will return (if rehash is needed) __n_bkt * _S_growth_factor (2)

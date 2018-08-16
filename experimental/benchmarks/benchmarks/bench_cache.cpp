@@ -189,19 +189,19 @@ namespace
 
     void    bench_cache_vector_traversal( benchmark::State& state )
     {
-        auto vector = create_container_random_values< std::vector< char > >( state.range_x() );
+        auto vector = create_container_random_values< std::vector< char > >( state.range(0) );
         start_traversal( vector, state );
     }
 
     void    bench_cache_list_traversal( benchmark::State& state )
     {
-        auto list = create_container_random_values< std::list< char > >( state.range_x() );
+        auto list = create_container_random_values< std::list< char > >( state.range(0) );
         start_traversal( list, state );
     }
 
     void    bench_cache_shuffle_list_traversal( benchmark::State& state )
     {
-        auto shuffleList = create_container_random_values< std::list< char > >( state.range_x() );
+        auto shuffleList = create_container_random_values< std::list< char > >( state.range(0) );
         shuffleList.sort();
 
         start_traversal( shuffleList, state );
@@ -235,7 +235,7 @@ namespace
     void    bench_cache_unordered_map_traversal( benchmark::State& state )
     {
         std::unordered_set< int > unorderedSet;
-        for ( auto i = 0; i < state.range_x(); ++i )
+        for ( auto i = 0; i < state.range(0); ++i )
             unorderedSet.insert( i );
 
         start_traversal( unorderedSet, state );
@@ -244,7 +244,7 @@ namespace
     void    bench_cache_map_traversal( benchmark::State& state )
     {
         std::set< int > set;
-        for ( auto i = 0; i < state.range_x(); ++i )
+        for ( auto i = 0; i < state.range(0); ++i )
             set.insert( i );
 
         start_traversal( set, state );
@@ -258,8 +258,8 @@ namespace
 {
     void    bench_cache_matrix_traversal_column( benchmark::State& state )
     {
-        auto matrix = create_container_random_values< std::vector< char > >( state.range_x() * state.range_x() );
-        auto f = [ &matrix, dimension = state.range_x() ]()
+        auto matrix = create_container_random_values< std::vector< char > >( state.range(0) * state.range(0) );
+        auto f = [ &matrix, dimension = state.range(0) ]()
         {
             auto res = 0;
             for ( auto i = 0; i < dimension; ++i )
@@ -274,8 +274,8 @@ namespace
 
     void    bench_cache_matrix_traversal_row( benchmark::State& state )
     {
-        auto matrix = create_container_random_values< std::vector< char > >( state.range_x() * state.range_x() );
-        auto f = [ &matrix, dimension = state.range_x() ]()
+        auto matrix = create_container_random_values< std::vector< char > >( state.range(0) * state.range(0) );
+        auto f = [ &matrix, dimension = state.range(0) ]()
         {
             auto res = 0;
             for ( auto j = 0; j < dimension; ++j )
@@ -314,8 +314,8 @@ namespace
     // 64 / ( 6 / 3 ) / sizeof( char ) = 32 useful values per fetch average (6 / 3 :  only need x, y, z)
     void    bench_cache_aos_partial( benchmark::State& state )
     {
-        AOSParticle aos( state.range_x() );
-        auto f = [ &aos, iteration = state.range_x() ]()
+        AOSParticle aos( state.range(0) );
+        auto f = [ &aos, iteration = state.range(0) ]()
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
@@ -323,14 +323,14 @@ namespace
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
     }
 
     // 64 / sizeof( char ) = 64 useful values per fetch
     void    bench_cache_soa_partial( benchmark::State& state )
     {
-        SOAParticle soa( state.range_x() );
-        auto f = [ &soa, iteration = state.range_x() ]()
+        SOAParticle soa( state.range(0) );
+        auto f = [ &soa, iteration = state.range(0) ]()
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
@@ -338,7 +338,7 @@ namespace
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
     }
 }
 
@@ -362,8 +362,8 @@ namespace
 
     void    bench_cache_aos_full( benchmark::State& state )
     {
-        AOSCompactParticle aos( state.range_x() );
-        auto f = [ &aos, iteration = state.range_x() ]()
+        AOSCompactParticle aos( state.range(0) );
+        auto f = [ &aos, iteration = state.range(0) ]()
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
@@ -371,13 +371,13 @@ namespace
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
     }
 
     void    bench_cache_soa_full( benchmark::State& state )
     {
-        SOACompactParticle soa( state.range_x() );
-        auto f = [ &soa, iteration = state.range_x() ]()
+        SOACompactParticle soa( state.range(0) );
+        auto f = [ &soa, iteration = state.range(0) ]()
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
@@ -385,7 +385,7 @@ namespace
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range_x(), f, state );
+        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
     }
 }
 

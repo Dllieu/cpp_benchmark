@@ -1,14 +1,15 @@
 cmake_minimum_required(VERSION 3.2)
 
-set(COMPILER_FLAGS_STANDARD "-std=c++1z -g -D_REENTRANT -fPIC -m64")
+set(COMPILER_FLAGS_STANDARD "-std=c++1z -g -D_REENTRANT -fPIC -m64 -fmessage-length=0")
 set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wstrict-aliasing -Wno-unused-local-typedefs -Wno-unused-parameter \
-                            -Wshadow -pedantic -pedantic-errors -fstrict-aliasing -fmessage-length=0")
+                            -Wshadow -Wdouble-promotion -Wdeprecated-declarations")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-O1")
 # Disable '-fomit-frame-pointer' during profiling
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -fomit-frame-pointer")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        set(COMPILER_FLAGS_WARNING "${COMPILER_FLAGS_WARNING} -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict")
         #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fdump-class-hierarchy")
 
         # TODO: -flto (gcc: ar / ranlib / nm)

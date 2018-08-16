@@ -33,7 +33,7 @@ namespace
         auto arrIt = std::fill_n( result.begin(), result.size() - s.size(), '0' );
         std::copy( s.begin(), s.end(), arrIt );
         return result;
-    };
+    }
 
     template < size_t STRING_SIZE >
     struct TFixtureATOI : public benchmark::Fixture

@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 #include <utils/allocator_statistics_checker.h>
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wdouble-promotion"
 #include <flat_hash_map.hpp>
+#pragma GCC diagnostic pop
 #include <cstddef>
 #include <iostream>
 
@@ -35,7 +39,7 @@ TEST(FlatHashMapTest, AllocationPattern)
     FlatHashMapWithAllocatorStatistics<std::uint64_t, std::uint64_t> fhm(statisticsChecker);
 
     static_assert(40 == sizeof(fhm));
-    EXPECT_EQ(0.5, fhm.max_load_factor());
+    EXPECT_EQ(0.5f, fhm.max_load_factor());
 
     // 1 - Reserve
 

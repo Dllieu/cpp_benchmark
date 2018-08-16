@@ -90,7 +90,7 @@ namespace
 {
     void    bench_context_switch_memset( benchmark::State& state )
     {
-        int ws_pages = state.range_x();
+        int ws_pages = state.range(0);
         void* buf = malloc( ws_pages * PAGE_SIZE );
 
         // i.e. number of pages
@@ -110,19 +110,19 @@ namespace
 {
     void    set_bytes_processed( benchmark::State& state )
     {
-        state.SetBytesProcessed( state.iterations() * ( ( state.range_x() + 1 ) * PAGE_SIZE ) + state.bytes_processed() );
+        state.SetBytesProcessed( state.iterations() * ( ( state.range(0) + 1 ) * PAGE_SIZE ) + state.bytes_processed() );
     }
 
     void    futex_thread_one_cache( benchmark::State& state, std::atomic< int >& sharedMemoryId )
     {
         // 1 PAGE_SIZE dedicated to futex / the others just for invalidating the cache
-        sharedMemoryId = shmget( IPC_PRIVATE, ( state.range_x() + 1 ) * PAGE_SIZE, IPC_CREAT | 0666 );
+        sharedMemoryId = shmget( IPC_PRIVATE, ( state.range(0) + 1 ) * PAGE_SIZE, IPC_CREAT | 0666 );
 
         volatile auto futex = (int*)shmat(sharedMemoryId, NULL, 0);
         auto workingSet = ((char*)futex) + PAGE_SIZE;
         while ( state.KeepRunning() )
         {
-            memset( workingSet, state.iterations(), state.range_x() * PAGE_SIZE );
+            memset( workingSet, state.iterations(), state.range(0) * PAGE_SIZE );
 
             *futex = 0xA;
             while ( ! syscall(SYS_futex, futex, FUTEX_WAKE, 1, NULL, NULL, 42 ) )
@@ -151,7 +151,7 @@ namespace
             while ( syscall( SYS_futex, futex, FUTEX_WAIT, 0xA, NULL, NULL, 42 ) )
                 std::this_thread::yield();
 
-            memset( workingSet, state.iterations(), state.range_x() * PAGE_SIZE );
+            memset( workingSet, state.iterations(), state.range(0) * PAGE_SIZE );
 
             *futex = 0xB;
             while ( ! syscall( SYS_futex, futex, FUTEX_WAKE, 1, NULL, NULL, 42 ) )
