@@ -14,10 +14,11 @@ environment:
 
   matrix:
     - COMPILER: gcc
-      COMPILER_PP_NAME: g
+      COMPILER_CPP_NAME: g++
       COMPILER_VERSION_TARGET: 8
+
     - COMPILER: clang
-      COMPILER_PP_NAME: ${COMPILER}
+      COMPILER_CPP_NAME: clang++
       COMPILER_VERSION_TARGET: 6.0
 
 install:
@@ -25,20 +26,19 @@ install:
   - lsb_release -a
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -y
-  - sudo apt-get install ${COMPILER}-${COMPILER_VERSION_TARGET} ${COMPILER_PP_NAME}++-${COMPILER_VERSION_TARGET} -y
-  - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION_TARGET} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_PP_NAME}++ ${COMPILER_PP_NAME}++ /usr/bin/${COMPILER_PP_NAME}++-${COMPILER_VERSION_TARGET}
+  - sudo apt-get install ${COMPILER}-${COMPILER_VERSION_TARGET} ${COMPILER_CPP_NAME}-${COMPILER_VERSION_TARGET} -y
+  - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION_TARGET} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP_NAME} ${COMPILER_CPP_NAME} /usr/bin/${COMPILER_CPP_NAME}-${COMPILER_VERSION_TARGET}
 
 before_build:
   # Debug logs
   - ldd --version
-  - ${COMPILER_PP_NAME}++ -v
-  - update-alternatives --display ${COMPILER_PP_NAME}++
+  - ${COMPILER_CPP_NAME} -v
   - env
 
   # Appveyor limitation
   - git submodule update --init --recursive
   - mkdir build && cd build
-  - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER_PP_NAME}++ -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
+  - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER_CPP_NAME} -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
 
 build_script:
   - make -j8 VERBOSE=1
