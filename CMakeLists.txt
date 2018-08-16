@@ -4,8 +4,9 @@ set(COMPILER_FLAGS_STANDARD "-std=c++2a -g -D_REENTRANT -fPIC -m64 -fmessage-len
 set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wstrict-aliasing -Wno-unused-local-typedefs -Wno-unused-parameter \
                             -Wshadow -Wdouble-promotion -Wdeprecated-declarations")
 
+# -fsanitize=undefined fail on appveyor (16.04)
 set(CMAKE_CXX_FLAGS_DEBUG "-O1                                                          \
-                           -fsanitize=address -fsanitize=leak -fsanitize=undefined      \
+                           -fsanitize=address -fsanitize=leak                           \
                            -fno-sanitize=alignment")
 # Disable '-fomit-frame-pointer' during profiling
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -fomit-frame-pointer")
