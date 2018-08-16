@@ -66,10 +66,10 @@
         VA_FOR_EACH(VA_DECLARE_PROPERTIES __VA_ARGS__);                                     \
     };                                                                                      \
                                                                                             \
-    template <std::size_t ExpectedLayoutSize, std::size_t LayoutSize>                       \
+    template <std::size_t ExpectedLayoutSize, std::size_t CurrentLayoutSize>                \
     static constexpr bool StaticSizeChecker()                                               \
     {                                                                                       \
-        static_assert(ExpectedLayoutSize == LayoutSize, "Layout size mismatch!");           \
+        static_assert(ExpectedLayoutSize == CurrentLayoutSize, "Layout size mismatch!");    \
         return true;                                                                        \
     };                                                                                      \
     static_assert(true == StaticSizeChecker<LAYOUT_SIZE, sizeof(MESSAGE_NAME)>());          \
