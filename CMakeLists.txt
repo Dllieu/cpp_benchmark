@@ -9,7 +9,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-O1")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -fomit-frame-pointer")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fdump-class-hierarchy")
+        #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fdump-class-hierarchy")
 
         # TODO: -flto (gcc: ar / ranlib / nm)
         # might add -flto=8 -fno-fat-lto-objects -mfpmath=sse -finline-limit=???
