@@ -49,4 +49,4 @@ test_script:
     fi
 
 # TODOOOOOOOOOOOOOOOOOOOOOOOOOOO:
-# clean markdown + mettre les sanitizers + flag de debug?
+# sanitizers + debug flag?
