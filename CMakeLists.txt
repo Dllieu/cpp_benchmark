@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 
-## might add -static-libgcc -static-libstdc++
 set(COMPILER_FLAGS_STANDARD "-std=c++1z -g -D_REENTRANT -fPIC -m64")
-set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wno-unused-local-typedefs -Wno-unused-parameter -fmessage-length=0")
+set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wstrict-aliasing -Wno-unused-local-typedefs -Wno-unused-parameter \
+                            -Wshadow -pedantic -pedantic-errors -fstrict-aliasing -fmessage-length=0")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-O1")
 # Disable '-fomit-frame-pointer' during profiling
@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -fomit-frame-pointer")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fdump-class-hierarchy")
-        
+
         # TODO: -flto (gcc: ar / ranlib / nm)
         # might add -flto=8 -fno-fat-lto-objects -mfpmath=sse -finline-limit=???
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations \
@@ -25,7 +25,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_STANDARD} ${COMPILER_FLAGS_WARNING}")
+set(CMAKE_CXX_FLAGS "${COMPILER_FLAGS_STANDARD} ${COMPILER_FLAGS_WARNING}")
 
 set(PATH_FLAT_HASH_MAP "${CMAKE_CURRENT_SOURCE_DIR}/external/flat_hash_map")
 set(PATH_GOOGLE_BENCHMARK "${CMAKE_CURRENT_SOURCE_DIR}/external/benchmark")
