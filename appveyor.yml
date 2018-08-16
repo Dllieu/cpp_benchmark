@@ -7,7 +7,7 @@ matrix:
 
 configuration:
   - Debug
-  #- Release
+  - Release
 
 environment:
   UPDATE_ALTERNATIVE_PRIORITY: 9999
@@ -22,8 +22,6 @@ environment:
       COMPILER_VERSION_TARGET: 6.0
 
 install:
-  # Ubuntu 16.04 (required for cleaning: 18.04)
-  - lsb_release -a
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -y
   - sudo apt-get install ${COMPILER}-${COMPILER_VERSION_TARGET} ${COMPILER_CPP_NAME}-${COMPILER_VERSION_TARGET} -y
@@ -31,6 +29,7 @@ install:
 
 before_build:
   # Debug logs
+  - lsb_release -a
   - ldd --version
   - ${COMPILER_CPP_NAME} -v
   - env
@@ -50,4 +49,4 @@ test_script:
     fi
 
 # TODOOOOOOOOOOOOOOOOOOOOOOOOOOO:
-# build avec clang + clean markdown + mettre les sanitizers + flag de debug?
+# clean markdown + mettre les sanitizers + flag de debug?
