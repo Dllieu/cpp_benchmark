@@ -52,13 +52,13 @@ namespace
 {
     // Close level difference for easier distribution fairness
     const std::vector< int > LEVEL_LAYER = {
-        {  0 }, // -infinite to 0
-        {  5 },
-        { 10 },
-        { 15 },
-        { 25 },
-        { 30 },
-        { 42 },
+         0, // -infinite to 0
+         5,
+        10,
+        15,
+        25,
+        30,
+        42,
     };
 
     auto    generate_inputs()

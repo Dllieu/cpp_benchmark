@@ -10,29 +10,33 @@ configuration:
   - Release
 
 environment:
-  GCC_MAJOR_VERSION_TARGET: 8
   UPDATE_ALTERNATIVE_PRIORITY: 9999
+
+  matrix:
+    - COMPILER: gcc
+      COMPILER_VERSION_TARGET: 8
+    - COMPILER: clang
+      COMPILER_VERSION_TARGET: 6.0
 
 install:
   # Ubuntu 16.04 (required for cleaning: 18.04)
   - lsb_release -a
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -y
-  - sudo apt-get install gcc-${GCC_MAJOR_VERSION_TARGET} g++-${GCC_MAJOR_VERSION_TARGET} -y
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${GCC_MAJOR_VERSION_TARGET} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/g++ g++ /usr/bin/g++-${GCC_MAJOR_VERSION_TARGET}
-  # Selected automatically as there's no alternative
-  # - sudo update-alternatives --config gcc
-  # - select gcc-8
+  - sudo apt-get install ${COMPILER}-${COMPILER_VERSION_TARGET} ${COMPILER}++-${COMPILER_VERSION_TARGET} -y
+  - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION_TARGET} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER}++ ${COMPILER}++ /usr/bin/${COMPILER}++-${COMPILER_VERSION_TARGET}
 
 before_build:
+  # Debug logs
   - ldd --version
-  - g++ -v
+  - ${COMPILER}++ -v
+  - update-alternatives --display ${COMPILER}++
   - env
 
   # Appveyor limitation
   - git submodule update --init --recursive
   - mkdir build && cd build
-  - cmake -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
+  - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER}++ -DCMAKE_BUILD_TYPE=${CONFIGURATION} ..
 
 build_script:
   - make -j8 VERBOSE=1
@@ -42,3 +46,6 @@ test_script:
   - if [ "${CONFIGURATION}" = "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME};
     fi
+
+# TODOOOOOOOOOOOOOOOOOOOOOOOOOOO:
+# build avec clang + clean markdown + mettre les sanitizers + flag de debug?

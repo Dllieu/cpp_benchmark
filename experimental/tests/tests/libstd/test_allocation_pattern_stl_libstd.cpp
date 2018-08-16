@@ -13,7 +13,7 @@
 
 using namespace tests;
 
-TEST(AllocationPatternStlGccTest, Vector)
+TEST(AllocationPatternStlLibStdTest, Vector)
 {
     // struct : allocator { ptr* start ; ptr* finish ; ptr* endOfStorage }
     static_assert(24 == sizeof(std::vector<char>)); // empty base optimization (stateless allocator)
@@ -46,9 +46,7 @@ TEST(AllocationPatternStlGccTest, Vector)
     statisticsChecker.IgnoreChecks();
 }
 
-#ifndef TRAVIS_BUILD
-
-TEST(AllocationPatternStlGccTest, String)
+TEST(AllocationPatternStlLibStdTest, String)
 {
     // struct { alloc_hider : allocator { ptr* p; } ; std::size_t length ; union { std::size_t capacity ; char[15 + 1] localBuffer } }
     std::string s;
@@ -60,7 +58,7 @@ TEST(AllocationPatternStlGccTest, String)
     static_assert(40 == sizeof(bs));
 
     // Small string optimization
-    // - GCC support string of size 15 (union, p point to localBuffer)
+    // - LibStd support string of size 15 (union, p point to localBuffer)
     // - if p == &localBuffer : capacity = 15
     std::size_t i = 0;
     for (; i < 16; ++i)
@@ -74,9 +72,7 @@ TEST(AllocationPatternStlGccTest, String)
     statisticsChecker.IgnoreChecks();
 }
 
-#endif
-
-TEST(AllocationPatternStlGccTest, Deque)
+TEST(AllocationPatternStlLibStdTest, Deque)
 {
     // struct : alloc { elt** _M_map ; std::size_t mapSize; iterator start ; iterator finish } (i.e. _M_map[mapSize]* store mapSize ptr to chunk of memory (they call it node))
     //// with iterator { elt* current ; elt* first ; elt* last ; map_elt* node ; } (i.e. last not used to store an element but to store the address of the next chunk of memory (they call it node))
@@ -114,8 +110,6 @@ TEST(AllocationPatternStlGccTest, Deque)
     statisticsChecker.IgnoreChecks();
 }
 
-#ifndef TRAVIS_BUILD
-
 namespace
 {
     // struct { node* next ; node* prev ; T };
@@ -123,7 +117,7 @@ namespace
     static constexpr const std::size_t ListNodeSize = sizeof(std::_List_node<T>);
 }
 
-TEST(AllocationPatternStlGccTest, List)
+TEST(AllocationPatternStlLibStdTest, List)
 {
     // struct : allocator { __gnu_cxx::__aligned_membuf<std::size_t> size; node* next ; node* prev ; }
     static_assert(24 == sizeof(std::list<char>)); // empty base optimization (stateless allocator)
@@ -145,8 +139,6 @@ TEST(AllocationPatternStlGccTest, List)
     statisticsChecker.IgnoreChecks();
 }
 
-#endif
-
 namespace
 {
     // IF __fast_hash and __is_noexcept_hash (Mandatory to have erase not throwing)
@@ -157,7 +149,7 @@ namespace
     static constexpr const std::size_t UnorderedMapNodeSize = sizeof(std::__detail::_Hash_node<std::pair<const Key, Value>, false == std::__is_fast_hash<Hash>::value || false == std::__is_nothrow_invocable<const Hash&, const Key&>::value>);
 }
 
-TEST(AllocationPatternStlGccTest, UnorderedMap)
+TEST(AllocationPatternStlLibStdTest, UnorderedMap)
 {
     constexpr const std::size_t nodeSize = UnorderedMapNodeSize<char, char, std::hash<char>>;
     static_assert(16u == nodeSize);

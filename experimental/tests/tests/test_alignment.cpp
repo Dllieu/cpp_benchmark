@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <cstddef>
 #include <memory>
+#include <type_traits>
 
 namespace
 {
@@ -13,7 +14,7 @@ namespace
     };
 
     static_assert(2 == sizeof(Alignment1));
-    static_assert(1 == alignof(Alignment1));
+    static_assert(1 == std::alignment_of_v<Alignment1>);
 
     struct Alignment1Bis
     {
@@ -21,7 +22,7 @@ namespace
     };
 
     static_assert(2 == sizeof(Alignment1Bis));
-    static_assert(1 == alignof(Alignment1Bis));
+    static_assert(1 == std::alignment_of_v<Alignment1Bis>);
 
     // Objects of type Alignment4 must be allocated at 4-byte boundaries
     // because Alignment4::i must be allocated at 4-byte boundaries
@@ -34,7 +35,7 @@ namespace
     };
 
     static_assert(12 == sizeof(Alignment4));
-    static_assert(4 == alignof(Alignment4));
+    static_assert(4 == std::alignment_of_v<Alignment4>);
 
     struct Alignment4Bis
     {
@@ -44,7 +45,7 @@ namespace
     };
 
     static_assert(8 == sizeof(Alignment4Bis));
-    static_assert(4 == alignof(Alignment4Bis));
+    static_assert(4 == std::alignment_of_v<Alignment4Bis>);
 
     // Objects of type Alignment8 must be allocated at 8-byte boundaries
     // because Alignment8::next and Alignment8::prev must be allocated at 8-byte boundaries
@@ -56,7 +57,7 @@ namespace
     };
 
     static_assert(16 == sizeof(Alignment8));
-    static_assert(8 == alignof(Alignment8));
+    static_assert(8 == std::alignment_of_v<Alignment8>);
 
     struct Alignment8Derived : Alignment8
     {
@@ -64,7 +65,7 @@ namespace
     };
 
     static_assert(24 == sizeof(Alignment8Derived));
-    static_assert(8 == alignof(Alignment8Derived));
+    static_assert(8 == std::alignment_of_v<Alignment8Derived>);
 
     // Objects of type Alignment16 must be allocated at 16-byte boundaries
     // because Alignment16::ll must be allocated at 16-byte boundaries
@@ -76,8 +77,8 @@ namespace
     };
 
     static_assert(16 == sizeof(Alignment16));
-    static_assert(16 == alignof(Alignment16));
-    static_assert(16 == alignof(std::max_align_t));
+    static_assert(16 == std::alignment_of_v<Alignment16>);
+    static_assert(16 == std::alignment_of_v<std::max_align_t>);
 
     struct alignas(64) Alignment64
     {
@@ -85,7 +86,7 @@ namespace
     };
 
     static_assert(64 == sizeof(Alignment64));
-    static_assert(64 == alignof(Alignment64));
+    static_assert(64 == std::alignment_of_v<Alignment64>);
 }
 
 TEST(AlignmentTest, Alignment)
@@ -145,7 +146,7 @@ namespace
 TEST(AlignmentTest, AlignedStorage)
 {
     AlignedBuffer<Alignment1> alignedBuffer;
-    static_assert(alignof(alignedBuffer) == 1);
+    static_assert(1 == std::alignment_of_v<decltype(alignedBuffer)>);
 
     Alignment1* alignment1 = new (alignedBuffer.Address()) Alignment1();
     alignment1->a = '0';
@@ -153,7 +154,7 @@ TEST(AlignmentTest, AlignedStorage)
     EXPECT_EQ(alignment1, alignedBuffer.Address());
 
     std::aligned_storage<sizeof(std::byte) * 512, 8>::type storage;
-    static_assert(alignof(storage) == 8);
+    static_assert(8 == std::alignment_of_v<decltype(storage)>);
 
     Alignment8* alignment8 = new (std::addressof(storage)) Alignment8();
     alignment8->next = nullptr;

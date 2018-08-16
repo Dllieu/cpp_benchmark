@@ -66,7 +66,13 @@
         VA_FOR_EACH(VA_DECLARE_PROPERTIES __VA_ARGS__);                                     \
     };                                                                                      \
                                                                                             \
-    static_assert(LAYOUT_SIZE == sizeof(MESSAGE_NAME));                                     \
+    template <std::size_t ExpectedLayoutSize, std::size_t LayoutSize>                       \
+    static constexpr bool StaticSizeChecker()                                               \
+    {                                                                                       \
+        static_assert(ExpectedLayoutSize == LayoutSize, "Layout size mismatch!");           \
+        return true;                                                                        \
+    };                                                                                      \
+    static_assert(true == StaticSizeChecker<LAYOUT_SIZE, sizeof(MESSAGE_NAME)>());          \
                                                                                             \
     std::ostream& operator<<(std::ostream& iOStream, const MESSAGE_NAME& iMessageLayout)    \
     {                                                                                       \

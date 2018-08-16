@@ -46,10 +46,17 @@ TEST(AllocatorMemoryPool, Cpp11Way)
     statisticsChecker.IgnoreChecks();
 }
 
-namespace std::experimental::fundamentals_v2::pmr
+
+namespace std::experimental
+{
+inline namespace fundamentals_v2
+{
+namespace pmr
 {
     template <typename T>
     using list = std::list<T, pmr::polymorphic_allocator<T>>;
+}
+}
 }
 
 TEST(AllocatorMemoryPool, Cpp17Way)
