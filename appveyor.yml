@@ -33,6 +33,7 @@ before_build:
   - lsb_release -a
   - ldd --version
   - ${COMPILER_CPP} -v
+  - cppcheck --version
   - env
 
   # Appveyor limitation

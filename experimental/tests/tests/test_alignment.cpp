@@ -146,6 +146,7 @@ TEST(AlignmentTest, AlignedStorage)
     std::aligned_storage<sizeof(std::byte) * 512, 8>::type storage;
     static_assert(8 == std::alignment_of_v<decltype(storage)>);
 
+    // cppcheck-suppress memleak
     Alignment8* alignment8 = new (std::addressof(storage)) Alignment8();
     alignment8->next = nullptr;
 }
