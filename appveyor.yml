@@ -49,7 +49,9 @@ after_build:
   - cppcheck --enable=all --inline-suppr --suppress=missingIncludeSystem ${APPVEYOR_BUILD_FOLDER}/${APPVEYOR_PROJECT_NAME}/
 
 test_script:
-  - ./bin/test_${APPVEYOR_PROJECT_NAME}
+  - ctest -V
+
+after_test:
   - if [ "${CONFIGURATION}" = "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME};
     fi

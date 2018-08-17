@@ -26,3 +26,5 @@ target_link_libraries(test_experimental
                       LINK_PRIVATE gtest
                       LINK_PRIVATE gmock
                       LINK_PRIVATE lib_experimental)
+
+add_test(NAME TEST_EXPERIMENTAL COMMAND $<TARGET_FILE:test_experimental>)
