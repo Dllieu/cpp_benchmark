@@ -130,16 +130,6 @@ namespace
         {
             return static_cast<const void*>(std::addressof(this->m_Storage));
         }
-
-        T* Pointer() noexcept
-        {
-            return static_cast<T*>(this->Address());
-        }
-
-        const T* Pointer() const noexcept
-        {
-            return static_cast<const T*>(this->Address());
-        }
     };
 }
 

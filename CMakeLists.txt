@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.2)
 
 set(COMPILER_FLAGS_STANDARD "-std=c++2a -g -D_REENTRANT -fPIC -m64 -fmessage-length=0")
-set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wstrict-aliasing -Wno-unused-local-typedefs -Wno-unused-parameter \
-                            -Wshadow -Wdouble-promotion -Wdeprecated-declarations")
+set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wstrict-aliasing -Wshadow -Wpedantic -Wdouble-promotion \
+                            -Wdeprecated-declarations -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wabi -Wcast-qual \
+                            -Wno-unused-local-typedefs -Wno-unused-parameter")
 
 # -fsanitize=undefined fail on appveyor (16.04)
 set(CMAKE_CXX_FLAGS_DEBUG "-O1                                                          \

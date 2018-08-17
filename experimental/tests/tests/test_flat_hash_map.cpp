@@ -81,7 +81,7 @@ TEST(FlatHashMapTest, AllocationPattern)
     numberOfBuckets = 2 * numberOfBuckets;
     EXPECT_EQ(46u, numberOfBuckets);
 
-    newPrimeIndex = primeNumberHashPolicy.next_size_over(numberOfBuckets);
+    primeNumberHashPolicy.next_size_over(numberOfBuckets);
     EXPECT_EQ(47u, numberOfBuckets);
 
     maximumLookup = std::max(static_cast<std::int8_t>(4), ska::detailv3::log2(numberOfBuckets));

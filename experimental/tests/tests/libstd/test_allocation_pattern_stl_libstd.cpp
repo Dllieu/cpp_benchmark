@@ -67,7 +67,9 @@ TEST(AllocationPatternStlLibStdTest, String)
     }
 
     statisticsChecker.ExpectAllocate(2 * bs.capacity() + 1);
+
     bs = std::string(i, '@');
+    EXPECT_EQ(30u, bs.capacity());
 
     statisticsChecker.IgnoreChecks();
 }

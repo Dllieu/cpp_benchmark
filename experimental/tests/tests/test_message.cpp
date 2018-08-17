@@ -25,7 +25,7 @@
 
 #define GET_4TH_ARG(_1, _2, _3, _4, ...) _4
 #define DECLARE_PROPERTY_WITH_ALIAS(...) \
-    GET_4TH_ARG(__VA_ARGS__, PROPERTY_ALIAS, PROPERTY)
+    GET_4TH_ARG(__VA_ARGS__, PROPERTY_ALIAS, PROPERTY,)
 
 #define VA_DECLARE_PROPERTIES_IMPL(...) \
     DECLARE_PROPERTY_WITH_ALIAS(__VA_ARGS__) \
@@ -54,16 +54,16 @@
     VA_STREAM_FIRST_IMPL(__VA_ARGS__) \
     VA_STREAM_0
 #define VA_STREAM_0(...) \
-    VA_STREAM_IMPL(__VA_ARGS__) \
+    VA_STREAM_IMPL(__VA_ARGS__,) \
     VA_STREAM_1
 #define VA_STREAM_1(...) \
-    VA_STREAM_IMPL(__VA_ARGS__) \
+    VA_STREAM_IMPL(__VA_ARGS__,) \
     VA_STREAM_0
 
 #define DECLARE_MESSAGE(MESSAGE_NAME, LAYOUT_SIZE, ...)                                     \
     struct MESSAGE_NAME                                                                     \
     {                                                                                       \
-        VA_FOR_EACH(VA_DECLARE_PROPERTIES __VA_ARGS__);                                     \
+        VA_FOR_EACH(VA_DECLARE_PROPERTIES __VA_ARGS__)                                      \
     };                                                                                      \
                                                                                             \
     template <std::size_t ExpectedLayoutSize, std::size_t CurrentLayoutSize>                \
@@ -71,7 +71,7 @@
     {                                                                                       \
         static_assert(ExpectedLayoutSize == CurrentLayoutSize, "Layout size mismatch!");    \
         return true;                                                                        \
-    };                                                                                      \
+    }                                                                                       \
     static_assert(true == StaticSizeChecker<LAYOUT_SIZE, sizeof(MESSAGE_NAME)>());          \
                                                                                             \
     std::ostream& operator<<(std::ostream& iOStream, const MESSAGE_NAME& iMessageLayout)    \
@@ -84,10 +84,11 @@ namespace
 {
 #pragma pack(push, 1)
 
+    // cppcheck-suppress unusedFunction
     DECLARE_MESSAGE(Message1, 20,
         (std::uint32_t, Id, ID)
         (std::uint64_t, Price)
-        (std::uint64_t, Quantity));
+        (std::uint64_t, Quantity))
 
 #pragma pack(pop)
 }
@@ -105,4 +106,8 @@ TEST(MessageTest, Usage)
     ss << *m;
 
     EXPECT_EQ("Message1 [Id=0 | Price=0 | Quantity=0]", ss.str());
+
+    Message1 qweqweqwe;
+
+    ss << qweqweqwe;
 }

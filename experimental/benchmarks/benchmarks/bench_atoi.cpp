@@ -226,8 +226,6 @@ namespace
     BENCHMARK_F( FixtureATOI_##N, atoi_vectorization )( benchmark::State& state ) { lambda_atoi_vectorization( state, inputs ); } \
     BENCHMARK_F( FixtureATOI_##N, atoi_vectorization_unroll )( benchmark::State& state ) { lambda_atoi_vectorization_unroll( state, inputs ); }
 
-CALL_MACRO_FOR_EACH(DECLARE_FIXTURE_ATOI, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 30, 42, 64);
+CALL_MACRO_FOR_EACH(DECLARE_FIXTURE_ATOI, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 30, 42, 64)
 
 #undef DECLARE_FIXTURE_ATOI
-
-

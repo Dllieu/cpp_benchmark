@@ -302,12 +302,16 @@ BENCHMARK( bench_cache_matrix_traversal_row )->Apply( matrix_args );
 namespace
 {
     // Array-Of-Structure vs Structure-Of-Array
-    struct Particle { char x, y, z, dx, dy, dz; };
+    struct Particle
+    {
+        Particle() : x(0), y(0), z(0), dx(0), dy(0), dz(0) {}
+        char x, y, z, dx, dy, dz;
+    };
     using AOSParticle = std::vector< Particle >;
 
     struct SOAParticle
     {
-        SOAParticle( size_t n ) : x( n ), y( n ), z( n ), dx( n ), dy( n ), dz( n ) {}
+        explicit SOAParticle( size_t n ) : x( n ), y( n ), z( n ), dx( n ), dy( n ), dz( n ) {}
         std::vector< char > x, y, z, dx, dy, dz;
     };
 
@@ -356,7 +360,7 @@ namespace
 
     struct SOACompactParticle
     {
-        SOACompactParticle( size_t n ) : x( n ), y( n ), z( n ) {}
+        explicit SOACompactParticle( size_t n ) : x( n ), y( n ), z( n ) {}
         std::vector< char > x, y, z;
     };
 
