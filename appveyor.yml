@@ -32,6 +32,7 @@ before_build:
   # Debug logs
   - lsb_release -a
   - ldd --version
+  - ld -v
   - ${COMPILER_CPP} -v
   - cppcheck --version
   - env
