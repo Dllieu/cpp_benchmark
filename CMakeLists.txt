@@ -16,8 +16,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         # Might add -mfpmath=sse -finline-limit=???
         set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations -static-libstdc++")
 
-        # Bin utils issue with gcc 8 on 16.04
-        # -flto -fno-fat-lto-objects -Wno-odr
+        # # Bin utils issue with gcc 8 on 16.04
+        # # -flto -fno-fat-lto-objects -Wno-odr
         # if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
         #         SET(BENCHMARK_ENABLE_LTO ON CACHE BOOL "Build google benchmark with lto")
         # endif()

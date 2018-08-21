@@ -24,7 +24,6 @@ environment:
 install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -y
-  - sudo apt-get install binutils -y
   - sudo apt-get install ${COMPILER}-${COMPILER_VERSION} ${COMPILER_CPP}-${COMPILER_VERSION} -y
   - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP} ${COMPILER_CPP} /usr/bin/${COMPILER_CPP}-${COMPILER_VERSION}
   - sudo apt-get install cppcheck -y
