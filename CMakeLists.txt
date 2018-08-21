@@ -15,7 +15,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
 
         # Might add -mfpmath=sse -finline-limit=???
         # Deactivate odr warning when linking benchmark with lto
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations -static-libstdc++
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations -static-libstdc++ \
                                                                 -flto -fno-fat-lto-objects -Wno-odr")
 
         if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
