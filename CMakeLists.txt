@@ -6,21 +6,21 @@ set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -
                             -Wno-unused-local-typedefs -Wno-unused-parameter")
 
 # -fsanitize=undefined fail on appveyor (16.04)
-set(CMAKE_CXX_FLAGS_DEBUG "-O1                                                          \
-                           -fsanitize=address -fsanitize=leak                           \
-                           -fno-sanitize=alignment")
+set(CMAKE_CXX_FLAGS_DEBUG "-O1 -fsanitize=address -fsanitize=leak -fno-sanitize=alignment")
 # Disable '-fomit-frame-pointer' during profiling
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -fomit-frame-pointer")
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         set(COMPILER_FLAGS_WARNING "${COMPILER_FLAGS_WARNING} -Wduplicated-cond -Wduplicated-branches -Wlogical-op -Wrestrict")
-        #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fdump-class-hierarchy")
 
-        # TODO: -flto (gcc: ar / ranlib / nm)
-        # might add -flto=8 -fno-fat-lto-objects -mfpmath=sse -finline-limit=???
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations \
-                                                                -static-libstdc++")
+        # Might add -mfpmath=sse -finline-limit=???
+        # Deactivate odr warning when linking benchmark with lto
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block -fgraphite-identity -funsafe-loop-optimizations -static-libstdc++
+                                                                -flto -fno-fat-lto-objects -Wno-odr")
 
+        if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
+                SET(BENCHMARK_ENABLE_LTO ON CACHE BOOL "Build google benchmark with lto")
+        endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # Clang is only used for additionals warnings and usage of the sanitizers
         # (Not interested by llvm libc++ at the moment)
