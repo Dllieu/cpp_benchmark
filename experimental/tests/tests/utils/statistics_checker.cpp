@@ -13,8 +13,8 @@ StatisticsChecker::StatisticsChecker()
 
 void StatisticsChecker::IgnoreChecks()
 {
-    EXPECT_EQ(true, this->m_ExpectedAllocatedBytes.empty());
-    EXPECT_EQ(true, this->m_ExpectedDeallocatedBytes.empty());
+    EXPECT_TRUE(this->m_ExpectedAllocatedBytes.empty());
+    EXPECT_TRUE(this->m_ExpectedDeallocatedBytes.empty());
 
     this->m_IgnoreCheck = true;
 }
@@ -36,7 +36,7 @@ void StatisticsChecker::RecordAllocate(std::size_t iAllocatedBytes)
         return;
     }
 
-    EXPECT_EQ(false, this->m_ExpectedAllocatedBytes.empty());
+    EXPECT_FALSE(this->m_ExpectedAllocatedBytes.empty());
     EXPECT_EQ(iAllocatedBytes, this->m_ExpectedAllocatedBytes.front());
 
     this->m_ExpectedAllocatedBytes.pop();
@@ -49,7 +49,7 @@ void StatisticsChecker::RecordDeallocate(std::size_t iDeallocatedBytes)
         return;
     }
 
-    EXPECT_EQ(false, this->m_ExpectedDeallocatedBytes.empty());
+    EXPECT_FALSE(this->m_ExpectedDeallocatedBytes.empty());
     EXPECT_EQ(iDeallocatedBytes, this->m_ExpectedDeallocatedBytes.front());
 
     this->m_ExpectedDeallocatedBytes.pop();

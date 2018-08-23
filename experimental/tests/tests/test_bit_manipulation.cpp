@@ -12,7 +12,7 @@ namespace
         return (((i >> N * CHAR_BIT & std::uint8_t(-1)) << (sizeof(T) - 1 - N) * CHAR_BIT) | ...);
     }
 
-    template<class T, class U = std::make_unsigned_t<T>>
+    template <class T, class U = std::make_unsigned_t<T>>
     constexpr U bit_swap(T i)
     {
         return bit_swap_impl<U>(i, std::make_index_sequence<sizeof(T)>{});
