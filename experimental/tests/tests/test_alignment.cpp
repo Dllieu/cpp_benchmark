@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include <cstddef>
+#include <gtest/gtest.h>
 #include <memory>
 #include <type_traits>
 
@@ -70,8 +70,8 @@ namespace
     static_assert(4 == std::alignment_of_v<Alignment4Bis>);
 
     // Objects of type Alignment8 must be allocated at 8-byte boundaries
-    // because Alignment8::next and Alignment8::prev must be allocated at 8-byte boundaries
-    // because pointer's alignment requirement is (usually) 8
+    // because Alignment8::next and Alignment8::prev must be allocated at 8-byte
+    // boundaries because pointer's alignment requirement is (usually) 8
     struct Alignment8
     {
         void* next;
@@ -123,7 +123,8 @@ namespace
     static_assert(0u == offsetof(Alignment8, next));
     static_assert(8u == offsetof(Alignment8, prev));
 
-    // Generate warning (Non-standard-layout type) but is not undefined behaviour in C++17, and gcc handle it correctly
+// Generate warning (Non-standard-layout type) but is not undefined behaviour in
+// C++17, and gcc handle it correctly
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
     static_assert(16u == offsetof(Alignment8Derived, c));

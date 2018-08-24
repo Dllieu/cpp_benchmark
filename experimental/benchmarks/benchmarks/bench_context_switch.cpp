@@ -45,7 +45,7 @@ namespace
             }
 
             std::this_thread::yield();
-            while (0 < syscall(SYS_futex, futex, FUTEX_WAIT, 0xB, nullptr, nullptr, 42))
+            while (0 != syscall(SYS_futex, futex, FUTEX_WAIT, 0xB, nullptr, nullptr, 42))
             {
                 std::this_thread::yield();
             }
@@ -66,7 +66,7 @@ namespace
         while ( state.KeepRunning() )
         {
             std::this_thread::yield();
-            while (0 < syscall(SYS_futex, futex, FUTEX_WAIT, 0xA, nullptr, nullptr, 42))
+            while (0 != syscall(SYS_futex, futex, FUTEX_WAIT, 0xA, nullptr, nullptr, 42))
             {
                 std::this_thread::yield();
             }
@@ -147,7 +147,7 @@ namespace
             }
 
             std::this_thread::yield();
-            while ( 0 < syscall( SYS_futex, futex, FUTEX_WAIT, 0xB, nullptr, nullptr, 42 ) )
+            while ( 0 != syscall( SYS_futex, futex, FUTEX_WAIT, 0xB, nullptr, nullptr, 42 ) )
             {
                 std::this_thread::yield();
             }
@@ -170,7 +170,7 @@ namespace
         while ( state.KeepRunning() )
         {
             std::this_thread::yield();
-            while ( 0 < syscall( SYS_futex, futex, FUTEX_WAIT, 0xA, nullptr, nullptr, 42 ) )
+            while ( 0 != syscall( SYS_futex, futex, FUTEX_WAIT, 0xA, nullptr, nullptr, 42 ) )
             {
                 std::this_thread::yield();
             }
