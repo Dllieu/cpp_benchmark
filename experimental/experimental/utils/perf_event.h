@@ -1,15 +1,16 @@
 #pragma once
 
+#include <utils/macros.h>
 #include <cstdint>
-// Explicit include
 #include <linux/perf_event.h>
 
-namespace perf
+namespace experimental
 {
     class PerfEvent
     {
     public:
-        PerfEvent( perf_hw_id hardwareEvent );
+        explicit PerfEvent( perf_hw_id hardwareEvent );
+        DELETE_COPY_MOVE_CONSTRUCTOR(PerfEvent);
         ~PerfEvent();
 
         bool        start();

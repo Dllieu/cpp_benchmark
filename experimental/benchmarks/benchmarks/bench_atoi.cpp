@@ -1,10 +1,10 @@
 #include <benchmark/benchmark.h>
-
+#include <cstddef>
+#include <cstdlib>
 #include <array>
 #include <random>
 #include <algorithm>
 #include <iostream>
-
 #include <utils/macros.h>
 #include <utils/utils.h>
 
@@ -18,12 +18,9 @@ namespace
     using StringType = std::array< char, SRING_SIZE >;
 
     template < size_t STRING_SIZE >
-    void    ensure_result_match( const StringType< STRING_SIZE >& );
-
-    template < size_t STRING_SIZE >
     auto    to_string_array( const std::string& s )
     {
-        std::array< char, STRING_SIZE > result;
+        std::array< char, STRING_SIZE > result{};
         if ( s.size() >= STRING_SIZE )
         {
             std::copy( s.begin(), s.begin() + STRING_SIZE, result.begin() );
@@ -46,9 +43,6 @@ namespace
             std::uniform_int_distribution< uint32_t>    rnd( 0, std::numeric_limits< uint32_t >::max() );
 
             std::generate( inputs.begin(), inputs.end(), [ & ] { return to_string_array< STRING_SIZE >( std::to_string( rnd( gen ) ) ); } );
-
-            for ( size_t i = 0; i < inputs.size() && i < 16; ++i )
-                ensure_result_match( inputs[i] );
         }
 
         std::array< StringType< STRING_SIZE >, 1000 > inputs;
@@ -65,7 +59,9 @@ namespace
     {
         T result = 0;
         for ( size_t i = 0; i < STRING_SIZE; ++i )
+        {
             result = result * 10 + ( s[ i ] - '0' ); // computation is dependant of result : no vectorization possible
+        }
         return result;
     }
 }
@@ -79,11 +75,15 @@ namespace
     constexpr T pow_10( size_t n )
     {
         if ( n > std::numeric_limits< T >::digits10 )
+        {
             return 0;
+        }
 
         T res = 1;
         while ( n-- )
+        {
             res *= 10;
+        }
         return res;
     }
 
@@ -93,7 +93,9 @@ namespace
         constexpr Power10Generator() : array()
         {
             for (size_t i = 0; i < STRING_SIZE; ++i)
+            {
                 array[ STRING_SIZE - 1 - i ] = pow_10< T >( i );
+            }
         }
 
         T array[ STRING_SIZE ]; // can't replace by std::array : operator[] non constexpr
@@ -114,7 +116,9 @@ namespace
 
         T result = 0;
         for ( size_t i = 0; i < STRING_SIZE; ++i )
+        {
             result += arrayPower10.array[ i ] * ( s[ i ] - '0' ); // no dependencies, vectorization friendly
+        }
 
         return result;
     }
@@ -137,7 +141,9 @@ namespace
         }
 
         for ( ; i < STRING_SIZE; ++i )
+        {
             result += arrayPower10.array[ i ] * ( s[ i ] - '0' );
+        }
 
         return result;
     }
@@ -148,25 +154,6 @@ namespace
  */
 namespace
 {
-    template < size_t STRING_SIZE >
-    void    ensure_result_match( const StringType< STRING_SIZE >& s )
-    {
-        std::string strRef(s.begin(), s.end());
-        strRef += '\0';
-
-        auto resultRef = (uint32_t)atoi(strRef.c_str());
-        if ( likely( resultRef == atoi_naive(s)
-                     && resultRef == atoi_vectorization(s) )
-                     && resultRef == atoi_vectorization_unroll(s) )
-            return;
-
-        std::cerr << "Incorrect conversion for input: " << strRef << '\n'
-                  << "atoi_naive:                     " << atoi_naive(s) << '\n'
-                  << "atoi_vectorization:             " << atoi_vectorization(s) << '\n'
-                  << "atoi_vectorization_unroll:      " << atoi_vectorization_unroll(s) << std::endl;
-        std::exit(1);
-    }
-
 //    auto lambda_array_traversal = [] ( auto& state, const auto& inputs )
 //    {
 //        size_t i = 0;
@@ -181,7 +168,7 @@ namespace
         {
             auto& input = inputs[ i++ % inputs.size() ];
             input[ input.size() - 1 ] = 0; // Not quite fair but atoi only handle null terminated string (size is evaluated at compile time, but we will need an extra write)
-            benchmark::DoNotOptimize( atoi( input.data() ) ); // avoid warning + can't inline atoi anyway
+            benchmark::DoNotOptimize( std::atoi( input.data() ) ); // NOLINT
         }
     };
 
@@ -226,6 +213,6 @@ namespace
     BENCHMARK_F( FixtureATOI_##N, atoi_vectorization )( benchmark::State& state ) { lambda_atoi_vectorization( state, inputs ); } \
     BENCHMARK_F( FixtureATOI_##N, atoi_vectorization_unroll )( benchmark::State& state ) { lambda_atoi_vectorization_unroll( state, inputs ); }
 
-CALL_MACRO_FOR_EACH(DECLARE_FIXTURE_ATOI, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 30, 42, 64)
+CALL_MACRO_FOR_EACH(DECLARE_FIXTURE_ATOI, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 30, 42, 64) // NOLINT
 
 #undef DECLARE_FIXTURE_ATOI

@@ -37,7 +37,7 @@ namespace
     };
 }
 
-TEST_F(MessageDispatcherTest, Flow)
+TEST_F(MessageDispatcherTest, Flow) // NOLINT
 {
     this->m_MessageDispatcher.RegisterMessage<MessageType::Login, LoginMessage>();
 
@@ -69,7 +69,7 @@ namespace
     DECLARE_DEFAULT_MESSAGE(CancelOrderMessage, MessageType::CancelOrder, experimental::IgnoreMessage);
 }
 
-TEST_F(MessageDispatcherTest, MultipleMessage)
+TEST_F(MessageDispatcherTest, MultipleMessage) // NOLINT
 {
     EXPECT_FALSE(this->m_MessageDispatcher.TryProcess(MessageType::NewOrder, this->m_Buffer.data(), sizeof(NewOrderMessageLayout)));
 

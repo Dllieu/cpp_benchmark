@@ -54,7 +54,7 @@ namespace experimental
     }
 
     template <typename T, typename U, std::size_t BlockSize, typename DefaultAllocator>
-    bool operator==(const AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>&, const AllocatorMemoryPoolFixedSize<U, BlockSize, DefaultAllocator>&) noexcept
+    bool operator==(const AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>& /*unused*/, const AllocatorMemoryPoolFixedSize<U, BlockSize, DefaultAllocator>& /*unused*/) noexcept
     {
         return true;
     }

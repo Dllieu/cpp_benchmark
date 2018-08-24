@@ -111,7 +111,7 @@ namespace
     static_assert(64 == std::alignment_of_v<Alignment64>);
 }
 
-TEST(AlignmentTest, Alignment)
+TEST(AlignmentTest, Alignment) // NOLINT
 {
 }
 
@@ -130,7 +130,7 @@ namespace
 #pragma GCC diagnostic pop
 }
 
-TEST(AlignmentTest, OffsetOf)
+TEST(AlignmentTest, OffsetOf) // NOLINT
 {
 }
 
@@ -155,9 +155,9 @@ namespace
     };
 }
 
-TEST(AlignmentTest, AlignedStorage)
+TEST(AlignmentTest, AlignedStorage) // NOLINT
 {
-    AlignedBuffer<Alignment1> alignedBuffer;
+    AlignedBuffer<Alignment1> alignedBuffer{};
     static_assert(1 == std::alignment_of_v<decltype(alignedBuffer)>);
 
     Alignment1* alignment1 = new (alignedBuffer.Address()) Alignment1();
@@ -165,7 +165,7 @@ TEST(AlignmentTest, AlignedStorage)
 
     EXPECT_EQ(alignment1, alignedBuffer.Address());
 
-    std::aligned_storage<sizeof(std::byte) * 512, 8>::type storage;
+    std::aligned_storage<sizeof(std::byte) * 512, 8>::type storage{};
     static_assert(8 == std::alignment_of_v<decltype(storage)>);
 
     Alignment8* alignment8 = new (std::addressof(storage)) Alignment8();

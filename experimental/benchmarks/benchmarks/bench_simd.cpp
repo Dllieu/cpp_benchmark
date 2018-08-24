@@ -1,12 +1,11 @@
 #include <benchmark/benchmark.h>
-
 #include <emmintrin.h>
 #include <random>
 #include <algorithm>
 #include <array>
 #include <vector>
 #include <limits>
-#include <stdint.h>
+#include <cstdint>
 
 // TODO: test with _mm_stream_si128
 
@@ -15,8 +14,9 @@ namespace
     struct Interval
     {
         Interval()
+            : boundLevel{}
         {
-            std::fill( boundLevel.begin(), boundLevel.end(), std::numeric_limits< int >::max() );
+            boundLevel.fill(std::numeric_limits< int >::max());
         }
 
         /*
@@ -51,7 +51,7 @@ namespace
 namespace
 {
     // Close level difference for easier distribution fairness
-    const std::vector< int > LEVEL_LAYER = {
+    const std::array LEVEL_LAYER = {
          0, // -infinite to 0
          5,
         10,
@@ -67,18 +67,20 @@ namespace
         std::mt19937                                gen( rd() );
         std::uniform_int_distribution< int >        rnd( 0, 50 );
 
-        std::array< int, std::numeric_limits< uint8_t >::max() > inputs;
+        std::array< int, std::numeric_limits< uint8_t >::max() > inputs{};
         std::generate( inputs.begin(), inputs.end(), [ &rnd, &gen ]{ return rnd( gen ); } );
 
         return inputs;
     }
 
     template < typename F >
-    void    start_bench_in_bound( benchmark::State& state, F&& f )
+    void    start_bench_in_bound(benchmark::State& state, F&& f)
     {
         Interval interval;
         for ( size_t i = 1; i < LEVEL_LAYER.size(); ++i )
+        {
             interval.boundLevel[ i - 1 ] = LEVEL_LAYER[ i ];
+        }
 
         auto inputs = generate_inputs();
         uint8_t i = 0; // to not use modulo during the bench when iterating
@@ -100,5 +102,5 @@ namespace
     }
 }
 
-BENCHMARK( bench_simd_in_bound_no_simd );
-BENCHMARK( bench_simd_in_bound );
+BENCHMARK( bench_simd_in_bound_no_simd ); // NOLINT
+BENCHMARK( bench_simd_in_bound ); // NOLINT

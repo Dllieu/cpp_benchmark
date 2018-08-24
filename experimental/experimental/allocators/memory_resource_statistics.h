@@ -16,9 +16,9 @@ namespace experimental
         explicit MemoryResourceStatistics(StatisticsHandler& iStatisticsHandler, pmr::memory_resource* iDefaultResource = pmr::get_default_resource());
 
     protected:
-         virtual void* do_allocate(std::size_t iBytes, std::size_t iAlignment) override;
-         virtual void do_deallocate(void* iPointer, std::size_t iBytes, std::size_t iAlignment) override;
-         virtual bool do_is_equal(const pmr::memory_resource& iMemoryResource) const noexcept override;
+         void* do_allocate(std::size_t iBytes, std::size_t iAlignment) override;
+         void do_deallocate(void* iPointer, std::size_t iBytes, std::size_t iAlignment) override;
+         bool do_is_equal(const pmr::memory_resource& iMemoryResourceStatistics) const noexcept override;
 
     private:
          StatisticsHandler& m_StatisticsHandler;

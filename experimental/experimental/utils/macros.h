@@ -8,20 +8,17 @@
 #define PRAGMA_PACK_PUSH(n) PRAGMA(pack(push,n))
 #define PRAGMA_PACK_POP()   PRAGMA(pack(pop))
 
-namespace experimental
-{
-    force_inline void escape(void* p)
-    {
-        // clobber: what part of the program is modified while this assembly run
-        asm volatile("" :: "g"(p) : "memory");
-    }
+#define DELETE_COPY_CONSTRUCTOR(ClassName) \
+    ClassName(const ClassName&) = delete; \
+    ClassName& operator=(const ClassName&) = delete
 
-    force_inline void clobber()
-    {
-        // prevent the compiler from reordering loads or stores
-        asm volatile("" ::: "memory");
-    }
-}
+#define DELETE_MOVE_CONSTRUCTOR(ClassName) \
+    ClassName(ClassName&&) = delete; \
+    ClassName&& operator=(ClassName&&) = delete
+
+#define DELETE_COPY_MOVE_CONSTRUCTOR(ClassName) \
+    DELETE_COPY_CONSTRUCTOR(ClassName); \
+    DELETE_MOVE_CONSTRUCTOR(ClassName)
 
 #define CONCATENATE(arg1, arg2)  CONCATENATE1(arg1, arg2)
 #define CONCATENATE1(arg1, arg2) CONCATENATE2(arg1, arg2)
@@ -59,3 +56,18 @@ namespace experimental
 
 #define CALL_MACRO_FOR_EACH_(N, MACRO_FUNCTOR, ARG, ...) CONCATENATE(CALL_MACRO_FOR_EACH_, N)(MACRO_FUNCTOR, ARG, __VA_ARGS__)
 #define CALL_MACRO_FOR_EACH(MACRO_FUNCTOR, ARG, ...) CALL_MACRO_FOR_EACH_(CALL_MACRO_FOR_EACH_NARG(ARG, __VA_ARGS__), MACRO_FUNCTOR, ARG, __VA_ARGS__)
+
+namespace experimental
+{
+    force_inline void escape(void* p)
+    {
+        // clobber: what part of the program is modified while this assembly run
+        asm volatile("" :: "g"(p) : "memory"); // NOLINT
+    }
+
+    force_inline void clobber()
+    {
+        // prevent the compiler from reordering loads or stores
+        asm volatile("" ::: "memory"); // NOLINT
+    }
+}

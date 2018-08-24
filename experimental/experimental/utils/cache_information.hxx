@@ -1,6 +1,6 @@
 #include <utils/cache_information.h>
-#include <utils/traits.h>
 #include <utils/macros.h>
+#include <utils/traits.h>
 
 namespace experimental
 {

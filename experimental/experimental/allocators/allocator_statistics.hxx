@@ -32,7 +32,7 @@ namespace experimental
     }
 
     template <typename T, typename U, typename StatisticsHandler, typename DefaultAllocator>
-    bool operator==(const AllocatorStatistics<T, StatisticsHandler, DefaultAllocator>&, const AllocatorStatistics<U, StatisticsHandler, DefaultAllocator>&) noexcept
+    bool operator==(const AllocatorStatistics<T, StatisticsHandler, DefaultAllocator>& /*unused*/, const AllocatorStatistics<U, StatisticsHandler, DefaultAllocator>& /*unused*/) noexcept
     {
         return true;
     }

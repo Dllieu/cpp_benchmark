@@ -16,9 +16,11 @@ namespace
     void    bench_syscall_gettid( benchmark::State& state )
     {
         while ( state.KeepRunning() )
+        {
             // returns the caller's thread ID
             syscall( SYS_gettid );
+        }
     }
 }
 
-BENCHMARK( bench_syscall_gettid );
+BENCHMARK( bench_syscall_gettid ); // NOLINT

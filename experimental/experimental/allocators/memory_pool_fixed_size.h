@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <allocators/memory_block.h>
+#include <utils/macros.h>
 
 namespace experimental
 {
@@ -10,6 +11,7 @@ namespace experimental
     {
     public:
         MemoryPoolFixedSize();
+        DELETE_COPY_MOVE_CONSTRUCTOR(MemoryPoolFixedSize);
         ~MemoryPoolFixedSize() = default;
 
         void ResetMemoryPool(std::size_t iNumberOfBlocks);

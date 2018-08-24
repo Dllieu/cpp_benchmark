@@ -140,18 +140,22 @@ namespace
     void    cache_args( benchmark::internal::Benchmark* b )
     {
         for ( size_t i = 2_KB; i <= 8_MB; i *= 2 )
+        {
             b->Arg( i );
+        }
     }
 
     template < typename ELEMENT_SIZE, typename F >
     void benchmark_with_cache_miss( std::size_t numberElements, F&& f, benchmark::State& state )
     {
         // only the last counter is useful
-        perf::PerfEvent counter( PERF_COUNT_HW_CACHE_MISSES );
+        experimental::PerfEvent counter( PERF_COUNT_HW_CACHE_MISSES );
         auto canCount = counter.start();
 
         while ( state.KeepRunning() )
+        {
             benchmark::DoNotOptimize( f() );
+        }
 
         auto count = counter.stop();
         std::stringstream ss;
@@ -159,9 +163,13 @@ namespace
 
         ss << " | CACHE MISSES: ";
         if ( canCount && state.iterations() > 0 )
+        {
             ss << ( count / state.iterations() );
+        }
         else
+        {
             ss << "DEACTIVATE";
+        }
 
         // Won't be accurate for node based container
         state.SetLabel( ss.str() );
@@ -207,9 +215,9 @@ namespace
     }
 }
 
-BENCHMARK( bench_cache_vector_traversal )->Apply( cache_args );
-BENCHMARK( bench_cache_list_traversal )->Apply( cache_args );
-BENCHMARK( bench_cache_shuffle_list_traversal )->Apply( cache_args );
+BENCHMARK( bench_cache_vector_traversal )->Apply( cache_args ); // NOLINT
+BENCHMARK( bench_cache_list_traversal )->Apply( cache_args ); // NOLINT
+BENCHMARK( bench_cache_shuffle_list_traversal )->Apply( cache_args ); // NOLINT
 
 // Unordered maps can be implemented in a variety of ways, with implications for the memory usage.The fundamental expectation is that there'll be a contiguous array of key/value "buckets",
 // but in real-world implementations the basic design tradeoffs may involve:
@@ -235,7 +243,9 @@ namespace
     {
         std::unordered_set< int > unorderedSet;
         for ( auto i = 0; i < state.range(0); ++i )
+        {
             unorderedSet.insert( i );
+        }
 
         start_traversal( unorderedSet, state );
     }
@@ -244,14 +254,16 @@ namespace
     {
         std::set< int > set;
         for ( auto i = 0; i < state.range(0); ++i )
+        {
             set.insert( i );
+        }
 
         start_traversal( set, state );
     }
 }
 
-BENCHMARK( bench_cache_unordered_map_traversal )->Apply( cache_args );
-BENCHMARK( bench_cache_map_traversal )->Apply( cache_args );
+BENCHMARK( bench_cache_unordered_map_traversal )->Apply( cache_args ); // NOLINT
+BENCHMARK( bench_cache_map_traversal )->Apply( cache_args ); // NOLINT
 
 namespace
 {
@@ -262,8 +274,12 @@ namespace
         {
             auto res = 0;
             for ( auto i = 0; i < dimension; ++i )
+            {
                 for ( auto j = 0; j < dimension; ++j )
+                {
                     res += matrix[ i * dimension + j ];
+                }
+            }
 
             return res;
         };
@@ -278,8 +294,12 @@ namespace
         {
             auto res = 0;
             for ( auto j = 0; j < dimension; ++j )
+            {
                 for ( auto i = 0; i < dimension; ++i )
+                {
                     res += matrix[ i * dimension + j ];
+                }
+            }
 
             return res;
         };
@@ -290,12 +310,14 @@ namespace
     void    matrix_args( benchmark::internal::Benchmark* b )
     {
         for ( size_t i = 64; i <= 8_KB; i *= 2 )
+        {
             b->Arg( i );
+        }
     }
 }
 
-BENCHMARK( bench_cache_matrix_traversal_column )->Apply( matrix_args );
-BENCHMARK( bench_cache_matrix_traversal_row )->Apply( matrix_args );
+BENCHMARK( bench_cache_matrix_traversal_column )->Apply( matrix_args ); // NOLINT
+BENCHMARK( bench_cache_matrix_traversal_row )->Apply( matrix_args ); // NOLINT
 
 namespace
 {
@@ -321,7 +343,9 @@ namespace
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
+            {
                 res += aos[ i ].x + aos[ i ].y + aos[ i ].z;
+            }
             return res;
         };
 
@@ -336,7 +360,9 @@ namespace
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
+            {
                 res += soa.x[ i ] + soa.y[ i ] + soa.z[ i ];
+            }
             return res;
         };
 
@@ -345,8 +371,8 @@ namespace
 }
 
 // SOA is faster (diminishingly as n grows)
-BENCHMARK( bench_cache_aos_partial )->Apply( cache_args );
-BENCHMARK( bench_cache_soa_partial )->Apply( cache_args );
+BENCHMARK( bench_cache_aos_partial )->Apply( cache_args ); // NOLINT
+BENCHMARK( bench_cache_soa_partial )->Apply( cache_args ); // NOLINT
 
 namespace
 {
@@ -369,7 +395,9 @@ namespace
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
+            {
                 res += aos[ i ].x + aos[ i ].y + aos[ i ].z;
+            }
             return res;
         };
 
@@ -383,7 +411,9 @@ namespace
         {
             auto res = 0;
             for ( auto i = 0; i < iteration; ++i )
+            {
                 res += soa.x[ i ] + soa.y[ i ] + soa.z[ i ];
+            }
             return res;
         };
 
@@ -392,5 +422,5 @@ namespace
 }
 
 // SOA is faster (diminishingly as n grows), then slower
-BENCHMARK( bench_cache_aos_full )->Apply( cache_args );
-BENCHMARK( bench_cache_soa_full )->Apply( cache_args );
+BENCHMARK( bench_cache_aos_full )->Apply( cache_args ); // NOLINT
+BENCHMARK( bench_cache_soa_full )->Apply( cache_args ); // NOLINT

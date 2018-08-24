@@ -8,8 +8,6 @@
 #include <cstddef>
 #include <iostream>
 
-using namespace tests;
-
 namespace
 {
     // Carefull as that map store std::pair<K, V> and not std::pair<const K, V> (not sure why yet)
@@ -17,10 +15,10 @@ namespace
 //    using FlatHashMapWithStatsAllocator = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, StatsAllocator<std::pair<K, V>>>;
 
     template <typename K, typename V>
-    using FlatHashMapWithAllocatorStatistics = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, AllocatorStatisticsChecker<std::pair<K, V>>>;
+    using FlatHashMapWithAllocatorStatistics = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, tests::AllocatorStatisticsChecker<std::pair<K, V>>>;
 }
 
-TEST(FlatHashMapTest, AllocationPattern)
+TEST(FlatHashMapTest, AllocationPattern) // NOLINT
 {
     ska::flat_hash_map<std::uint64_t, std::uint64_t> f;
     static_assert(32 == sizeof(f));
@@ -35,7 +33,7 @@ TEST(FlatHashMapTest, AllocationPattern)
     // Default one : Return index for the hash, or return next size which return the closest power of 2 in an hardcoded list (superior or =)
     //ska::power_of_two_hash_policy powerOf2HashPolicy;
 
-    StatisticsChecker statisticsChecker;
+    tests::StatisticsChecker statisticsChecker;
     FlatHashMapWithAllocatorStatistics<std::uint64_t, std::uint64_t> fhm(statisticsChecker);
 
     static_assert(40 == sizeof(fhm));
@@ -95,7 +93,7 @@ TEST(FlatHashMapTest, AllocationPattern)
     statisticsChecker.IgnoreChecks();
 }
 
-TEST(FlatHashMapTest, Retrieval)
+TEST(FlatHashMapTest, Retrieval) // NOLINT
 {
     ska::flat_hash_map<std::uint64_t, std::uint64_t> f;
 

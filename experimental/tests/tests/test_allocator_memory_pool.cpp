@@ -8,7 +8,6 @@
 #include <cstdint>
 
 namespace pmr = std::experimental::fundamentals_v2::pmr;
-using namespace tests;
 
 namespace
 {
@@ -18,13 +17,13 @@ namespace
     constexpr const std::size_t BlockSize = 32;
 }
 
-TEST(AllocatorMemoryPool, Cpp11Way)
+TEST(AllocatorMemoryPool, Cpp11Way) // NOLINT
 {
-    StatisticsChecker statisticsChecker;
-    AllocatorStatisticsChecker<std::uint64_t> alloc(statisticsChecker);
+    tests::StatisticsChecker statisticsChecker;
+    tests::AllocatorStatisticsChecker<std::uint64_t> alloc(statisticsChecker);
 
     experimental::MemoryPoolFixedSize<BlockSize> memoryPool;
-    experimental::AllocatorMemoryPoolFixedSize<std::uint64_t, BlockSize, AllocatorStatisticsChecker<std::uint64_t>> allocMemoryPool(memoryPool, statisticsChecker);
+    experimental::AllocatorMemoryPoolFixedSize<std::uint64_t, BlockSize, tests::AllocatorStatisticsChecker<std::uint64_t>> allocMemoryPool(memoryPool, statisticsChecker);
 
     memoryPool.ResetMemoryPool(64);
 
@@ -47,7 +46,7 @@ TEST(AllocatorMemoryPool, Cpp11Way)
 }
 
 
-namespace std::experimental
+namespace std::experimental // NOLINT
 {
 inline namespace fundamentals_v2
 {
@@ -59,10 +58,10 @@ namespace pmr
 }
 }
 
-TEST(AllocatorMemoryPool, Cpp17Way)
+TEST(AllocatorMemoryPool, Cpp17Way) // NOLINT
 {
-    StatisticsChecker statisticsChecker;
-    MemoryResourceStatisticsChecker memoryResourceStatisticsChecker(statisticsChecker);
+    tests::StatisticsChecker statisticsChecker;
+    tests::MemoryResourceStatisticsChecker memoryResourceStatisticsChecker(statisticsChecker);
 
     experimental::MemoryPoolFixedSize<BlockSize> memoryPool;
     experimental::MemoryResourceMemoryPoolFixedSize<BlockSize> memoryResourceMemoryPool(memoryPool, &memoryResourceStatisticsChecker);

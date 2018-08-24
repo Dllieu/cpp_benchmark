@@ -11,15 +11,13 @@
 #include <string>
 #include <deque>
 
-using namespace tests;
-
-TEST(AllocationPatternStlLibStdTest, Vector)
+TEST(AllocationPatternStlLibStdTest, Vector) // NOLINT
 {
     // struct : allocator { ptr* start ; ptr* finish ; ptr* endOfStorage }
     static_assert(24 == sizeof(std::vector<char>)); // empty base optimization (stateless allocator)
 
-    StatisticsChecker statisticsChecker;
-    std::vector<char, AllocatorStatisticsChecker<char>> v(statisticsChecker);
+    tests::StatisticsChecker statisticsChecker;
+    std::vector<char, tests::AllocatorStatisticsChecker<char>> v(statisticsChecker);
 
     statisticsChecker.ExpectAllocate(10);
     v.reserve(10);
@@ -46,14 +44,14 @@ TEST(AllocationPatternStlLibStdTest, Vector)
     statisticsChecker.IgnoreChecks();
 }
 
-TEST(AllocationPatternStlLibStdTest, String)
+TEST(AllocationPatternStlLibStdTest, String) // NOLINT
 {
     // struct { alloc_hider : allocator { ptr* p; } ; std::size_t length ; union { std::size_t capacity ; char[15 + 1] localBuffer } }
     std::string s;
     static_assert(32 == sizeof(s)); // empty base optimization (stateless allocator)
 
-    StatisticsChecker statisticsChecker;
-    std::basic_string<char, std::char_traits<char>, AllocatorStatisticsChecker<char>> bs(statisticsChecker);
+    tests::StatisticsChecker statisticsChecker;
+    std::basic_string<char, std::char_traits<char>, tests::AllocatorStatisticsChecker<char>> bs(statisticsChecker);
 
     static_assert(40 == sizeof(bs));
 
@@ -74,14 +72,14 @@ TEST(AllocationPatternStlLibStdTest, String)
     statisticsChecker.IgnoreChecks();
 }
 
-TEST(AllocationPatternStlLibStdTest, Deque)
+TEST(AllocationPatternStlLibStdTest, Deque) // NOLINT
 {
     // struct : alloc { elt** _M_map ; std::size_t mapSize; iterator start ; iterator finish } (i.e. _M_map[mapSize]* store mapSize ptr to chunk of memory (they call it node))
     //// with iterator { elt* current ; elt* first ; elt* last ; map_elt* node ; } (i.e. last not used to store an element but to store the address of the next chunk of memory (they call it node))
     std::deque<char> deque;
     static_assert(80 == sizeof(deque));
 
-    StatisticsChecker statisticsChecker;
+    tests::StatisticsChecker statisticsChecker;
 
     using value_type = std::uint64_t;
 
@@ -94,7 +92,7 @@ TEST(AllocationPatternStlLibStdTest, Deque)
     // Then it allocate the nodes (_M_create_nodes), by default it create only one node
     statisticsChecker.ExpectAllocate(dequeBufferSize * sizeof(value_type)); // i.e. 512
 
-    std::deque<value_type, AllocatorStatisticsChecker<value_type>> d(statisticsChecker);
+    std::deque<value_type, tests::AllocatorStatisticsChecker<value_type>> d(statisticsChecker);
 
     // First element can always be inserted in the pre-allocated chunk
     std::size_t i = 0;
@@ -119,7 +117,7 @@ namespace
     static constexpr const std::size_t ListNodeSize = sizeof(std::_List_node<T>);
 }
 
-TEST(AllocationPatternStlLibStdTest, List)
+TEST(AllocationPatternStlLibStdTest, List) // NOLINT
 {
     // struct : allocator { __gnu_cxx::__aligned_membuf<std::size_t> size; node* next ; node* prev ; }
     static_assert(24 == sizeof(std::list<char>)); // empty base optimization (stateless allocator)
@@ -129,8 +127,8 @@ TEST(AllocationPatternStlLibStdTest, List)
     static_assert(24u == nodeSize);
 
 
-    StatisticsChecker statisticsChecker;
-    std::list<char, AllocatorStatisticsChecker<char>> v(statisticsChecker);
+    tests::StatisticsChecker statisticsChecker;
+    std::list<char, tests::AllocatorStatisticsChecker<char>> v(statisticsChecker);
 
     statisticsChecker.ExpectAllocate(nodeSize);
     v.push_back(1);
@@ -151,14 +149,14 @@ namespace
     static constexpr const std::size_t UnorderedMapNodeSize = sizeof(std::__detail::_Hash_node<std::pair<const Key, Value>, false == std::__is_fast_hash<Hash>::value || false == std::__is_nothrow_invocable<const Hash&, const Key&>::value>);
 }
 
-TEST(AllocationPatternStlLibStdTest, UnorderedMap)
+TEST(AllocationPatternStlLibStdTest, UnorderedMap) // NOLINT
 {
     constexpr const std::size_t nodeSize = UnorderedMapNodeSize<char, char, std::hash<char>>;
     static_assert(16u == nodeSize);
 
-    StatisticsChecker statisticsChecker;
+    tests::StatisticsChecker statisticsChecker;
     // No allocation is required at construction, unordered_map use a pre-allocated default node, this is to avoid to add branch (e.g. to avoid branching to check if n != 0 in order to perform modulo)
-    std::unordered_map<char, char, std::hash<char>, std::equal_to<char>, AllocatorStatisticsChecker<std::pair<const char, char>>> v(statisticsChecker);
+    std::unordered_map<char, char, std::hash<char>, std::equal_to<>, tests::AllocatorStatisticsChecker<std::pair<const char, char>>> v(statisticsChecker);
 
     // Max element per bucket ratio (e.g. if max_load_factor / bucket_count >= 1 it will involve a rehash)
     EXPECT_EQ(1.0f, v.max_load_factor());
@@ -193,13 +191,13 @@ TEST(AllocationPatternStlLibStdTest, UnorderedMap)
     statisticsChecker.ExpectDeallocate(nodeSize);
     // Emplacing will allocate a node upfront, call _M_bucket_index, then call _M_find_node, if _M_find_node doesn't return nullptr, node will be deallocated
     // i.e. if the key is not unique, it will perform an allocation + deallocation + bkt traversal
-    auto [it, couldEmplace] = v.emplace(0, 1);
+    auto [it, couldEmplace] = v.emplace(0, 1); // NOLINT (bug)
 
     EXPECT_EQ(false, couldEmplace);
     EXPECT_EQ(0, it->second);
 
     statisticsChecker.ExpectAllocate(nodeSize);
-    statisticsChecker.ExpectAllocate(primeRehashPolicy._M_next_bkt(implicitBucketsCreated * primeRehashPolicy._S_growth_factor) * sizeof(void*));
+    statisticsChecker.ExpectAllocate(primeRehashPolicy._M_next_bkt(implicitBucketsCreated * std::__detail::_Prime_rehash_policy::_S_growth_factor) * sizeof(void*));
     statisticsChecker.ExpectDeallocate(implicitBucketsCreated * sizeof(void*));
     v.emplace(10, 10);
 

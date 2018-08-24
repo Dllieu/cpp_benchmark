@@ -1,5 +1,6 @@
 #pragma once
 
+#include <utils/macros.h>
 #include <queue>
 #include <cstdint>
 
@@ -10,6 +11,7 @@ namespace tests
     {
     public:
         StatisticsChecker();
+        DELETE_COPY_MOVE_CONSTRUCTOR(StatisticsChecker);
         ~StatisticsChecker() = default;
 
         void IgnoreChecks();

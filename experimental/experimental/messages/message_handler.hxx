@@ -4,7 +4,7 @@
 namespace experimental
 {
     template <typename MessageT, typename... MessagesT>
-    bool MessageHandler<MessageT, MessagesT...>::TryProcess(std::byte* iBuffer, std::size_t iBufferSize)
+    force_inline bool MessageHandler<MessageT, MessagesT...>::TryProcess(std::byte* iBuffer, std::size_t iBufferSize)
     {
         if (likely(sizeof(MessageT) == iBufferSize))
         {
@@ -19,7 +19,7 @@ namespace experimental
         }
     }
 
-    bool MessageHandler<>::TryProcess(std::byte* iBuffer, std::size_t iBufferSize)
+    force_inline bool MessageHandler<>::TryProcess(std::byte* /*iBuffer*/, std::size_t /*iBufferSize*/)
     {
         return false;
     }

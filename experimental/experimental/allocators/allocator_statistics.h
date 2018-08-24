@@ -12,9 +12,9 @@ namespace experimental
         using value_type = typename DefaultAllocator::value_type;
 
         AllocatorStatistics() = delete;
-        AllocatorStatistics(StatisticsHandler& iStatisticsHandler) noexcept;
+        AllocatorStatistics(StatisticsHandler& iStatisticsHandler) noexcept; // NOLINT
         AllocatorStatistics(const AllocatorStatistics&) = default;
-        AllocatorStatistics(AllocatorStatistics&&) noexcept = default;
+        AllocatorStatistics(AllocatorStatistics&&) noexcept = default; // NOLINT (bug)
         AllocatorStatistics& operator=(const AllocatorStatistics&) = delete;
         AllocatorStatistics& operator=(AllocatorStatistics&&) = delete;
         ~AllocatorStatistics() noexcept = default;
@@ -26,7 +26,7 @@ namespace experimental
         };
 
         template <typename U>
-        AllocatorStatistics(const AllocatorStatistics<U, StatisticsHandler, typename DefaultAllocator::template rebind<U>::other>& iAllocatorStatistics) noexcept;
+        AllocatorStatistics(const AllocatorStatistics<U, StatisticsHandler, typename DefaultAllocator::template rebind<U>::other>& iAllocatorStatistics) noexcept; // NOLINT
 
         value_type* allocate(std::size_t iNumberOfElements);
         void deallocate(value_type* iPointer, std::size_t iNumberOfElements) noexcept;

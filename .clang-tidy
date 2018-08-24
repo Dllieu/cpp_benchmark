@@ -1,0 +1,29 @@
+---
+Checks:          "*,\
+                  -cppcoreguidelines-owning-memory,\
+                  -cppcoreguidelines-pro-bounds-constant-array-index,\
+                  -cppcoreguidelines-pro-bounds-pointer-arithmetic,\
+                  -cppcoreguidelines-pro-type-reinterpret-cast,\
+                  -cppcoreguidelines-pro-type-vararg,\
+                  -fuchsia-default-arguments,\
+                  -fuchsia-overloaded-operator,\
+                  -google-readability-namespace-comments,\
+                  -google-readability-todo,\
+                  -google-runtime-references,\
+                  -hicpp-signed-bitwise,\
+                  -hicpp-use-auto,\
+                  -hicpp-vararg,\
+                  -llvm-header-guard,\
+                  -llvm-include-order,\
+                  -llvm-namespace-comment,\
+                  -misc-macro-parentheses,\
+                  -misc-sizeof-container,\
+                  -modernize-use-auto,\
+                  -modernize-use-default-member-init,\
+                  -readability-else-after-return,\
+                  -readability-simplify-boolean-expr,\
+                  -readability-static-definition-in-anonymous-namespace"
+
+HeaderFilterRegex: 'experimental/experimental/.*'
+FormatStyle:     none
+...

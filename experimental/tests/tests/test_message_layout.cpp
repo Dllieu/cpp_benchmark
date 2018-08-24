@@ -12,7 +12,7 @@ namespace
         (std::uint64_t, Quantity));
 }
 
-TEST(MessageLayoutTest, Layout)
+TEST(MessageLayoutTest, Layout) // NOLINT
 {
     std::array<std::byte, sizeof(ExampledPacketMessageLayout)> buffer{};
     auto* m = reinterpret_cast<ExampledPacketMessageLayout*>(buffer.data());
