@@ -13,7 +13,7 @@
 
 #include <utils/cache_information.h>
 
-using namespace cache;
+using namespace experimental;
 
 // Test utils
 namespace
@@ -99,7 +99,7 @@ namespace
             memset( buf, i++, ws_pages * PAGE_SIZE );
 
         state.SetItemsProcessed( state.iterations() );
-        state.SetLabel( cache::to_string( cache::byteToAppropriateCacheSize< char >( ws_pages * PAGE_SIZE ) ) );
+        state.SetLabel( experimental::to_string( experimental::byteToAppropriateCacheSize< char >( ws_pages * PAGE_SIZE ) ) );
         free( buf );
     }
 }

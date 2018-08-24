@@ -1,6 +1,6 @@
 #include <utils/cache_information.h>
 
-namespace cache
+namespace experimental
 {
     const char* to_string( CacheSize cacheSize )
     {

@@ -1,16 +1,14 @@
 #pragma once
 
+#include <utils/user_defined_literals.h>
 #include <bits/wordsize.h>
 #include <cstddef>
 
-namespace cache
+namespace experimental
 {
     constexpr const auto PAGE_SIZE = 4'096;
     // In bytes
     constexpr const auto WORD_SIZE = __WORDSIZE / 8;
-
-    constexpr auto operator""_KB( unsigned long long int s ) { return s * 1'024; }
-    constexpr auto operator""_MB( unsigned long long int s ) { return s * 1'024_KB; }
 
     // Max number of segment in L1 = 32KB / 64 = 512
     // Specific Intel Core i5-4460

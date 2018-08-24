@@ -139,7 +139,7 @@ namespace
 
     void    cache_args( benchmark::internal::Benchmark* b )
     {
-        using namespace cache;
+        using namespace experimental;
         for ( size_t i = 2_KB; i <= 8_MB; i *= 2 )
             b->Arg( i );
     }
@@ -156,7 +156,7 @@ namespace
 
         auto count = counter.stop();
         std::stringstream ss;
-        ss << "Require " << std::setw( 4 ) << cache::to_string( cache::byteToAppropriateCacheSize< ELEMENT_SIZE >( numberElements ) );
+        ss << "Require " << std::setw( 4 ) << experimental::to_string( experimental::byteToAppropriateCacheSize< ELEMENT_SIZE >( numberElements ) );
 
         ss << " | CACHE MISSES: ";
         if ( canCount && state.iterations() > 0 )
@@ -290,7 +290,7 @@ namespace
 
     void    matrix_args( benchmark::internal::Benchmark* b )
     {
-        using namespace cache;
+        using namespace experimental;
         for ( size_t i = 64; i <= 8_KB; i *= 2 )
             b->Arg( i );
     }

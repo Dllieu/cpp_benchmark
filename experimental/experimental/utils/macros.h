@@ -1,20 +1,27 @@
 #pragma once
 
-#define likely(x)       __builtin_expect((x),1)
-#define unlikely(x)     __builtin_expect((x),0)
+#define likely(x)           __builtin_expect((x),1)
+#define unlikely(x)         __builtin_expect((x),0)
+#define force_inline        inline __attribute__((always_inline))
 
-//namespace
-//{
-//    void escape(void * p)
-//    {
-//        asm volatile("" : : "g"(p) /**input from c++ to c*/: "memory"/*clobber: what part of the program is modified while this assembly run*/);
-//    }
-//
-//    void clobber()
-//    {
-//        asm volatile("" : : : "memory"); // write in all memory
-//    }
-//}
+#define PRAGMA(X)           _Pragma(#X)
+#define PRAGMA_PACK_PUSH(n) PRAGMA(pack(push,n))
+#define PRAGMA_PACK_POP()   PRAGMA(pack(pop))
+
+namespace experimental
+{
+    force_inline void escape(void* p)
+    {
+        // clobber: what part of the program is modified while this assembly run
+        asm volatile("" :: "g"(p) : "memory");
+    }
+
+    force_inline void clobber()
+    {
+        // prevent the compiler from reordering loads or stores
+        asm volatile("" ::: "memory");
+    }
+}
 
 #define CONCATENATE(arg1, arg2)  CONCATENATE1(arg1, arg2)
 #define CONCATENATE1(arg1, arg2) CONCATENATE2(arg1, arg2)
@@ -23,7 +30,7 @@
 #define VA_FOR_EACH_IMPL(...) __VA_ARGS__##_END
 #define VA_FOR_EACH(...) VA_FOR_EACH_IMPL(__VA_ARGS__)
 
-// Don't mind this (maybe use boost preprocessor some day)
+// Don't mind this
 #define CALL_MACRO_FOR_EACH_1(MACRO_FUNCTOR, ARG) MACRO_FUNCTOR(ARG)
 #define CALL_MACRO_FOR_EACH_2(MACRO_FUNCTOR, ARG, ...) MACRO_FUNCTOR(ARG) CALL_MACRO_FOR_EACH_1(MACRO_FUNCTOR, __VA_ARGS__)
 #define CALL_MACRO_FOR_EACH_3(MACRO_FUNCTOR, ARG, ...) MACRO_FUNCTOR(ARG) CALL_MACRO_FOR_EACH_2(MACRO_FUNCTOR, __VA_ARGS__)

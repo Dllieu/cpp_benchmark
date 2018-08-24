@@ -2,11 +2,18 @@
 
 #include <type_traits>
 
-namespace traits
+namespace experimental
 {
-    template < typename ENUM_TYPE >
-    constexpr auto enum_cast( ENUM_TYPE v )
+    template <std::size_t Expected, std::size_t Current>
+    constexpr bool EnsureEqual()
     {
-        return static_cast< std::underlying_type_t< ENUM_TYPE > >( v );
+        static_assert(Expected == Current, "Mismatch!");
+        return true;
+    }
+
+    template <typename EnumT>
+    constexpr auto enum_cast(EnumT v)
+    {
+        return static_cast<std::underlying_type_t<EnumT>>(v);
     }
 }

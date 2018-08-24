@@ -20,13 +20,13 @@ namespace
     class Interface
     {
     public:
-        Interface()
+        Interface() noexcept
             : m_Name(),
               m_Host()
         {
         }
 
-        Interface(const std::string& iName, const std::string& iHost)
+        Interface(const std::string& iName, const std::string& iHost) noexcept
             : m_Name(iName),
               m_Host(iHost)
         {
@@ -410,14 +410,22 @@ namespace
 
         virtual bool Connect(InterfacesInfo& iInterfacesInfo) final override
         {
+            if (true == this->m_IsConnected)
+            {
+
+            }
+
+            return false;
         }
 
-        virtual bool Disconnect(InterfacesInfo& iInterfacesInfo) final override
+        virtual bool Disconnect() final override
         {
+            return SocketInet::Disconnect();
         }
 
         virtual std::uint64_t Send(const std::byte* iBuffer, std::size_t iLength) final override
         {
+            return 0;
         }
 
         static bool OnRead(SocketEvent* iSocketEvent);
@@ -431,10 +439,19 @@ namespace
 
         virtual bool Create(InterfacesInfo& iInterfacesInfo) final override
         {
+            return false;
         }
 
         bool SetTcpOptionNoDelay()
         {
+            if (-1 == this->m_FileDescriptor)
+            {
+                return false;
+            }
+
+            int value = 1;
+
+            return 0 == setsockopt(this->m_FileDescriptor, IPPROTO_TCP, TCP_NODELAY, reinterpret_cast<const std::byte*>(&value), sizeof(value));
         }
 
         bool SetTcpOptionQuickAck()

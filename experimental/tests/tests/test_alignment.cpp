@@ -9,8 +9,8 @@ namespace
     // because both Alignment1::a and Alignment1::b can be allocated at any address
     struct Alignment1
     {
-        char a;
-        char b;
+        std::byte a;
+        std::byte b;
     };
 
     static_assert(2 == sizeof(Alignment1));
@@ -18,20 +18,42 @@ namespace
 
     struct Alignment1Bis
     {
-        char a[2];
+        std::byte a[2];
     };
 
     static_assert(2 == sizeof(Alignment1Bis));
     static_assert(1 == std::alignment_of_v<Alignment1Bis>);
+
+    struct __attribute__((packed)) Alignment1Packed
+    {
+        std::byte b1;
+        std::int32_t i;
+        std::byte b2;
+    };
+
+    static_assert(6 == sizeof(Alignment1Packed));
+    static_assert(1 == std::alignment_of_v<Alignment1Packed>);
+
+#pragma pack(push, 1)
+    struct Alignment1PackedBis
+    {
+        std::byte b1;
+        std::int32_t i;
+        std::byte b2;
+    };
+#pragma pack(pop)
+
+    static_assert(6 == sizeof(Alignment1PackedBis));
+    static_assert(1 == std::alignment_of_v<Alignment1PackedBis>);
 
     // Objects of type Alignment4 must be allocated at 4-byte boundaries
     // because Alignment4::i must be allocated at 4-byte boundaries
     // because int's alignment requirement is (usually) 4
     struct Alignment4
     {
-        short s;
-        int i;
-        char a;
+        std::int16_t s;
+        std::int32_t i;
+        std::byte a;
     };
 
     static_assert(12 == sizeof(Alignment4));
@@ -39,9 +61,9 @@ namespace
 
     struct Alignment4Bis
     {
-        int i;
-        short s;
-        char a;
+        std::int32_t i;
+        std::int16_t s;
+        std::byte a;
     };
 
     static_assert(8 == sizeof(Alignment4Bis));
@@ -61,7 +83,7 @@ namespace
 
     struct Alignment8Derived : Alignment8
     {
-        char c;
+        std::byte c;
     };
 
     static_assert(24 == sizeof(Alignment8Derived));
@@ -82,7 +104,7 @@ namespace
 
     struct alignas(64) Alignment64
     {
-        char cacheLine[64];
+        std::byte cacheLine[64];
     };
 
     static_assert(64 == sizeof(Alignment64));
@@ -139,7 +161,7 @@ TEST(AlignmentTest, AlignedStorage)
     static_assert(1 == std::alignment_of_v<decltype(alignedBuffer)>);
 
     Alignment1* alignment1 = new (alignedBuffer.Address()) Alignment1();
-    alignment1->a = '0';
+    alignment1->a = std::byte(0);
 
     EXPECT_EQ(alignment1, alignedBuffer.Address());
 

@@ -1,8 +1,10 @@
 #pragma once
 
-namespace utils
+#include <utils/macros.h>
+
+namespace experimental
 {
-    constexpr std::size_t    round_up_to_word( std::size_t size )
+    constexpr force_inline std::size_t    round_up_to_word( std::size_t size )
     {
         auto remainder = size % sizeof( std::size_t ); // sizeof( size_t ) == word size
 
@@ -12,4 +14,3 @@ namespace utils
         return size + sizeof( std::size_t ) - remainder;
     }
 }
-
