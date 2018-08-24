@@ -30,7 +30,10 @@ install:
 
   # Static analysis
   - sudo apt-get install cppcheck -y
-  - sudo apt-get install clang-tidy -y
+  - if [ "${COMPILER}" = "clang" ]; then
+      sudo apt-get install clang-tidy -y
+      sudo apt-get install clang-format -y
+    fi
 
 before_build:
   # Debug logs
