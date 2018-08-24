@@ -139,7 +139,6 @@ namespace
 
     void    cache_args( benchmark::internal::Benchmark* b )
     {
-        using namespace experimental;
         for ( size_t i = 2_KB; i <= 8_MB; i *= 2 )
             b->Arg( i );
     }
@@ -290,7 +289,6 @@ namespace
 
     void    matrix_args( benchmark::internal::Benchmark* b )
     {
-        using namespace experimental;
         for ( size_t i = 64; i <= 8_KB; i *= 2 )
             b->Arg( i );
     }
