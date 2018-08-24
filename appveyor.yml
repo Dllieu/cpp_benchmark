@@ -30,7 +30,7 @@ install:
 
   # Static analysis
   - sudo apt-get install cppcheck -y
-  - if [ "${COMPILER}" = "clang" ]; then
+  - if [[ ${COMPILER} = "clang" ]]; then
       sudo apt-get install clang-tidy -y
       sudo apt-get install clang-format -y
     fi
@@ -55,7 +55,7 @@ build_script:
 after_build:
   # Cannot activate --error-exitcode=1 as there's false positive (16.04)
   - cppcheck --enable=all --inline-suppr --suppress=missingIncludeSystem ../${APPVEYOR_PROJECT_NAME}/
-  - if [ "${COMPILER}" = "clang" ]; then
+  - if [[ ${COMPILER} = "clang" ]]; then
       find ../${APPVEYOR_PROJECT_NAME}/* -name '*.cpp' -not -name 'CMakeCXXCompilerId.cpp' | xargs clang-tidy -p ./ -config ''
     fi
 
@@ -63,7 +63,7 @@ test_script:
   - ctest -V
 
 after_test:
-  - if [ "${CONFIGURATION}" = "Release" ]; then
+  - if [[ ${CONFIGURATION} = "Release" ]]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME};
     fi
 
