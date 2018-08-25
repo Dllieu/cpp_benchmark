@@ -58,9 +58,14 @@ after_build:
   - |
     if [ "${COMPILER}" = "clang" ]; then
       find ../${APPVEYOR_PROJECT_NAME}/* -name '*.cpp' -not -name 'CMakeCXXCompilerId.cpp' -or -name '*.h' -or -name '*.hxx' | xargs clang-format -style=file -output-replacements-xml | grep "<replacement " > /dev/null
+
       if [ $? -ne 1 ]; then
         echo "Formatting change required by clang-format!"
+        exit 1
+      else
+        echo "formatting inline with clang-format"
       fi
+
       find ../${APPVEYOR_PROJECT_NAME}/* -name '*.cpp' -not -name 'CMakeCXXCompilerId.cpp' | xargs clang-tidy-${COMPILER_VERSION} -p ./ -config ''
     fi
 
@@ -74,7 +79,6 @@ after_test:
     fi
 
 # - TODO:
-# clang-format
 # clean benchmarks
 # add benchmark from the presentation
 # report cppcheck
