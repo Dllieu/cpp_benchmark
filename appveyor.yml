@@ -57,7 +57,7 @@ after_build:
   - cppcheck --enable=all --inline-suppr --suppress=missingIncludeSystem ../${APPVEYOR_PROJECT_NAME}/
   - |
     if [ "${COMPILER}" = "clang" ]; then
-      find ../${APPVEYOR_PROJECT_NAME}/* -name '*.cpp' -not -name 'CMakeCXXCompilerId.cpp' -or -name '*.h' -or -name '*.hxx' | xargs clang-format -style=file -output-replacements-xml | grep "<replacement " > /dev/null
+      find ../${APPVEYOR_PROJECT_NAME}/* -name '*.cpp' -not -name 'CMakeCXXCompilerId.cpp' -or -name '*.h' -or -name '*.hxx' | xargs clang-format-${COMPILER_VERSION} -style=file -output-replacements-xml | grep "<replacement " > /dev/null
 
       if [ $? -ne 1 ]; then
         echo "Formatting change required by clang-format!"
