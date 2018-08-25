@@ -30,6 +30,18 @@ add_custom_target(cppcheck
                   --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/cmake/cppcheck_listing.csv
                   ${ALL_CPP_FILES})
 
+add_custom_target(cppcheck-deprecated
+                  COMMAND ${CPPCHECK_PATH}
+                  --std=c++11
+                  --language=c++
+                  --quiet
+                  --inconclusive
+                  --xml-version=2
+
+                  --enable=all
+                  --suppressions-list=${CMAKE_CURRENT_SOURCE_DIR}/cmake/cppcheck_listing.csv
+                  ${ALL_CPP_FILES})
+
 # clang-format
 ensure_program_exist("clang-format" CLANG_FORMAT_PATH)
 

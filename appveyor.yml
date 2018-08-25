@@ -55,7 +55,7 @@ build_script:
 
 after_build:
   # Run Static analysis
-  - make cppcheck
+  - make cppcheck-deprecated
   - |
     make clang-format-xml | grep "<replacement " > /dev/null
 
