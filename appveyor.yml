@@ -57,7 +57,7 @@ after_build:
   # Run Static analysis
   - make cppcheck-deprecated
   - |
-    make clang-format-xml | grep "<replacement " > /dev/null
+    make clang-format-xml | grep "<replacement "
 
     if [ $? -ne 1 ]; then
       echo "Formatting change required by clang-format!"
