@@ -107,7 +107,7 @@ namespace experimental
     template <auto MessageId, typename LayoutT>
     struct Message : public LayoutT
     {
-        static constexpr auto GetExpectedMessageId()
+        [[maybe_unused]] static constexpr auto GetExpectedMessageId()
         {
             return MessageId;
         }

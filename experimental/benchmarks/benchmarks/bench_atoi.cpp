@@ -6,7 +6,6 @@
 #include <iostream>
 #include <random>
 #include <utils/macros.h>
-#include <utils/utils.h>
 
 // The aim of the benchmark is to compute atoi for a known size string
 //  - practical use case: receiving a message from exchange: string size is always fixed / known in advance

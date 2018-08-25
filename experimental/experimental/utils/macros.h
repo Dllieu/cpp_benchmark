@@ -59,15 +59,17 @@
 
 namespace experimental
 {
-    force_inline void escape(void* p)
+    // clang-format off
+    [[maybe_unused]] force_inline void escape(void* p)
     {
-        // clobber: what part of the program is modified while this assembly run
+        // what part of the program is modified while this assembly run
         asm volatile("" ::"g"(p) : "memory"); // NOLINT
     }
 
-    force_inline void clobber()
+    [[maybe_unused]] force_inline void clobber()
     {
         // prevent the compiler from reordering loads or stores
         asm volatile("" ::: "memory"); // NOLINT
     }
+    // clang-format on
 }

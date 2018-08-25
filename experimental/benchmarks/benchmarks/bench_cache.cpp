@@ -10,7 +10,6 @@
 
 #include <utils/cache_information.h>
 #include <utils/perf_event.h>
-#include <utils/utils.h>
 
 // Intel Core i5-4460 (4 cores) (give a general idea - most of the benchmark might give different result depending of the architecture (e.g. if running on a VM with appveyor))
 //
