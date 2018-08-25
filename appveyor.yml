@@ -69,7 +69,7 @@ after_build:
     fi
 
 test_script:
-  - export GTEST_OUTPUT:"xml:gtest_output.xml"
+  - export GTEST_OUTPUT="xml:gtest_output.xml"
   - ctest -V
 
 after_test:
