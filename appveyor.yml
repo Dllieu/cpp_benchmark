@@ -69,13 +69,13 @@ after_build:
     fi
 
 test_script:
-  - export GTEST_OUTPUT:"xml:${PWD}/gtest_output.xml"
+  - export GTEST_OUTPUT:"xml:gtest_output.xml"
   - ctest -V
 
 after_test:
   - |
     $wc = New-Object 'System.Net.WebClient'
-    $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (${PWD}/gtest_output.xml))
+    $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "gtest_output.xml")
 
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
@@ -83,6 +83,7 @@ after_test:
     fi
 
 # - TODO:
+# activate gcovr
 # report cppcheck
 # report test
 # report benchmark + graph
