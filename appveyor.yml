@@ -11,15 +11,16 @@ configuration:
 
 environment:
   UPDATE_ALTERNATIVE_PRIORITY: 9999
+  CLANG_VERSION: 6.0
 
   matrix:
-    # - COMPILER: gcc
-    #   COMPILER_CPP: g++
-    #   COMPILER_VERSION: 8
+    - COMPILER: gcc
+      COMPILER_CPP: g++
+      COMPILER_VERSION: 8
 
     - COMPILER: clang
       COMPILER_CPP: clang++
-      COMPILER_VERSION: 6.0
+      COMPILER_VERSION: ${CLANG_VERSION}
 
 install:
   # Compilers
@@ -30,14 +31,10 @@ install:
 
   # Install Static analysis
   - sudo apt-get install cppcheck -y
-  - |
-    if [ "${COMPILER}" = "clang" ]; then
-      sudo apt-get install clang-tidy-${COMPILER_VERSION} -y
-      sudo ln -s  /usr/bin/clang-tidy /usr/bin/clang-tidy-${COMPILER_VERSION}
-
-      sudo apt-get install clang-format-${COMPILER_VERSION} -y
-      sudo ln -s  /usr/bin/clang-format /usr/bin/clang-format-${COMPILER_VERSION}
-    fi
+  - sudo apt-get install clang-tidy-${CLANG_VERSION} -y
+  - sudo ln -s  /usr/bin/clang-tidy-${CLANG_VERSION} /usr/bin/clang-tidy
+  - sudo apt-get install clang-format-${CLANG_VERSION} -y
+  - sudo ln -s  /usr/bin/clang-format-${CLANG_VERSION} /usr/bin/clang-format
 
 before_build:
   # Debug logs
@@ -60,14 +57,14 @@ after_build:
   # Run Static analysis
   - make cppcheck
   - |
+    make clang-format-xml | grep "<replacement " > /dev/null
+
+    if [ $? -ne 1 ]; then
+      echo "Formatting change required by clang-format!"
+      exit 1
+    fi
+  - |
     if [ "${COMPILER}" = "clang" ]; then
-      make clang-format-xml | grep "<replacement " > /dev/null
-
-      if [ $? -ne 1 ]; then
-        echo "Formatting change required by clang-format!"
-        exit 1
-      fi
-
       make clang-tidy
     fi
 
