@@ -31,8 +31,8 @@ install:
   # Static analysis
   - sudo apt-get install cppcheck -y
   - if [ "${COMPILER}" = "clang" ]; then
-      sudo apt-get install clang-tidy -y;
-      sudo apt-get install clang-format -y;
+      sudo apt-get install clang-tidy-${COMPILER_VERSION} -y;
+      sudo apt-get install clang-format-${COMPILER_VERSION} -y;
     fi
 
 before_build:

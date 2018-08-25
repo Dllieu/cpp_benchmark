@@ -1,26 +1,26 @@
 #pragma once
 
-#define likely(x)           __builtin_expect((x),1)
-#define unlikely(x)         __builtin_expect((x),0)
-#define force_inline        inline __attribute__((always_inline))
+#define likely(x) __builtin_expect((x), 1)
+#define unlikely(x) __builtin_expect((x), 0)
+#define force_inline inline __attribute__((always_inline))
 
-#define PRAGMA(X)           _Pragma(#X)
-#define PRAGMA_PACK_PUSH(n) PRAGMA(pack(push,n))
-#define PRAGMA_PACK_POP()   PRAGMA(pack(pop))
+#define PRAGMA(X) _Pragma(#X)
+#define PRAGMA_PACK_PUSH(n) PRAGMA(pack(push, n))
+#define PRAGMA_PACK_POP() PRAGMA(pack(pop))
 
 #define DELETE_COPY_CONSTRUCTOR(ClassName) \
-    ClassName(const ClassName&) = delete; \
+    ClassName(const ClassName&) = delete;  \
     ClassName& operator=(const ClassName&) = delete
 
 #define DELETE_MOVE_CONSTRUCTOR(ClassName) \
-    ClassName(ClassName&&) = delete; \
+    ClassName(ClassName&&) = delete;       \
     ClassName&& operator=(ClassName&&) = delete
 
 #define DELETE_COPY_MOVE_CONSTRUCTOR(ClassName) \
-    DELETE_COPY_CONSTRUCTOR(ClassName); \
+    DELETE_COPY_CONSTRUCTOR(ClassName);         \
     DELETE_MOVE_CONSTRUCTOR(ClassName)
 
-#define CONCATENATE(arg1, arg2)  CONCATENATE1(arg1, arg2)
+#define CONCATENATE(arg1, arg2) CONCATENATE1(arg1, arg2)
 #define CONCATENATE1(arg1, arg2) CONCATENATE2(arg1, arg2)
 #define CONCATENATE2(arg1, arg2) arg1##arg2
 
@@ -62,7 +62,7 @@ namespace experimental
     force_inline void escape(void* p)
     {
         // clobber: what part of the program is modified while this assembly run
-        asm volatile("" :: "g"(p) : "memory"); // NOLINT
+        asm volatile("" ::"g"(p) : "memory"); // NOLINT
     }
 
     force_inline void clobber()

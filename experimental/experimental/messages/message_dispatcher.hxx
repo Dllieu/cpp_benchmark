@@ -1,6 +1,6 @@
+#include <algorithm>
 #include <messages/message_dispatcher.h>
 #include <messages/message_handler.h>
-#include <algorithm>
 #include <utility>
 
 namespace experimental
