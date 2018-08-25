@@ -1,8 +1,8 @@
 #pragma once
 
-#include <utils/macros.h>
-#include <queue>
 #include <cstdint>
+#include <queue>
+#include <utils/macros.h>
 
 namespace tests
 {

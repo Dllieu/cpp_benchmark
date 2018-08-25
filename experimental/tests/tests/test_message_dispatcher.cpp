@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
+#include <messages/default_messages/ignore_message.h>
 #include <messages/message.h>
 #include <messages/message_dispatcher.h>
-#include <messages/default_messages/ignore_message.h>
-#include <utils/user_defined_literals.h>
 #include <utils/macros.h>
+#include <utils/user_defined_literals.h>
 
 namespace
 {
@@ -14,8 +14,10 @@ namespace
         Login = "LO"_AlphaNumeric,
     };
 
-    DECLARE_LAYOUT_PACKED(LoginMessage, 8,
+    // clang-format off
+    DECLARE_MESSAGE_LAYOUT_PACKED(LoginMessage, 8,
         (std::uint64_t, LoginId));
+    // clang-format on
 
     DECLARE_MESSAGE(LoginMessage, MessageType::Login);
 
@@ -50,19 +52,25 @@ TEST_F(MessageDispatcherTest, Flow) // NOLINT
 
 namespace
 {
-    DECLARE_LAYOUT_PACKED(NewOrderMessage, 18,
+    // clang-format off
+    DECLARE_MESSAGE_LAYOUT_PACKED(NewOrderMessage, 18,
         (std::uint64_t, OrderId)
         (std::uint64_t, Price)
         (std::uint16_t, Quantity));
+    // clang-format on
 
-    DECLARE_LAYOUT_PACKED(DeprecatedNewOrderMessage, 20,
+    // clang-format off
+    DECLARE_MESSAGE_LAYOUT_PACKED(DeprecatedNewOrderMessage, 20,
         (std::uint64_t, OrderId)
         (std::uint64_t, Price)
         (std::uint16_t, Quantity)
         (std::uint16_t, Reserved));
+    // clang-format on
 
-    DECLARE_LAYOUT_PACKED(CancelOrderMessage, 8,
+    // clang-format off
+    DECLARE_MESSAGE_LAYOUT_PACKED(CancelOrderMessage, 8,
         (std::uint64_t, OrderId));
+    // clang-format on
 
     DECLARE_DEFAULT_MESSAGE(NewOrderMessage, MessageType::NewOrder, experimental::IgnoreMessage);
     DECLARE_DEFAULT_MESSAGE(DeprecatedNewOrderMessage, MessageType::NewOrder, experimental::IgnoreMessage);

@@ -1,15 +1,15 @@
+#include <algorithm>
+#include <cstddef>
+#include <deque>
 #include <gtest/gtest.h>
+#include <iostream>
+#include <list>
+#include <numeric>
+#include <queue>
+#include <string>
+#include <unordered_map>
 #include <utils/allocator_statistics_checker.h>
 #include <vector>
-#include <cstddef>
-#include <iostream>
-#include <algorithm>
-#include <numeric>
-#include <list>
-#include <queue>
-#include <unordered_map>
-#include <string>
-#include <deque>
 
 TEST(AllocationPatternStlLibStdTest, Vector) // NOLINT
 {
@@ -126,7 +126,6 @@ TEST(AllocationPatternStlLibStdTest, List) // NOLINT
 
     static_assert(24u == nodeSize);
 
-
     tests::StatisticsChecker statisticsChecker;
     std::list<char, tests::AllocatorStatisticsChecker<char>> v(statisticsChecker);
 
@@ -169,7 +168,7 @@ TEST(AllocationPatternStlLibStdTest, UnorderedMap) // NOLINT
     // New rehashing policy, can be used manually by declaring a _Hashtable, _M_next_bkt will return the next power of 2
     //                                                                       _M_need_rehash will return (if rehash is needed) __n_bkt * _S_growth_factor (2)
     // The compatible range hashing policy is _Mask_range_hashing, it allow to find the right bucket (_M_bucket_index) by doing HashKey & (_M_bucket_count - 1) (which is much more performant as it doesn't include any modulo)
-    //std::__detail::_Power2_rehash_policy power2RehashPolicy(v.max_load_factor());
+    // std::__detail::_Power2_rehash_policy power2RehashPolicy(v.max_load_factor());
 
     // Allocate the bucket array (buckets are stored as a pointer)
     std::size_t implicitBucketsCreated = primeRehashPolicy._M_next_bkt(10);

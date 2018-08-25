@@ -1,15 +1,17 @@
+#include <cstddef>
+#include <cstdint>
 #include <gtest/gtest.h>
 #include <messages/message.h>
-#include <cstddef>
 #include <sstream>
-#include <cstdint>
 
 namespace
 {
-    DECLARE_LAYOUT_PACKED(ExampledPacketMessage, 20,
+    // clang-format off
+    DECLARE_MESSAGE_LAYOUT_PACKED(ExampledPacketMessage, 20,
         (std::uint32_t, Id, ID)
         (std::uint64_t, Price)
         (std::uint64_t, Quantity));
+    // clang-format on
 }
 
 TEST(MessageLayoutTest, Layout) // NOLINT
@@ -31,14 +33,18 @@ TEST(MessageLayoutTest, Layout) // NOLINT
 
 namespace
 {
-    DECLARE_LAYOUT_CUSTOM_PACK(ExampleCustomPaddingMessage, 22, 2,
+    // clang-format off
+    DECLARE_MESSAGE_LAYOUT_CUSTOM_PACK(ExampleCustomPaddingMessage, 22, 2,
         (std::uint32_t, Id, ID)
         (std::uint64_t, Price)
         (std::uint64_t, Quantity)
         (std::int8_t, Flag));
+    // clang-format on
 
-    DECLARE_LAYOUT_DEFAULT_ALIGNMENT(ExampleDefaultAlignmentMessage, 24,
+    // clang-format off
+    DECLARE_MESSAGE_LAYOUT_DEFAULT_ALIGNMENT(ExampleDefaultAlignmentMessage, 24,
         (std::uint32_t, Id, ID)
         (std::uint64_t, Price)
         (std::uint64_t, Quantity));
+    // clang-format on
 }

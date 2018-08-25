@@ -2,21 +2,21 @@
 
 namespace experimental
 {
-    const char* to_string( CacheSize cacheSize )
+    const char* to_string(CacheSize cacheSize)
     {
-        switch ( cacheSize )
+        switch (cacheSize)
         {
-            case CacheSize::L1:
-                return "L1";
+        case CacheSize::L1:
+            return "L1";
 
-            case CacheSize::L2:
-                return "L2";
+        case CacheSize::L2:
+            return "L2";
 
-            case CacheSize::L3:
-                return "L3";
+        case CacheSize::L3:
+            return "L3";
 
-            default:
-                return "DRAM";
+        default:
+            return "DRAM";
         }
     }
 }

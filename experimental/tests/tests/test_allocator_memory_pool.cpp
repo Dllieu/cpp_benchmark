@@ -1,11 +1,11 @@
-#include <gtest/gtest.h>
 #include <allocators/allocator_memory_pool_fixed_size.h>
 #include <allocators/memory_pool_fixed_size.h>
 #include <allocators/memory_resource_memory_pool_fixed_size.h>
-#include <utils/allocator_statistics_checker.h>
 #include <array>
-#include <list>
 #include <cstdint>
+#include <gtest/gtest.h>
+#include <list>
+#include <utils/allocator_statistics_checker.h>
 
 namespace pmr = std::experimental::fundamentals_v2::pmr;
 
@@ -45,17 +45,16 @@ TEST(AllocatorMemoryPool, Cpp11Way) // NOLINT
     statisticsChecker.IgnoreChecks();
 }
 
-
 namespace std::experimental // NOLINT
 {
-inline namespace fundamentals_v2
-{
-namespace pmr
-{
-    template <typename T>
-    using list = std::list<T, pmr::polymorphic_allocator<T>>;
-}
-}
+    inline namespace fundamentals_v2
+    {
+        namespace pmr
+        {
+            template <typename T>
+            using list = std::list<T, pmr::polymorphic_allocator<T>>;
+        }
+    }
 }
 
 TEST(AllocatorMemoryPool, Cpp17Way) // NOLINT

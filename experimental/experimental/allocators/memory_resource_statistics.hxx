@@ -3,9 +3,7 @@
 namespace experimental
 {
     template <typename StatisticsHandler>
-    MemoryResourceStatistics<StatisticsHandler>::MemoryResourceStatistics(StatisticsHandler& iStatisticsHandler, pmr::memory_resource* iDefaultResource)
-        : m_StatisticsHandler(iStatisticsHandler),
-          m_DefaultResource(iDefaultResource)
+    MemoryResourceStatistics<StatisticsHandler>::MemoryResourceStatistics(StatisticsHandler& iStatisticsHandler, pmr::memory_resource* iDefaultResource) : m_StatisticsHandler(iStatisticsHandler), m_DefaultResource(iDefaultResource)
     {
     }
 

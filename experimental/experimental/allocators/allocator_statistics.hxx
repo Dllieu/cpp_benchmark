@@ -3,8 +3,7 @@
 namespace experimental
 {
     template <typename T, typename StatisticsHandler, typename DefaultAllocator>
-    AllocatorStatistics<T, StatisticsHandler, DefaultAllocator>::AllocatorStatistics(StatisticsHandler& iStatisticsHandler) noexcept
-        : m_StatisticsHandler(iStatisticsHandler)
+    AllocatorStatistics<T, StatisticsHandler, DefaultAllocator>::AllocatorStatistics(StatisticsHandler& iStatisticsHandler) noexcept : m_StatisticsHandler(iStatisticsHandler)
     {
     }
 

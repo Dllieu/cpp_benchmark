@@ -11,8 +11,8 @@
 namespace
 {
     // Carefull as that map store std::pair<K, V> and not std::pair<const K, V> (not sure why yet)
-//    template <typename K, typename V>
-//    using FlatHashMapWithStatsAllocator = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, StatsAllocator<std::pair<K, V>>>;
+    //    template <typename K, typename V>
+    //    using FlatHashMapWithStatsAllocator = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, StatsAllocator<std::pair<K, V>>>;
 
     template <typename K, typename V>
     using FlatHashMapWithAllocatorStatistics = ska::flat_hash_map<K, V, std::hash<K>, std::equal_to<K>, tests::AllocatorStatisticsChecker<std::pair<K, V>>>;
@@ -31,7 +31,7 @@ TEST(FlatHashMapTest, AllocationPattern) // NOLINT
     ska::prime_number_hash_policy primeNumberHashPolicy;
 
     // Default one : Return index for the hash, or return next size which return the closest power of 2 in an hardcoded list (superior or =)
-    //ska::power_of_two_hash_policy powerOf2HashPolicy;
+    // ska::power_of_two_hash_policy powerOf2HashPolicy;
 
     tests::StatisticsChecker statisticsChecker;
     FlatHashMapWithAllocatorStatistics<std::uint64_t, std::uint64_t> fhm(statisticsChecker);

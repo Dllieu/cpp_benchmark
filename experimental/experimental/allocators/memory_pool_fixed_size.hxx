@@ -4,9 +4,7 @@
 namespace experimental
 {
     template <std::size_t BlockSize>
-    MemoryPoolFixedSize<BlockSize>::MemoryPoolFixedSize()
-        : m_Head(nullptr),
-          m_MemoryBlock()
+    MemoryPoolFixedSize<BlockSize>::MemoryPoolFixedSize() : m_Head(nullptr), m_MemoryBlock()
     {
     }
 

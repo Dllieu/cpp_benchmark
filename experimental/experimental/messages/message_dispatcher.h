@@ -1,8 +1,8 @@
 #pragma once
 
-#include <utils/macros.h>
-#include <cstddef>
 #include <array>
+#include <cstddef>
+#include <utils/macros.h>
 
 namespace experimental
 {

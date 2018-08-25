@@ -13,14 +13,14 @@ namespace
      *
      *        system calls don't actually cause a full context switch anymore nowadays, the kernel can get away with a "mode switch" (go from user mode to kernel mode, then back to user mode)
      */
-    void    bench_syscall_gettid( benchmark::State& state )
+    void bench_syscall_gettid(benchmark::State& state)
     {
-        while ( state.KeepRunning() )
+        while (state.KeepRunning())
         {
             // returns the caller's thread ID
-            syscall( SYS_gettid );
+            syscall(SYS_gettid);
         }
     }
 }
 
-BENCHMARK( bench_syscall_gettid ); // NOLINT
+BENCHMARK(bench_syscall_gettid); // NOLINT

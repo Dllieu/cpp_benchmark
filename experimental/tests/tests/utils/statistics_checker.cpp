@@ -1,13 +1,10 @@
+#include <cstddef>
 #include <gtest/gtest.h>
 #include <utils/statistics_checker.h>
-#include <cstddef>
 
 namespace tests
 {
-    StatisticsChecker::StatisticsChecker()
-        : m_ExpectedAllocatedBytes(),
-        m_ExpectedDeallocatedBytes(),
-        m_IgnoreCheck(false)
+    StatisticsChecker::StatisticsChecker() : m_ExpectedAllocatedBytes(), m_ExpectedDeallocatedBytes(), m_IgnoreCheck(false)
     {
     }
 

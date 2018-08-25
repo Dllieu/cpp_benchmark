@@ -7,7 +7,7 @@
 #include <utils/traits.h>
 
 #define PROPERTY(PROPERTY_TYPE, PROPERTY_NAME)             \
-  public:                                                  \
+public:                                                    \
     inline const PROPERTY_TYPE& Get##PROPERTY_NAME() const \
     {                                                      \
         return this->m_##PROPERTY_NAME;                    \
@@ -19,11 +19,11 @@
         this->m_##PROPERTY_NAME = std::forward<T>(iValue); \
     }                                                      \
                                                            \
-  protected:                                               \
+protected:                                                 \
     PROPERTY_TYPE m_##PROPERTY_NAME;
 
 #define PROPERTY_ALIAS(PROPERTY_TYPE, PROPERTY_NAME, PROPERTY_ALIAS_NAME) \
-  public:                                                                 \
+public:                                                                   \
     inline const PROPERTY_TYPE& Get##PROPERTY_ALIAS_NAME() const          \
     {                                                                     \
         return this->m_##PROPERTY_NAME;                                   \
@@ -71,7 +71,7 @@
     VA_STREAM_IMPL(__VA_ARGS__, ) \
     VA_STREAM_0
 
-#define DECLARE_LAYOUT_IMPL(LAYOUT_NAME, ...)          \
+#define DECLARE_MESSAGE_LAYOUT_IMPL(LAYOUT_NAME, ...)  \
     struct LAYOUT_NAME##Layout                         \
     {                                                  \
         VA_FOR_EACH(VA_DECLARE_PROPERTIES __VA_ARGS__) \
@@ -86,20 +86,20 @@
                                                                                                                  \
     static_assert(true == experimental::EnsureEqual<LAYOUT_SIZE, sizeof(LAYOUT_NAME##Layout)>())
 
-#define DECLARE_LAYOUT_PACKED(LAYOUT_NAME, LAYOUT_SIZE, ...) \
-    PRAGMA_PACK_PUSH(1)                                      \
-    DECLARE_LAYOUT_IMPL(LAYOUT_NAME, __VA_ARGS__)            \
-    PRAGMA_PACK_POP()                                        \
+#define DECLARE_MESSAGE_LAYOUT_PACKED(LAYOUT_NAME, LAYOUT_SIZE, ...) \
+    PRAGMA_PACK_PUSH(1)                                              \
+    DECLARE_MESSAGE_LAYOUT_IMPL(LAYOUT_NAME, __VA_ARGS__)            \
+    PRAGMA_PACK_POP()                                                \
     DEFINE_LAYOUT_STREAM(LAYOUT_NAME, LAYOUT_SIZE, __VA_ARGS__)
 
-#define DECLARE_LAYOUT_CUSTOM_PACK(LAYOUT_NAME, LAYOUT_SIZE, PACK_REQUIREMENT, ...) \
-    PRAGMA_PACK_PUSH(PACK_REQUIREMENT)                                              \
-    DECLARE_LAYOUT_IMPL(LAYOUT_NAME, __VA_ARGS__)                                   \
-    PRAGMA_PACK_POP()                                                               \
+#define DECLARE_MESSAGE_LAYOUT_CUSTOM_PACK(LAYOUT_NAME, LAYOUT_SIZE, PACK_REQUIREMENT, ...) \
+    PRAGMA_PACK_PUSH(PACK_REQUIREMENT)                                                      \
+    DECLARE_MESSAGE_LAYOUT_IMPL(LAYOUT_NAME, __VA_ARGS__)                                   \
+    PRAGMA_PACK_POP()                                                                       \
     DEFINE_LAYOUT_STREAM(LAYOUT_NAME, LAYOUT_SIZE, __VA_ARGS__)
 
-#define DECLARE_LAYOUT_DEFAULT_ALIGNMENT(LAYOUT_NAME, LAYOUT_SIZE, ...) \
-    DECLARE_LAYOUT_IMPL(LAYOUT_NAME, __VA_ARGS__)                       \
+#define DECLARE_MESSAGE_LAYOUT_DEFAULT_ALIGNMENT(LAYOUT_NAME, LAYOUT_SIZE, ...) \
+    DECLARE_MESSAGE_LAYOUT_IMPL(LAYOUT_NAME, __VA_ARGS__)                       \
     DEFINE_LAYOUT_STREAM(LAYOUT_NAME, LAYOUT_SIZE, __VA_ARGS__)
 
 namespace experimental

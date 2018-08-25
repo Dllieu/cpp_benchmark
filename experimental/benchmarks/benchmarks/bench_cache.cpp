@@ -1,12 +1,12 @@
-#include <benchmark/benchmark.h>
-#include <random>
-#include <list>
 #include <algorithm>
+#include <benchmark/benchmark.h>
+#include <iomanip>
+#include <iostream>
+#include <list>
+#include <random>
 #include <set>
 #include <sstream>
 #include <unordered_set>
-#include <iostream>
-#include <iomanip>
 
 #include <utils/cache_information.h>
 #include <utils/perf_event.h>
@@ -52,8 +52,10 @@
 // Check for more infos: http://www.7-cpu.com/
 
 // Main memory to cache
-// - Memory is transferred from the main memory into the caches in blocks which are smaller than the cache line size.Today 64 bits are transferred at once and the cache line size is (usually) 64 bytes (This means 8 or 16 transfers per cache line are needed)
-// - The DRAM chips can transfer those 64-byte blocks in burst mode.This can fill the cache line without any further commands from the memory controller and the possibly associated delays. If the processor prefetches cache lines this is probably the best way to operate
+// - Memory is transferred from the main memory into the caches in blocks which are smaller than the cache line size.Today 64 bits are transferred at once and the cache line size is (usually) 64 bytes (This means 8 or 16 transfers per cache line are
+// needed)
+// - The DRAM chips can transfer those 64-byte blocks in burst mode.This can fill the cache line without any further commands from the memory controller and the possibly associated delays. If the processor prefetches cache lines this is probably the
+// best way to operate
 // - The memory controller is free to request the words of the cache line in a different order.The processor can communicate which word the program is waiting on, the critical word, and the memory controller can request this word first.
 //   Once the word arrives the program can continue while the rest of the cache line arrives and the cache is not yet in a consistent state.
 //   This technique is called Critical Word First
@@ -82,15 +84,16 @@
 //  - Cache read misses from a data cache usually cause a smaller delay, because instructions not dependent on the cache read can be issued and continue execution until the data is returned from main memory,
 //    and the dependent instructions can resume execution.
 //  - Cache write misses to a data cache generally cause the shortest delay, because the write can be queued and there are few limitations on the execution of subsequent instructions; the processor can continue until the queue is full
-//  - could possibly have cache miss on unlinked data (two static data that are put on the same cache line, N global on different translation unit could also be put in same cache line, same thing for different dynamic allocation, or stack for that matter)
+//  - could possibly have cache miss on unlinked data (two static data that are put on the same cache line, N global on different translation unit could also be put in same cache line, same thing for different dynamic allocation, or stack for that
+//  matter)
 //  - As data cache is 8-way associative, we can know in which block a cache line is depending of the address of the data (i.e. beginning_adress_cache_line(address) % 8)
 //    theoretically we could only work with data that are contains in the same cache block which could result in horrible performance as we would only use 1/8 of the cache available
 
 // About Instruction Cache friendly
 // Any code that changes the flow of execution affects the Instruction Cache. This includes function calls and loops as well as dereferencing function pointers.
 // - When a branch or jump instruction is executed, the processor has to spend extra time deciding if the code is already in the instruction cache or whether it needs to reload the instruction cache( from the destination of the branch ).
-// - For example, some processors may have a large enough instruction cache to hold the execution code for small loops.Some processors don't have a large instruction cache and simple reload it. Reloading of the instruction cache takes time that could be spent executing instructions.
-// What can help
+// - For example, some processors may have a large enough instruction cache to hold the execution code for small loops.Some processors don't have a large instruction cache and simple reload it. Reloading of the instruction cache takes time that could
+// be spent executing instructions. What can help
 // - Reduce "if" statements
 // - Define small functions as inline or macros
 //     -> There is an overhead associated with calling functions, such as storing the return location and reloading the instruction cache.
@@ -125,46 +128,46 @@
 // - WPO (whole program optimization (O3 + unsafe unloop + omit frame ptr + specific target arch instructions + ...))
 namespace
 {
-    template < typename T >
-    T   create_container_random_values( size_t size )
+    template <typename T>
+    T create_container_random_values(size_t size)
     {
-        std::uniform_int_distribution<> rnd( 0, static_cast< int >( size ) - 1 );
+        std::uniform_int_distribution<> rnd(0, static_cast<int>(size) - 1);
         std::mt19937 gen;
 
-        T t( size );
-        std::generate( std::begin( t ), std::end( t ), [ &rnd, &gen ] { return rnd( gen ); } );
+        T t(size);
+        std::generate(std::begin(t), std::end(t), [&rnd, &gen] { return rnd(gen); });
 
         return t;
     }
 
-    void    cache_args( benchmark::internal::Benchmark* b )
+    void cache_args(benchmark::internal::Benchmark* b)
     {
-        for ( size_t i = 2_KB; i <= 8_MB; i *= 2 )
+        for (size_t i = 2_KB; i <= 8_MB; i *= 2)
         {
-            b->Arg( i );
+            b->Arg(i);
         }
     }
 
-    template < typename ELEMENT_SIZE, typename F >
-    void benchmark_with_cache_miss( std::size_t numberElements, F&& f, benchmark::State& state )
+    template <typename ELEMENT_SIZE, typename F>
+    void benchmark_with_cache_miss(std::size_t numberElements, F&& f, benchmark::State& state)
     {
         // only the last counter is useful
-        experimental::PerfEvent counter( PERF_COUNT_HW_CACHE_MISSES );
+        experimental::PerfEvent counter(PERF_COUNT_HW_CACHE_MISSES);
         auto canCount = counter.start();
 
-        while ( state.KeepRunning() )
+        while (state.KeepRunning())
         {
-            benchmark::DoNotOptimize( f() );
+            benchmark::DoNotOptimize(f());
         }
 
         auto count = counter.stop();
         std::stringstream ss;
-        ss << "Require " << std::setw( 4 ) << experimental::to_string( experimental::byteToAppropriateCacheSize< ELEMENT_SIZE >( numberElements ) );
+        ss << "Require " << std::setw(4) << experimental::to_string(experimental::byteToAppropriateCacheSize<ELEMENT_SIZE>(numberElements));
 
         ss << " | CACHE MISSES: ";
-        if ( canCount && state.iterations() > 0 )
+        if (canCount && state.iterations() > 0)
         {
-            ss << ( count / state.iterations() );
+            ss << (count / state.iterations());
         }
         else
         {
@@ -172,7 +175,7 @@ namespace
         }
 
         // Won't be accurate for node based container
-        state.SetLabel( ss.str() );
+        state.SetLabel(ss.str());
     }
 }
 
@@ -187,37 +190,37 @@ namespace
 // shuffled nodes is the worst scenario
 namespace
 {
-    template < typename T >
-    void    start_traversal( const T& container, benchmark::State& state )
+    template <typename T>
+    void start_traversal(const T& container, benchmark::State& state)
     {
-        auto f = [ &container ](){ return std::accumulate( std::begin( container ), std::end( container ), 0 ); };
-        benchmark_with_cache_miss< typename T::value_type >( container.size(), f, state );
+        auto f = [&container]() { return std::accumulate(std::begin(container), std::end(container), 0); };
+        benchmark_with_cache_miss<typename T::value_type>(container.size(), f, state);
     }
 
-    void    bench_cache_vector_traversal( benchmark::State& state )
+    void bench_cache_vector_traversal(benchmark::State& state)
     {
-        auto vector = create_container_random_values< std::vector< char > >( state.range(0) );
-        start_traversal( vector, state );
+        auto vector = create_container_random_values<std::vector<char>>(state.range(0));
+        start_traversal(vector, state);
     }
 
-    void    bench_cache_list_traversal( benchmark::State& state )
+    void bench_cache_list_traversal(benchmark::State& state)
     {
-        auto list = create_container_random_values< std::list< char > >( state.range(0) );
-        start_traversal( list, state );
+        auto list = create_container_random_values<std::list<char>>(state.range(0));
+        start_traversal(list, state);
     }
 
-    void    bench_cache_shuffle_list_traversal( benchmark::State& state )
+    void bench_cache_shuffle_list_traversal(benchmark::State& state)
     {
-        auto shuffleList = create_container_random_values< std::list< char > >( state.range(0) );
+        auto shuffleList = create_container_random_values<std::list<char>>(state.range(0));
         shuffleList.sort();
 
-        start_traversal( shuffleList, state );
+        start_traversal(shuffleList, state);
     }
 }
 
-BENCHMARK( bench_cache_vector_traversal )->Apply( cache_args ); // NOLINT
-BENCHMARK( bench_cache_list_traversal )->Apply( cache_args ); // NOLINT
-BENCHMARK( bench_cache_shuffle_list_traversal )->Apply( cache_args ); // NOLINT
+BENCHMARK(bench_cache_vector_traversal)->Apply(cache_args);       // NOLINT
+BENCHMARK(bench_cache_list_traversal)->Apply(cache_args);         // NOLINT
+BENCHMARK(bench_cache_shuffle_list_traversal)->Apply(cache_args); // NOLINT
 
 // Unordered maps can be implemented in a variety of ways, with implications for the memory usage.The fundamental expectation is that there'll be a contiguous array of key/value "buckets",
 // but in real-world implementations the basic design tradeoffs may involve:
@@ -239,188 +242,191 @@ BENCHMARK( bench_cache_shuffle_list_traversal )->Apply( cache_args ); // NOLINT
 // and do less distinct allocations and deallocations as well as working better with caches, but it's far from guaranteed.
 namespace
 {
-    void    bench_cache_unordered_map_traversal( benchmark::State& state )
+    void bench_cache_unordered_map_traversal(benchmark::State& state)
     {
-        std::unordered_set< int > unorderedSet;
-        for ( auto i = 0; i < state.range(0); ++i )
+        std::unordered_set<int> unorderedSet;
+        for (auto i = 0; i < state.range(0); ++i)
         {
-            unorderedSet.insert( i );
+            unorderedSet.insert(i);
         }
 
-        start_traversal( unorderedSet, state );
+        start_traversal(unorderedSet, state);
     }
 
-    void    bench_cache_map_traversal( benchmark::State& state )
+    void bench_cache_map_traversal(benchmark::State& state)
     {
-        std::set< int > set;
-        for ( auto i = 0; i < state.range(0); ++i )
+        std::set<int> set;
+        for (auto i = 0; i < state.range(0); ++i)
         {
-            set.insert( i );
+            set.insert(i);
         }
 
-        start_traversal( set, state );
+        start_traversal(set, state);
     }
 }
 
-BENCHMARK( bench_cache_unordered_map_traversal )->Apply( cache_args ); // NOLINT
-BENCHMARK( bench_cache_map_traversal )->Apply( cache_args ); // NOLINT
+BENCHMARK(bench_cache_unordered_map_traversal)->Apply(cache_args); // NOLINT
+BENCHMARK(bench_cache_map_traversal)->Apply(cache_args);           // NOLINT
 
 namespace
 {
-    void    bench_cache_matrix_traversal_column( benchmark::State& state )
+    void bench_cache_matrix_traversal_column(benchmark::State& state)
     {
-        auto matrix = create_container_random_values< std::vector< char > >( state.range(0) * state.range(0) );
-        auto f = [ &matrix, dimension = state.range(0) ]()
-        {
+        auto matrix = create_container_random_values<std::vector<char>>(state.range(0) * state.range(0));
+        auto f = [&matrix, dimension = state.range(0)]() {
             auto res = 0;
-            for ( auto i = 0; i < dimension; ++i )
+            for (auto i = 0; i < dimension; ++i)
             {
-                for ( auto j = 0; j < dimension; ++j )
+                for (auto j = 0; j < dimension; ++j)
                 {
-                    res += matrix[ i * dimension + j ];
+                    res += matrix[i * dimension + j];
                 }
             }
 
             return res;
         };
 
-        benchmark_with_cache_miss< typename decltype( matrix )::value_type >( matrix.size(), f, state );
+        benchmark_with_cache_miss<typename decltype(matrix)::value_type>(matrix.size(), f, state);
     }
 
-    void    bench_cache_matrix_traversal_row( benchmark::State& state )
+    void bench_cache_matrix_traversal_row(benchmark::State& state)
     {
-        auto matrix = create_container_random_values< std::vector< char > >( state.range(0) * state.range(0) );
-        auto f = [ &matrix, dimension = state.range(0) ]()
-        {
+        auto matrix = create_container_random_values<std::vector<char>>(state.range(0) * state.range(0));
+        auto f = [&matrix, dimension = state.range(0)]() {
             auto res = 0;
-            for ( auto j = 0; j < dimension; ++j )
+            for (auto j = 0; j < dimension; ++j)
             {
-                for ( auto i = 0; i < dimension; ++i )
+                for (auto i = 0; i < dimension; ++i)
                 {
-                    res += matrix[ i * dimension + j ];
+                    res += matrix[i * dimension + j];
                 }
             }
 
             return res;
         };
 
-        benchmark_with_cache_miss< typename decltype( matrix )::value_type >( matrix.size(), f, state );
+        benchmark_with_cache_miss<typename decltype(matrix)::value_type>(matrix.size(), f, state);
     }
 
-    void    matrix_args( benchmark::internal::Benchmark* b )
+    void matrix_args(benchmark::internal::Benchmark* b)
     {
-        for ( size_t i = 64; i <= 8_KB; i *= 2 )
+        for (size_t i = 64; i <= 8_KB; i *= 2)
         {
-            b->Arg( i );
+            b->Arg(i);
         }
     }
 }
 
-BENCHMARK( bench_cache_matrix_traversal_column )->Apply( matrix_args ); // NOLINT
-BENCHMARK( bench_cache_matrix_traversal_row )->Apply( matrix_args ); // NOLINT
+BENCHMARK(bench_cache_matrix_traversal_column)->Apply(matrix_args); // NOLINT
+BENCHMARK(bench_cache_matrix_traversal_row)->Apply(matrix_args);    // NOLINT
 
 namespace
 {
     // Array-Of-Structure vs Structure-Of-Array
     struct Particle
     {
-        Particle() : x(0), y(0), z(0), dx(0), dy(0), dz(0) {}
+        Particle() : x(0), y(0), z(0), dx(0), dy(0), dz(0)
+        {
+        }
         char x, y, z, dx, dy, dz;
     };
-    using AOSParticle = std::vector< Particle >;
+    using AOSParticle = std::vector<Particle>;
 
     struct SOAParticle
     {
-        explicit SOAParticle( size_t n ) : x( n ), y( n ), z( n ), dx( n ), dy( n ), dz( n ) {}
-        std::vector< char > x, y, z, dx, dy, dz;
+        explicit SOAParticle(size_t n) : x(n), y(n), z(n), dx(n), dy(n), dz(n)
+        {
+        }
+        std::vector<char> x, y, z, dx, dy, dz;
     };
 
     // 64 / ( 6 / 3 ) / sizeof( char ) = 32 useful values per fetch average (6 / 3 :  only need x, y, z)
-    void    bench_cache_aos_partial( benchmark::State& state )
+    void bench_cache_aos_partial(benchmark::State& state)
     {
-        AOSParticle aos( state.range(0) );
-        auto f = [ &aos, iteration = state.range(0) ]()
-        {
+        AOSParticle aos(state.range(0));
+        auto f = [&aos, iteration = state.range(0)]() {
             auto res = 0;
-            for ( auto i = 0; i < iteration; ++i )
+            for (auto i = 0; i < iteration; ++i)
             {
-                res += aos[ i ].x + aos[ i ].y + aos[ i ].z;
+                res += aos[i].x + aos[i].y + aos[i].z;
             }
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
+        benchmark_with_cache_miss<AOSParticle>(state.range(0), f, state);
     }
 
     // 64 / sizeof( char ) = 64 useful values per fetch
-    void    bench_cache_soa_partial( benchmark::State& state )
+    void bench_cache_soa_partial(benchmark::State& state)
     {
-        SOAParticle soa( state.range(0) );
-        auto f = [ &soa, iteration = state.range(0) ]()
-        {
+        SOAParticle soa(state.range(0));
+        auto f = [&soa, iteration = state.range(0)]() {
             auto res = 0;
-            for ( auto i = 0; i < iteration; ++i )
+            for (auto i = 0; i < iteration; ++i)
             {
-                res += soa.x[ i ] + soa.y[ i ] + soa.z[ i ];
+                res += soa.x[i] + soa.y[i] + soa.z[i];
             }
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
+        benchmark_with_cache_miss<AOSParticle>(state.range(0), f, state);
     }
 }
 
 // SOA is faster (diminishingly as n grows)
-BENCHMARK( bench_cache_aos_partial )->Apply( cache_args ); // NOLINT
-BENCHMARK( bench_cache_soa_partial )->Apply( cache_args ); // NOLINT
+BENCHMARK(bench_cache_aos_partial)->Apply(cache_args); // NOLINT
+BENCHMARK(bench_cache_soa_partial)->Apply(cache_args); // NOLINT
 
 namespace
 {
     // Both fetch only useful values
     // SOA is faster (diminishingly as n grows), because CPU can prefetch x, y, z in parallel
     // (e.g. big picture: aos need to prefetch (stale) every N bytes, but soa only need to prefetch every N * 3 (the is more expensive, but less than the stale depending of the cache layer))
-    struct CompactParticle { char x, y, z; };
-    using AOSCompactParticle = std::vector< CompactParticle >;
+    struct CompactParticle
+    {
+        char x, y, z;
+    };
+    using AOSCompactParticle = std::vector<CompactParticle>;
 
     struct SOACompactParticle
     {
-        explicit SOACompactParticle( size_t n ) : x( n ), y( n ), z( n ) {}
-        std::vector< char > x, y, z;
+        explicit SOACompactParticle(size_t n) : x(n), y(n), z(n)
+        {
+        }
+        std::vector<char> x, y, z;
     };
 
-    void    bench_cache_aos_full( benchmark::State& state )
+    void bench_cache_aos_full(benchmark::State& state)
     {
-        AOSCompactParticle aos( state.range(0) );
-        auto f = [ &aos, iteration = state.range(0) ]()
-        {
+        AOSCompactParticle aos(state.range(0));
+        auto f = [&aos, iteration = state.range(0)]() {
             auto res = 0;
-            for ( auto i = 0; i < iteration; ++i )
+            for (auto i = 0; i < iteration; ++i)
             {
-                res += aos[ i ].x + aos[ i ].y + aos[ i ].z;
+                res += aos[i].x + aos[i].y + aos[i].z;
             }
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
+        benchmark_with_cache_miss<AOSParticle>(state.range(0), f, state);
     }
 
-    void    bench_cache_soa_full( benchmark::State& state )
+    void bench_cache_soa_full(benchmark::State& state)
     {
-        SOACompactParticle soa( state.range(0) );
-        auto f = [ &soa, iteration = state.range(0) ]()
-        {
+        SOACompactParticle soa(state.range(0));
+        auto f = [&soa, iteration = state.range(0)]() {
             auto res = 0;
-            for ( auto i = 0; i < iteration; ++i )
+            for (auto i = 0; i < iteration; ++i)
             {
-                res += soa.x[ i ] + soa.y[ i ] + soa.z[ i ];
+                res += soa.x[i] + soa.y[i] + soa.z[i];
             }
             return res;
         };
 
-        benchmark_with_cache_miss< AOSParticle >( state.range(0), f, state );
+        benchmark_with_cache_miss<AOSParticle>(state.range(0), f, state);
     }
 }
 
 // SOA is faster (diminishingly as n grows), then slower
-BENCHMARK( bench_cache_aos_full )->Apply( cache_args ); // NOLINT
-BENCHMARK( bench_cache_soa_full )->Apply( cache_args ); // NOLINT
+BENCHMARK(bench_cache_aos_full)->Apply(cache_args); // NOLINT
+BENCHMARK(bench_cache_soa_full)->Apply(cache_args); // NOLINT

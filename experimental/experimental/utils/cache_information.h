@@ -20,10 +20,10 @@ namespace experimental
         DRAM
     };
 
-    const char* to_string( CacheSize cacheSize );
+    const char* to_string(CacheSize cacheSize);
 
-    template < typename T >
-    CacheSize   byteToAppropriateCacheSize( std::size_t numberElements );
+    template <typename T>
+    CacheSize byteToAppropriateCacheSize(std::size_t numberElements);
 }
 
 #include <utils/cache_information.hxx>

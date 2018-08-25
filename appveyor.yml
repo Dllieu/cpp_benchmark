@@ -55,6 +55,7 @@ after_build:
   # Cannot activate --error-exitcode=1 as there's false positive (16.04)
   - cppcheck --enable=all --inline-suppr --suppress=missingIncludeSystem ../${APPVEYOR_PROJECT_NAME}/
   - if [ "${COMPILER}" = "clang" ]; then
+      find ../${APPVEYOR_PROJECT_NAME}/* -name '*.cpp' -not -name 'CMakeCXXCompilerId.cpp' -or -name '*.h' -or -name '*.hxx' | xargs clang-format -i;
       find ../${APPVEYOR_PROJECT_NAME}/* -name '*.cpp' -not -name 'CMakeCXXCompilerId.cpp' | xargs clang-tidy -p ./ -config '';
     fi
 
