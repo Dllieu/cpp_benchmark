@@ -28,7 +28,7 @@ def find_xml_header_index(xmlFile):
 if __name__ == "__main__":
     args = setup_args()
 
-    bla = pd.read_csv(args.googlebenchmark_xml, header=find_xml_header_index(args.googlebenchmark_json))
+    bla = pd.read_csv(args.googlebenchmark_xml, header=find_xml_header_index(args.googlebenchmark_xml))
     print(bla)
 
     subprocess.call('echo appveyor PushArtifact BLABLA.JPG', shell=True)
