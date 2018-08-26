@@ -6,7 +6,7 @@ matrix:
   fast_finish: true
 
 configuration:
-  - Debug
+  #- Debug
   - Release
 
 environment:
@@ -20,9 +20,9 @@ environment:
       COMPILER_CPP: g++
       COMPILER_VERSION: 8
 
-    - COMPILER: clang
-      COMPILER_CPP: clang++
-      COMPILER_VERSION: ${CLANG_VERSION}
+    # - COMPILER: clang
+    #   COMPILER_CPP: clang++
+    #   COMPILER_VERSION: ${CLANG_VERSION}
 
 install:
   # Compilers
@@ -42,7 +42,7 @@ install:
   - sudo apt-get install clang-format-${CLANG_VERSION} -y
   - sudo ln -s  /usr/bin/clang-format-${CLANG_VERSION} /usr/bin/clang-format
 
-  - appveyor AddMessage 'Install succeed!'
+  - appveyor AddMessage 'Install succeed!' -Category Information
 
 before_build:
   # Debug logs
@@ -56,12 +56,12 @@ before_build:
 
   - git submodule update --init --recursive
   - mkdir build && cd build
-  - export GTEST_OUTPUT="xml:${PWD}/${GTEST_OUTPUT_FILE}"
+  - export GTEST_OUTPUT="xml:${GTEST_OUTPUT_FILE}"
   - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER_CPP} -DCMAKE_BUILD_TYPE=${CONFIGURATION} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
 build_script:
   - make -j8 VERBOSE=1
-  - appveyor AddMessage 'Build succeed!'
+  - appveyor AddMessage 'Build succeed!' -Category Information
 
 after_build:
   - make cppcheck-deprecated
@@ -77,19 +77,21 @@ after_build:
       make clang-tidy
     fi
 
-  - appveyor AddMessage 'Static analysis succeed!'
+  - appveyor AddMessage 'Static analysis succeed!' -Category Information
 
 test_script:
   - ctest -V
-  - appveyor AddMessage 'Tests succeed!'
+
+  - appveyor PushArtifact ${GTEST_OUTPUT_FILE}
+  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${GTEST_OUTPUT_FILE}
+  - appveyor AddMessage 'Tests succeed!' -Category Information
 
 after_test:
-  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/${GTEST_OUTPUT_FILE}
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME}
       #appveyor PushArtifact Testing/Temporary/LastTest.log # push json?
-      appveyor AddMessage 'Benchmark succeed!'
+      appveyor AddMessage 'Benchmark succeed!' -Category Information
     fi
 
 # - TODO:
