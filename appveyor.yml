@@ -38,7 +38,7 @@ install:
   - sudo apt-get update -y
   - sudo apt-get install python${PYTHON_VERSION} -y
   - sudo update-alternatives --install /usr/bin/python${PYTHON_MAJOR_VERSION} python${PYTHON_MAJOR_VERSION} /usr/bin/python${PYTHON_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY}
-  - sudo apt-get install python${PYTHON_MAJOR_VERSION}-pip
+  - sudo apt-get install python${PYTHON_MAJOR_VERSION}-pip -y
 
   # Install Static analysis + coverage
   - sudo apt-get install gcovr -y
