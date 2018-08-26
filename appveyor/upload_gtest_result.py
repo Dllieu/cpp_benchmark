@@ -28,4 +28,4 @@ if __name__ == "__main__":
     appVeyorTestReportResults.sort()
 
     for appVeyorTestReportResult in appVeyorTestReportResults:
-        subprocess.call("echo " + appVeyorTestReportResult, shell=True)
+        subprocess.call(appVeyorTestReportResult, shell=True)

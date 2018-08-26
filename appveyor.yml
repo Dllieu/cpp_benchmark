@@ -42,7 +42,7 @@ install:
   - sudo apt-get install clang-format-${CLANG_VERSION} -y
   - sudo ln -s  /usr/bin/clang-format-${CLANG_VERSION} /usr/bin/clang-format
 
-  - appveyor AddCompilationMessage 'install succeed!'
+  - appveyor AddMessage 'Install succeed!'
 
 before_build:
   # Debug logs
@@ -61,7 +61,7 @@ before_build:
 
 build_script:
   - make -j8 VERBOSE=1
-  - appveyor AddCompilationMessage 'build succeed!'
+  - appveyor AddMessage 'Build succeed!'
 
 after_build:
   - make cppcheck-deprecated
@@ -77,13 +77,11 @@ after_build:
       make clang-tidy
     fi
 
-  - appveyor AddCompilationMessage 'static analysis succeed!'
+  - appveyor AddMessage 'Static analysis succeed!'
 
 test_script:
-  - ls -l
   - ctest -V
-  - ls -l
-  - appveyor AddCompilationMessage 'ctest succeed!'
+  - appveyor AddMessage 'ctest succeed!'
 
 after_test:
   - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/${GTEST_OUTPUT_FILE}
@@ -91,7 +89,7 @@ after_test:
     if [ "${CONFIGURATION}" == "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME}
       #appveyor PushArtifact Testing/Temporary/LastTest.log # push json?
-      appveyor AddCompilationMessage 'benchmark succeed!'
+      appveyor AddMessage 'Benchmark succeed!'
     fi
 
 # - TODO:
