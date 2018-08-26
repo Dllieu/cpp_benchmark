@@ -81,7 +81,7 @@ after_build:
 
 test_script:
   - ctest -V
-  - appveyor AddMessage 'ctest succeed!'
+  - appveyor AddMessage 'Tests succeed!'
 
 after_test:
   - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/${GTEST_OUTPUT_FILE}
