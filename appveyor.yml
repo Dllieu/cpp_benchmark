@@ -10,8 +10,11 @@ configuration:
   - Release
 
 environment:
-  UPDATE_ALTERNATIVE_PRIORITY: 9999
   CLANG_VERSION: 6.0
+  PYTHON_MAJOR_VERSION: 3
+  # 3.7 break Ubuntu if change default python3
+  PYTHON_VERSION: ${PYTHON_MAJOR_VERSION}.6
+  UPDATE_ALTERNATIVE_PRIORITY: 9999
 
   matrix:
     - COMPILER: gcc
@@ -29,9 +32,13 @@ install:
   - sudo apt-get install ${COMPILER}-${COMPILER_VERSION} ${COMPILER_CPP}-${COMPILER_VERSION} -y
   - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP} ${COMPILER_CPP} /usr/bin/${COMPILER_CPP}-${COMPILER_VERSION}
 
+  # Python
+  - sudo apt-get install python${PYTHON_VERSION}
+  - sudo update-alternatives --install /usr/bin/python${PYTHON_MAJOR_VERSION} python${PYTHON_MAJOR_VERSION} /usr/bin/python${PYTHON_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY}
+  - sudo apt-get install python${PYTHON_MAJOR_VERSION}-pip
+
   # Install Static analysis + coverage
   - sudo apt-get install gcovr -y
-
   - sudo apt-get install cppcheck -y
   - sudo apt-get install clang-tidy-${CLANG_VERSION} -y
   - sudo ln -s  /usr/bin/clang-tidy-${CLANG_VERSION} /usr/bin/clang-tidy
@@ -77,16 +84,10 @@ after_build:
 test_script:
   - export GTEST_OUTPUT="xml:gtest_output.xml"
   - ctest -V
-
-  - appveyor AddTest BLAAAA -Framework NUnit -FileName TESTTTTTYYYYYYYYYYYYYYYY.cpp -Outcome Passed
   - appveyor AddCompilationMessage 'ctest succeed!'
 
 after_test:
-  # - |
-  #   $wc = New-Object 'System.Net.WebClient'
-  #   $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", "gtest_output.xml")
-  #   appveyor AddCompilationMessage 'upload gtest_output.xml'
-
+  - appveyor/upload_gtest_result --gtest_xml=gtest_output.xml
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME}
@@ -97,7 +98,6 @@ after_test:
 # - TODO:
 # activate gcovr
 # report cppcheck
-# report test
 # report benchmark + graph (json + pandas)
 # lto release (on hold until 18.04 release on appveyor)
 # clean benchmarks

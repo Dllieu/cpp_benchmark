@@ -12,7 +12,6 @@ endif()
 
 include_directories(${PATH_LIB_EXPERIMENTAL})
 include_directories("${PATH_GOOGLE_BENCHMARK}/include")
-
 aux_source_directory(benchmarks SRC_BENCHMARKS)
 
 add_executable(benchmark_experimental ${SRC_BENCHMARKS})
@@ -21,4 +20,3 @@ target_link_libraries(benchmark_experimental
                       LINK_PRIVATE Threads::Threads
                       LINK_PRIVATE benchmark
                       LINK_PRIVATE lib_experimental)
-

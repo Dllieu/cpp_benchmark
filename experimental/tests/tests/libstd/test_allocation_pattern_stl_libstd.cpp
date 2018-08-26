@@ -11,7 +11,7 @@
 #include <utils/allocator_statistics_checker.h>
 #include <vector>
 
-TEST(AllocationPatternStlLibStdTest, Vector) // NOLINT
+TEST(AllocationPatternStlLibstdTest, Vector) // NOLINT
 {
     // struct : allocator { ptr* start ; ptr* finish ; ptr* endOfStorage }
     static_assert(24 == sizeof(std::vector<char>)); // empty base optimization (stateless allocator)
@@ -44,7 +44,7 @@ TEST(AllocationPatternStlLibStdTest, Vector) // NOLINT
     statisticsChecker.IgnoreChecks();
 }
 
-TEST(AllocationPatternStlLibStdTest, String) // NOLINT
+TEST(AllocationPatternStlLibstdTest, String) // NOLINT
 {
     // struct { alloc_hider : allocator { ptr* p; } ; std::size_t length ; union { std::size_t capacity ; char[15 + 1] localBuffer } }
     std::string s;
@@ -72,7 +72,7 @@ TEST(AllocationPatternStlLibStdTest, String) // NOLINT
     statisticsChecker.IgnoreChecks();
 }
 
-TEST(AllocationPatternStlLibStdTest, Deque) // NOLINT
+TEST(AllocationPatternStlLibstdTest, Deque) // NOLINT
 {
     // struct : alloc { elt** _M_map ; std::size_t mapSize; iterator start ; iterator finish } (i.e. _M_map[mapSize]* store mapSize ptr to chunk of memory (they call it node))
     //// with iterator { elt* current ; elt* first ; elt* last ; map_elt* node ; } (i.e. last not used to store an element but to store the address of the next chunk of memory (they call it node))
@@ -117,7 +117,7 @@ namespace
     static constexpr const std::size_t ListNodeSize = sizeof(std::_List_node<T>);
 }
 
-TEST(AllocationPatternStlLibStdTest, List) // NOLINT
+TEST(AllocationPatternStlLibstdTest, List) // NOLINT
 {
     // struct : allocator { __gnu_cxx::__aligned_membuf<std::size_t> size; node* next ; node* prev ; }
     static_assert(24 == sizeof(std::list<char>)); // empty base optimization (stateless allocator)
@@ -148,7 +148,7 @@ namespace
     static constexpr const std::size_t UnorderedMapNodeSize = sizeof(std::__detail::_Hash_node<std::pair<const Key, Value>, false == std::__is_fast_hash<Hash>::value || false == std::__is_nothrow_invocable<const Hash&, const Key&>::value>);
 }
 
-TEST(AllocationPatternStlLibStdTest, UnorderedMap) // NOLINT
+TEST(AllocationPatternStlLibstdTest, UnorderedMap) // NOLINT
 {
     constexpr const std::size_t nodeSize = UnorderedMapNodeSize<char, char, std::hash<char>>;
     static_assert(16u == nodeSize);

@@ -6,11 +6,10 @@ include(cmake/compilation_flag.cmake)
 include(cmake/external.cmake)
 include(cmake/tools.cmake)
 
-set(PATH_LIB_EXPERIMENTAL "${CMAKE_CURRENT_SOURCE_DIR}/experimental/experimental")
-
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(PATH_LIB_EXPERIMENTAL "${CMAKE_CURRENT_SOURCE_DIR}/experimental/experimental")
 
 enable_testing()
 add_subdirectory(experimental/experimental)
