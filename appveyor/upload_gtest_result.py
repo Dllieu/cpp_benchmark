@@ -2,6 +2,18 @@ import argparse
 import subprocess
 import xml.etree.ElementTree as etree
 
+def setup_args():
+    parser = argparse.ArgumentParser()
+    parser._action_groups.pop()
+
+    requiredArguments = parser.add_argument_group('required arguments')
+    requiredArguments.add_argument("--gtest_xml", help="XML filename from gtest output", required=True)
+
+    optionalArguments = parser.add_argument_group('optional arguments')
+    optionalArguments.add_argument("--debug", action='store_true', help="Echo output instead of sending to appveyor")
+
+    return parser.parse_args()
+
 def format_filename(testsuite_name):
     formalizedName = ''.join(['_{}'.format(c.lower()) if c.isupper() else c for c in testsuite_name])
     formalizedName = formalizedName.replace('_test', '')
@@ -9,11 +21,7 @@ def format_filename(testsuite_name):
     return 'test{}.cpp'.format(formalizedName)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--gtest_xml_output", help="XML filename from gtest output")
-    parser.add_argument("--debug", action='store_true', help="Echo output instead of sending to appveyor")
-
-    args = parser.parse_args()
+    args = setup_args()
 
     testsuites = etree.parse(args.gtest_xml_output)
 

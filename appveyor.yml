@@ -11,8 +11,9 @@ configuration:
 
 environment:
   CLANG_VERSION: 6.0
+  CPP_CHECK_OUTPUT_FILE: cppcheck_output.xml
   GTEST_OUTPUT_FILE: gtest_output.xml
-  GBENCHMARK_OUTPUT_FILE: gbenchmark_output.json
+  GOOGLEBENCHMARK_OUTPUT_FILE: googlebenchmark_output.xml
   PYTHON_MAJOR_VERSION: 3
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
@@ -34,6 +35,7 @@ install:
 
   # Python
   - sudo apt-get install python${PYTHON_MAJOR_VERSION}-pip -y
+  - pip${PYTHON_MAJOR_VERSION} install pandas
 
   # Install Static analysis + coverage
   - sudo apt-get install gcovr -y
@@ -65,7 +67,9 @@ build_script:
   - appveyor AddMessage 'Build succeed!' -Category Information
 
 after_build:
-  - make cppcheck-deprecated
+  - make cppcheck-deprecated 2> ${PWD}/${CPP_CHECK_OUTPUT_FILE}
+  - appveyor PushArtifact ${PWD}/${CPP_CHECK_OUTPUT_FILE}
+
   - |
     make clang-format-xml | grep "<replacement "
 
@@ -90,15 +94,16 @@ test_script:
 after_test:
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
-      ./bin/benchmark_${APPVEYOR_PROJECT_NAME} --benchmark_filter=bench_cache_.*_partial --benchmark_out=${PWD}/${GBENCHMARK_OUTPUT_FILE} --benchmark_out_format=json
-      appveyor PushArtifact ${PWD}/${GBENCHMARK_OUTPUT_FILE}
+      ./bin/benchmark_${APPVEYOR_PROJECT_NAME} --benchmark_filter=bench_cache_.*_partial --benchmark_out=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE} --benchmark_out_format=xml
+
+      python3 ../appveyor/upload_googlebenchmark_result.py --googlebenchmark_xml=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE}
+      appveyor PushArtifact ${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE}
       appveyor AddMessage 'Benchmark succeed!' -Category Information
     fi
 
 # - TODO:
 # activate gcovr
 # report cppcheck
-# report benchmark + graph (json + pandas)
 # lto release (on hold until 18.04 release on appveyor)
 # clean benchmarks
 # add benchmark from the presentation
