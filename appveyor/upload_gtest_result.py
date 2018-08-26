@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     for testsuite in testsuites.getroot():
         for testcase in testsuite:
-          outcome = 'Passed' if 'run' == testsuite.get('status') else 'Failed'
+          outcome = 'Passed' if 'run' == testcase.get('status') else 'Failed'
           testcaseName = '{}/{}'.format(testsuite.get('name'), testcase.get('name'))
 
           appVeyorTestReportResults.append(appVeyorTestReportTemplate.format(testcaseName, format_filename(testsuite.get('name')), outcome, testsuite.get('time')))
@@ -28,4 +28,4 @@ if __name__ == "__main__":
     appVeyorTestReportResults.sort()
 
     for appVeyorTestReportResult in appVeyorTestReportResults:
-        subprocess.call(appVeyorTestReportResult, shell=True)
+        subprocess.call("echo " + appVeyorTestReportResult, shell=True)
