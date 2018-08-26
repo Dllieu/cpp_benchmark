@@ -23,7 +23,7 @@ def format_filename(testsuite_name):
 if __name__ == "__main__":
     args = setup_args()
 
-    testsuites = etree.parse(args.gtest_xml_output)
+    testsuites = etree.parse(args.gtest_xml)
 
     appVeyorTestReportTemplate = 'appveyor AddTest {} -Framework NUnit -Filename {} -Outcome {} -Duration {}'
     if args.debug:
