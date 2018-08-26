@@ -56,7 +56,7 @@ before_build:
 
   - git submodule update --init --recursive
   - mkdir build && cd build
-  - export GTEST_OUTPUT="xml:${GTEST_OUTPUT_FILE}"
+  - export GTEST_OUTPUT="xml:${PWD}/${GTEST_OUTPUT_FILE}"
   - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER_CPP} -DCMAKE_BUILD_TYPE=${CONFIGURATION} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
 build_script:
@@ -82,8 +82,8 @@ after_build:
 test_script:
   - ctest -V
 
-  - appveyor PushArtifact ${GTEST_OUTPUT_FILE}
-  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${GTEST_OUTPUT_FILE}
+  - appveyor PushArtifact ${PWD}/${GTEST_OUTPUT_FILE}
+  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/${GTEST_OUTPUT_FILE}
   - appveyor AddMessage 'Tests succeed!' -Category Information
 
 after_test:
