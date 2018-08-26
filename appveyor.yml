@@ -11,6 +11,7 @@ configuration:
 
 environment:
   CLANG_VERSION: 6.0
+  GTEST_OUTPUT_FILE: gtest_output.xml
   PYTHON_MAJOR_VERSION: 3
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
@@ -55,6 +56,7 @@ before_build:
 
   - git submodule update --init --recursive
   - mkdir build && cd build
+  - export GTEST_OUTPUT="xml:${PWD}/${GTEST_OUTPUT_FILE}"
   - cmake -DCMAKE_CXX_COMPILER=/usr/bin/${COMPILER_CPP} -DCMAKE_BUILD_TYPE=${CONFIGURATION} -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 
 build_script:
@@ -78,12 +80,13 @@ after_build:
   - appveyor AddCompilationMessage 'static analysis succeed!'
 
 test_script:
-  - export GTEST_OUTPUT="xml:gtest_output.xml"
+  - ls -l
   - ctest -V
+  - ls -l
   - appveyor AddCompilationMessage 'ctest succeed!'
 
 after_test:
-  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/gtest_output.xml
+  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/${GTEST_OUTPUT_FILE}
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME}
