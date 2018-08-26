@@ -90,7 +90,7 @@ test_script:
   - appveyor AddCompilationMessage 'ctest succeed!'
 
 after_test:
-  - ../appveyor/upload_gtest_result --gtest_xml=gtest_output.xml
+  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=gtest_output.xml
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME}
