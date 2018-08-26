@@ -33,6 +33,9 @@ install:
   - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP} ${COMPILER_CPP} /usr/bin/${COMPILER_CPP}-${COMPILER_VERSION}
 
   # Python
+  # Ugly hack 16.04
+  - sudo add-apt-repository ppa:jonathonf/python-${PYTHON_VERSION}
+  - sudo apt-get update -y
   - sudo apt-get install python${PYTHON_VERSION}
   - sudo update-alternatives --install /usr/bin/python${PYTHON_MAJOR_VERSION} python${PYTHON_MAJOR_VERSION} /usr/bin/python${PYTHON_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY}
   - sudo apt-get install python${PYTHON_MAJOR_VERSION}-pip
