@@ -12,6 +12,7 @@ configuration:
 environment:
   CLANG_VERSION: 6.0
   GTEST_OUTPUT_FILE: gtest_output.xml
+  GBENCHMARK_OUTPUT_FILE: gbenchmark_output.json
   PYTHON_MAJOR_VERSION: 3
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
@@ -82,15 +83,15 @@ after_build:
 test_script:
   - ctest -V
 
-  - appveyor PushArtifact ${PWD}/${GTEST_OUTPUT_FILE}
   - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/${GTEST_OUTPUT_FILE}
+  - appveyor PushArtifact ${PWD}/${GTEST_OUTPUT_FILE}
   - appveyor AddMessage 'Tests succeed!' -Category Information
 
 after_test:
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
-      ./bin/benchmark_${APPVEYOR_PROJECT_NAME}
-      #appveyor PushArtifact Testing/Temporary/LastTest.log # push json?
+      ./bin/benchmark_${APPVEYOR_PROJECT_NAME} --benchmark_filter=bench_cache_.*_partial --benchmark_out=${PWD}/${GBENCHMARK_OUTPUT_FILE} --benchmark_out_format=json
+      appveyor PushArtifact ${PWD}/${GBENCHMARK_OUTPUT_FILE}
       appveyor AddMessage 'Benchmark succeed!' -Category Information
     fi
 
