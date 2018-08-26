@@ -94,7 +94,7 @@ test_script:
 after_test:
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
-      ./bin/benchmark_${APPVEYOR_PROJECT_NAME} --benchmark_filter=bench_cache_.*_partial --benchmark_out=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE} --benchmark_out_format=csv
+      ./bin/benchmark_${APPVEYOR_PROJECT_NAME} --benchmark_out=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE} --benchmark_out_format=csv
 
       python3 ../appveyor/upload_googlebenchmark_result.py --googlebenchmark_csv=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE}
       appveyor PushArtifact ${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE}
