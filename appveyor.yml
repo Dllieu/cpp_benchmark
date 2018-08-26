@@ -12,8 +12,6 @@ configuration:
 environment:
   CLANG_VERSION: 6.0
   PYTHON_MAJOR_VERSION: 3
-  # 3.7 break Ubuntu if change default python3
-  PYTHON_VERSION: ${PYTHON_MAJOR_VERSION}.6
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
   matrix:
@@ -33,11 +31,6 @@ install:
   - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP} ${COMPILER_CPP} /usr/bin/${COMPILER_CPP}-${COMPILER_VERSION}
 
   # Python
-  # Ugly hack 16.04
-  - sudo add-apt-repository ppa:jonathonf/python-${PYTHON_VERSION}
-  - sudo apt-get update -y
-  - sudo apt-get install python${PYTHON_VERSION} -y
-  - sudo update-alternatives --install /usr/bin/python${PYTHON_MAJOR_VERSION} python${PYTHON_MAJOR_VERSION} /usr/bin/python${PYTHON_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY}
   - sudo apt-get install python${PYTHON_MAJOR_VERSION}-pip -y
 
   # Install Static analysis + coverage
@@ -90,7 +83,7 @@ test_script:
   - appveyor AddCompilationMessage 'ctest succeed!'
 
 after_test:
-  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=gtest_output.xml
+  - python3 ../appveyor/upload_gtest_result.py --gtest_xml=${PWD}/gtest_output.xml
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME}
