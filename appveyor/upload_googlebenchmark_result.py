@@ -103,6 +103,6 @@ if __name__ == "__main__":
             testname_df.plot(ax=ax, label=testname, legend=True)
             ax.set_xticklabels(testname_df.index)
 
-        filename = os.path.join(os.getcwd(), '{}.png'.format(category))
+        filename = os.path.join(os.getcwd(), 'googlebenchmark_graph_{}.png'.format(category))
         fig.savefig(filename)
         subprocess.call('appveyor PushArtifact {}'.format(filename), shell=True)
