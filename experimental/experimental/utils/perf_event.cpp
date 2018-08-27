@@ -33,7 +33,8 @@ namespace
 
 namespace experimental
 {
-    PerfEvent::PerfEvent(perf_hw_id hardwareEvent) : m_Fd(perf_event_open(hardwareEvent, 0, -1, -1, 0))
+    PerfEvent::PerfEvent(perf_hw_id hardwareEvent)
+        : m_Fd(perf_event_open(hardwareEvent, 0, -1, -1, 0))
     {
         // NOTHING
     }

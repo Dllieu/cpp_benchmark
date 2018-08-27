@@ -1,5 +1,5 @@
-#include <numeric>
 #include <benchmark/benchmark.h>
+#include <numeric>
 #include <set>
 #include <unordered_set>
 #include <utils/cache_information.h>
@@ -59,5 +59,5 @@ namespace
     }
 }
 
-BENCHMARK(CacheSetTraversal_OrderedSetBenchmark)->RangeMultiplier(2)->Range(1_KB, 64_KB); // NOLINT
+BENCHMARK(CacheSetTraversal_OrderedSetBenchmark)->RangeMultiplier(2)->Range(1_KB, 64_KB);   // NOLINT
 BENCHMARK(CacheSetTraversal_UnorderedSetBenchmark)->RangeMultiplier(2)->Range(1_KB, 64_KB); // NOLINT

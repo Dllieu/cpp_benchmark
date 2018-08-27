@@ -9,7 +9,9 @@ namespace
     struct NakedStructure
     {
         NakedStructure()
-            : m_X(0), m_Y(0), m_Z(0)
+            : m_X(0)
+            , m_Y(0)
+            , m_Z(0)
         {
         }
 
@@ -38,12 +40,16 @@ namespace
     struct NakedStructureWithUnusedMembers
     {
         NakedStructureWithUnusedMembers()
-            : m_X(0), m_Y(0), m_Z(0), m_DX(0), m_DY(0), m_DZ(0)
+            : m_X(0)
+            , m_Y(0)
+            , m_Z(0)
+            , m_DX(0)
+            , m_DY(0)
+            , m_DZ(0)
         {
         }
 
-        std::size_t m_X, m_Y, m_Z;
-        [[maybe_unused]] std::size_t m_DX, m_DY, m_DZ;
+        std::size_t m_X, m_Y, m_Z, m_DX, m_DY, m_DZ;
     };
 
     // 64 / ( 6 / 3 ) / sizeof( std::uint8_t ) = 32 useful values per fetch average (6 / 3 as we only need x, y, z)
@@ -68,7 +74,9 @@ namespace
     struct StructureOfArrays
     {
         explicit StructureOfArrays(std::size_t n)
-            : m_X(n), m_Y(n), m_Z(n)
+            : m_X(n)
+            , m_Y(n)
+            , m_Z(n)
         {
         }
 
@@ -97,12 +105,16 @@ namespace
     struct StructureOfArraysWithUnusedMembers
     {
         explicit StructureOfArraysWithUnusedMembers(std::size_t n)
-            : m_X(n), m_Y(n), m_Z(n), m_DX(n), m_DY(n), m_DZ(n)
+            : m_X(n)
+            , m_Y(n)
+            , m_Z(n)
+            , m_DX(n)
+            , m_DY(n)
+            , m_DZ(n)
         {
         }
 
-        std::vector<std::size_t> m_X, m_Y, m_Z;
-        [[maybe_unused]] std::vector<std::size_t> m_DX, m_DY, m_DZ;
+        std::vector<std::size_t> m_X, m_Y, m_Z, m_DX, m_DY, m_DZ;
     };
 
     // 64 useful values per fetch
@@ -125,7 +137,7 @@ namespace
     }
 }
 
-BENCHMARK(CacheStructureAndArray_ArrayOfStructure)->Range(2_KB, 8_MB); // NOLINT
-BENCHMARK(CacheStructureAndArray_ArrayOfStructureWithUnusedMembers)->Range(2_KB, 8_MB); // NOLINT
-BENCHMARK(CacheStructureAndArray_StructureOfArrays)->Range(2_KB, 8_MB); // NOLINT
+BENCHMARK(CacheStructureAndArray_ArrayOfStructure)->Range(2_KB, 8_MB);                   // NOLINT
+BENCHMARK(CacheStructureAndArray_ArrayOfStructureWithUnusedMembers)->Range(2_KB, 8_MB);  // NOLINT
+BENCHMARK(CacheStructureAndArray_StructureOfArrays)->Range(2_KB, 8_MB);                  // NOLINT
 BENCHMARK(CacheStructureAndArray_StructureOfArraysWithUnusedMembers)->Range(2_KB, 8_MB); // NOLINT

@@ -3,7 +3,9 @@
 namespace experimental
 {
     template <std::size_t BlockSize>
-    MemoryResourceMemoryPoolFixedSize<BlockSize>::MemoryResourceMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool, pmr::memory_resource* iDefaultResource) : m_MemoryPool(iMemoryPool), m_DefaultResource(iDefaultResource)
+    MemoryResourceMemoryPoolFixedSize<BlockSize>::MemoryResourceMemoryPoolFixedSize(MemoryPoolFixedSize<BlockSize>& iMemoryPool, pmr::memory_resource* iDefaultResource)
+        : m_MemoryPool(iMemoryPool)
+        , m_DefaultResource(iDefaultResource)
     {
     }
 

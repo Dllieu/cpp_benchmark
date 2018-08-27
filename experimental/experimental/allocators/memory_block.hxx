@@ -3,7 +3,9 @@
 namespace experimental
 {
     template <std::size_t BlockSize>
-    MemoryBlock<BlockSize>::MemoryBlock() : m_Blocks(nullptr), m_NumberOfBlocks(0)
+    MemoryBlock<BlockSize>::MemoryBlock()
+        : m_Blocks(nullptr)
+        , m_NumberOfBlocks(0)
     {
     }
 

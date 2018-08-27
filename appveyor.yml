@@ -103,6 +103,5 @@ after_test:
 
 # - TODO:
 # activate gcovr
-# lto release (on hold until 18.04 release on appveyor)
-# clean benchmarks
 # add benchmark from the presentation
+# lto release (on hold until 18.04 release on appveyor)

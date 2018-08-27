@@ -4,7 +4,10 @@
 
 namespace tests
 {
-    StatisticsChecker::StatisticsChecker() : m_ExpectedAllocatedBytes(), m_ExpectedDeallocatedBytes(), m_IgnoreCheck(false)
+    StatisticsChecker::StatisticsChecker()
+        : m_ExpectedAllocatedBytes()
+        , m_ExpectedDeallocatedBytes()
+        , m_IgnoreCheck(false)
     {
     }
 

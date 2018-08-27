@@ -1,5 +1,5 @@
-#include <numeric>
 #include <benchmark/benchmark.h>
+#include <numeric>
 #include <set>
 #include <unordered_set>
 #include <utils/cache_information.h>
@@ -10,7 +10,7 @@ namespace
     {
         std::size_t dimension = iState.range(0);
         auto matrix = std::vector<std::int8_t>(dimension * dimension);
-        std::generate(std::begin(matrix), std::end(matrix), [n = 0] () mutable { return n++; });
+        std::generate(std::begin(matrix), std::end(matrix), [n = 0]() mutable { return n++; });
 
         std::size_t n = 0;
         for ([[maybe_unused]] auto handler : iState)
@@ -31,7 +31,7 @@ namespace
     {
         std::size_t dimension = iState.range(0);
         auto matrix = std::vector<std::int8_t>(dimension * dimension);
-        std::generate(std::begin(matrix), std::end(matrix), [n = 0] () mutable { return n++; });
+        std::generate(std::begin(matrix), std::end(matrix), [n = 0]() mutable { return n++; });
 
         std::size_t n = 0;
         for ([[maybe_unused]] auto handler : iState)
@@ -50,4 +50,4 @@ namespace
 }
 
 BENCHMARK(CacheMatrixTraversal_ColumnWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB); // NOLINT
-BENCHMARK(CacheMatrixTraversal_RowWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB); // NOLINT
+BENCHMARK(CacheMatrixTraversal_RowWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);    // NOLINT
