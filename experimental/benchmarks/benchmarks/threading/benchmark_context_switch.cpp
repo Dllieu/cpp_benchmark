@@ -1,6 +1,5 @@
-#include <benchmark/benchmark.h>
-
 #include <atomic>
+#include <benchmark/benchmark.h>
 #include <cstddef>
 #include <cstring>
 #include <iostream>
@@ -16,103 +15,19 @@
 namespace
 {
     constexpr const auto SHARED_MEMORY_DEFAULT_VALUE = -2;
-    constexpr const auto MAX_THREADS = 2;
-
-    void power2_argument(benchmark::internal::Benchmark* b)
-    {
-        for (size_t i = 1; i <= 2_KB; i <<= 1)
-        {
-            b->Arg(i);
-        }
-    }
 }
-
-// TODO: run with and without affinity
-namespace
-{
-    // i.e. unsafe but that's ok
-    void futex_thread_one(benchmark::State& state, std::atomic<int>& sharedMemoryId)
-    {
-        sharedMemoryId = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666);
-
-        volatile auto futex = static_cast<int*>(shmat(sharedMemoryId, nullptr, 0));
-        while (state.KeepRunning())
-        {
-            *futex = 0xA;
-            while (0 == syscall(SYS_futex, futex, FUTEX_WAKE, 1, nullptr, nullptr, 42))
-            {
-                std::this_thread::yield();
-            }
-
-            std::this_thread::yield();
-            while (0 != syscall(SYS_futex, futex, FUTEX_WAIT, 0xB, nullptr, nullptr, 42))
-            {
-                std::this_thread::yield();
-            }
-        }
-
-        sharedMemoryId = SHARED_MEMORY_DEFAULT_VALUE;
-        wait(futex);
-    }
-
-    void futex_thread_two(benchmark::State& state, std::atomic<int>& sharedMemoryId)
-    {
-        while (sharedMemoryId == SHARED_MEMORY_DEFAULT_VALUE)
-        {
-            std::this_thread::yield();
-        }
-
-        volatile auto futex = static_cast<int*>(shmat(sharedMemoryId, nullptr, 0));
-        while (state.KeepRunning())
-        {
-            std::this_thread::yield();
-            while (0 != syscall(SYS_futex, futex, FUTEX_WAIT, 0xA, nullptr, nullptr, 42))
-            {
-                std::this_thread::yield();
-            }
-
-            *futex = 0xB;
-            while (0 == syscall(SYS_futex, futex, FUTEX_WAKE, 1, nullptr, nullptr, 42))
-            {
-                std::this_thread::yield();
-            }
-        }
-
-        while (sharedMemoryId != SHARED_MEMORY_DEFAULT_VALUE)
-        {
-            std::this_thread::yield();
-        }
-    }
-
-    // Does nothing but context switching. In practice context switching is expensive because it screws up the CPU caches (L1, L2, L3 and the TLB)
-    void bench_context_switch_raw(benchmark::State& state)
-    {
-        static std::atomic<int> sharedMemoryId(SHARED_MEMORY_DEFAULT_VALUE);
-        if (state.thread_index == 0)
-        {
-            futex_thread_one(state, sharedMemoryId);
-        }
-        else
-        {
-            futex_thread_two(state, sharedMemoryId);
-        }
-    }
-}
-
-BENCHMARK(bench_context_switch_raw)->Threads(MAX_THREADS); // NOLINT
 
 namespace
 {
-    void bench_context_switch_memset(benchmark::State& state)
+    void ContextSwitch_SingleThreadMemsetBenchmark(benchmark::State& state)
     {
         int ws_pages = state.range(0);
         std::unique_ptr<std::byte[]> buf(new std::byte[ws_pages * experimental::PAGE_SIZE]);
 
-        // i.e. number of pages
-        int i = 0;
-        while (state.KeepRunning())
+        int numberOfPages = 0;
+        for ([[maybe_unused]] auto handler : state)
         {
-            memset(buf.get(), i++, ws_pages * experimental::PAGE_SIZE);
+            std::memset(buf.get(), numberOfPages++, ws_pages * experimental::PAGE_SIZE);
         }
 
         state.SetItemsProcessed(state.iterations());
@@ -120,25 +35,97 @@ namespace
     }
 }
 
-BENCHMARK(bench_context_switch_memset)->Apply(power2_argument); // NOLINT
+BENCHMARK(ContextSwitch_SingleThreadMemsetBenchmark)->RangeMultiplier(2)->Range(1, 2_KB); // NOLINT
 
 namespace
 {
-    void set_bytes_processed(benchmark::State& state)
+    // i.e. unsafe but that's ok
+    void FutexThreadOne(benchmark::State& state, std::atomic<int>& sharedMemoryId)
+    {
+        sharedMemoryId = shmget(IPC_PRIVATE, sizeof(int), IPC_CREAT | 0666);
+
+        volatile auto futex = static_cast<int*>(shmat(sharedMemoryId, nullptr, 0));
+        for ([[maybe_unused]] auto handler : state)
+        {
+            *futex = 0xA;
+            while (0 == syscall(SYS_futex, futex, FUTEX_WAKE, 1, nullptr, nullptr, 42))
+            {
+                std::this_thread::yield();
+            }
+
+            std::this_thread::yield();
+            while (0 != syscall(SYS_futex, futex, FUTEX_WAIT, 0xB, nullptr, nullptr, 42))
+            {
+                std::this_thread::yield();
+            }
+        }
+
+        sharedMemoryId = SHARED_MEMORY_DEFAULT_VALUE;
+        wait(futex);
+    }
+
+    void FutexThreadTwo(benchmark::State& state, std::atomic<int>& sharedMemoryId)
+    {
+        while (sharedMemoryId == SHARED_MEMORY_DEFAULT_VALUE)
+        {
+            std::this_thread::yield();
+        }
+
+        volatile auto futex = static_cast<int*>(shmat(sharedMemoryId, nullptr, 0));
+        for ([[maybe_unused]] auto handler : state)
+        {
+            std::this_thread::yield();
+            while (0 != syscall(SYS_futex, futex, FUTEX_WAIT, 0xA, nullptr, nullptr, 42))
+            {
+                std::this_thread::yield();
+            }
+
+            *futex = 0xB;
+            while (0 == syscall(SYS_futex, futex, FUTEX_WAKE, 1, nullptr, nullptr, 42))
+            {
+                std::this_thread::yield();
+            }
+        }
+
+        while (sharedMemoryId != SHARED_MEMORY_DEFAULT_VALUE)
+        {
+            std::this_thread::yield();
+        }
+    }
+
+    void ContextSwitch_TwoThreadAccessSharedMemoryBenchmark(benchmark::State& state)
+    {
+        static std::atomic<int> sharedMemoryId(SHARED_MEMORY_DEFAULT_VALUE);
+        if (state.thread_index == 0)
+        {
+            FutexThreadOne(state, sharedMemoryId);
+        }
+        else
+        {
+            FutexThreadTwo(state, sharedMemoryId);
+        }
+    }
+}
+
+BENCHMARK(ContextSwitch_TwoThreadAccessSharedMemoryBenchmark)->Threads(2); // NOLINT
+
+namespace
+{
+    void SetBytesProcessed(benchmark::State& state)
     {
         state.SetBytesProcessed(state.iterations() * ((state.range(0) + 1) * experimental::PAGE_SIZE) + state.bytes_processed());
     }
 
-    void futex_thread_one_cache(benchmark::State& state, std::atomic<int>& sharedMemoryId)
+    void FutexThreadOneMemset(benchmark::State& state, std::atomic<int>& sharedMemoryId)
     {
         // 1 experimental::PAGE_SIZE dedicated to futex / the others just for invalidating the cache
         sharedMemoryId = shmget(IPC_PRIVATE, (state.range(0) + 1) * experimental::PAGE_SIZE, IPC_CREAT | 0666);
 
         volatile auto futex = static_cast<int*>(shmat(sharedMemoryId, nullptr, 0));
         auto workingSet = reinterpret_cast<std::byte*>(futex) + experimental::PAGE_SIZE;
-        while (state.KeepRunning())
+        for ([[maybe_unused]] auto handler : state)
         {
-            memset(workingSet, state.iterations(), state.range(0) * experimental::PAGE_SIZE);
+            std::memset(workingSet, state.iterations(), state.range(0) * experimental::PAGE_SIZE);
 
             *futex = 0xA;
             while (0 == syscall(SYS_futex, futex, FUTEX_WAKE, 1, nullptr, nullptr, 42))
@@ -153,12 +140,12 @@ namespace
             }
         }
 
-        set_bytes_processed(state);
+        SetBytesProcessed(state);
         sharedMemoryId = SHARED_MEMORY_DEFAULT_VALUE;
         wait(futex);
     }
 
-    void futex_thread_two_cache(benchmark::State& state, std::atomic<int>& sharedMemoryId)
+    void FutexThreadTwoMemset(benchmark::State& state, std::atomic<int>& sharedMemoryId)
     {
         while (sharedMemoryId == SHARED_MEMORY_DEFAULT_VALUE)
         {
@@ -167,7 +154,7 @@ namespace
 
         volatile auto futex = static_cast<int*>(shmat(sharedMemoryId, nullptr, 0));
         auto workingSet = reinterpret_cast<std::byte*>(futex) + experimental::PAGE_SIZE;
-        while (state.KeepRunning())
+        for ([[maybe_unused]] auto handler : state)
         {
             std::this_thread::yield();
             while (0 != syscall(SYS_futex, futex, FUTEX_WAIT, 0xA, nullptr, nullptr, 42))
@@ -175,7 +162,7 @@ namespace
                 std::this_thread::yield();
             }
 
-            memset(workingSet, state.iterations(), state.range(0) * experimental::PAGE_SIZE);
+            std::memset(workingSet, state.iterations(), state.range(0) * experimental::PAGE_SIZE);
 
             *futex = 0xB;
             while (0 == syscall(SYS_futex, futex, FUTEX_WAKE, 1, nullptr, nullptr, 42))
@@ -184,26 +171,26 @@ namespace
             }
         }
 
-        set_bytes_processed(state);
+        SetBytesProcessed(state);
         while (sharedMemoryId != SHARED_MEMORY_DEFAULT_VALUE)
         {
             std::this_thread::yield();
         }
     }
 
-    void bench_context_switch_cache(benchmark::State& state)
+    void ContextSwitch_TwoThreadAccessAndMemsetSharedMemoryBenchmark(benchmark::State& state)
     {
         static std::atomic<int> sharedMemoryId(SHARED_MEMORY_DEFAULT_VALUE);
 
         if (state.thread_index == 0)
         {
-            futex_thread_one_cache(state, sharedMemoryId);
+            FutexThreadOneMemset(state, sharedMemoryId);
         }
         else
         {
-            futex_thread_two_cache(state, sharedMemoryId);
+            FutexThreadTwoMemset(state, sharedMemoryId);
         }
     }
 }
 
-BENCHMARK(bench_context_switch_cache)->Threads(MAX_THREADS)->Apply(power2_argument); // NOLINT
+BENCHMARK(ContextSwitch_TwoThreadAccessAndMemsetSharedMemoryBenchmark)->Threads(2)->RangeMultiplier(2)->Range(1, 2_KB); // NOLINT

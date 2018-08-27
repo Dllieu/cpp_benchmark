@@ -1,5 +1,4 @@
 #include <benchmark/benchmark.h>
-
 #include <sys/syscall.h>
 #include <unistd.h>
 
@@ -13,9 +12,9 @@ namespace
      *
      *        system calls don't actually cause a full context switch anymore nowadays, the kernel can get away with a "mode switch" (go from user mode to kernel mode, then back to user mode)
      */
-    void bench_syscall_gettid(benchmark::State& state)
+    void SystemCall_GettidBenchmark(benchmark::State& state)
     {
-        while (state.KeepRunning())
+        for ([[maybe_unused]] auto handler : state)
         {
             // returns the caller's thread ID
             syscall(SYS_gettid);
@@ -23,4 +22,4 @@ namespace
     }
 }
 
-BENCHMARK(bench_syscall_gettid); // NOLINT
+BENCHMARK(SystemCall_GettidBenchmark); // NOLINT
