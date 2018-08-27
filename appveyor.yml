@@ -36,6 +36,7 @@ install:
   # Python
   - sudo apt-get install python${PYTHON_MAJOR_VERSION}-pip -y
   - pip${PYTHON_MAJOR_VERSION} install pandas
+  - pip${PYTHON_MAJOR_VERSION} install matplotlib
 
   # Install Static analysis + coverage
   - sudo apt-get install gcovr -y
