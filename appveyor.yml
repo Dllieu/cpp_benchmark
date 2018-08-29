@@ -39,7 +39,11 @@ install:
   - pip${PYTHON_MAJOR_VERSION} install matplotlib
 
   # Install Static analysis + coverage
-  - sudo apt-get install gcovr -y
+  # TODO: IF GCC ONLY
+  # - sudo apt-get install gcovr -y
+  # - sudo rm /usr/bin/gcov
+  # - sudo ln -s /usr/bin/gcov-${COMPILER_VERSION} /usr/bin/gcov
+
   - sudo apt-get install cppcheck -y
   - sudo apt-get install clang-tidy-${CLANG_VERSION} -y
   - sudo ln -s  /usr/bin/clang-tidy-${CLANG_VERSION} /usr/bin/clang-tidy
@@ -103,6 +107,11 @@ after_test:
     fi
 
 # - TODO:
-# activate gcovr
 # add benchmark from the presentation
 # lto release (on hold until 18.04 release on appveyor)
+
+
+# 1 Ensure only gcov-8 is used
+# - run gcov-8 on a *.gcda file (e.g. after running the tests, if not running test -> no gcda -> 0 coverage)
+# - gcov-8 ../build/experimental/tests/CMakeFiles/test_experimental.dir/tests/test_message_layout.cpp.gcda
+# 2 Install lcov
