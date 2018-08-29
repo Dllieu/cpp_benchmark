@@ -115,7 +115,7 @@ namespace
     }
 
     template <std::size_t N>
-    void Atoi_SystemCallBenchmark(benchmark::State& state)
+    void Atoi_AtollBenchmark(benchmark::State& state)
     {
         // std::string numberAsString = GetNumberAsString(state.range(0));
         std::string numberAsString = GetNumberAsString(N);
@@ -173,7 +173,7 @@ namespace
 }
 
 #define DECLARE_ATOI_BENCHMARK(N)                                 \
-    BENCHMARK_TEMPLATE(Atoi_SystemCallBenchmark, N);              \
+    BENCHMARK_TEMPLATE(Atoi_AtollBenchmark, N);                   \
     BENCHMARK_TEMPLATE(Atoi_StaticSizeNaiveBenchmark, N);         \
     BENCHMARK_TEMPLATE(Atoi_StaticSizeVectorizationBenchmark, N); \
     BENCHMARK_TEMPLATE(Atoi_StaticSizeVectorizationExplicitUnrollBenchmark, N);

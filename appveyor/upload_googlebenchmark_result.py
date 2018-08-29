@@ -15,8 +15,8 @@ def setup_args():
     requiredArguments = parser.add_argument_group('required arguments')
     requiredArguments.add_argument("--googlebenchmark_csv", help="CSV filename from googlebenchmark output", required=True)
 
-    # optionalArguments = parser.add_argument_group('optional arguments')
-    # optionalArguments.add_argument("--debug", action='store_true', help="Echo output instead of sending to appveyor")
+    optionalArguments = parser.add_argument_group('optional arguments')
+    optionalArguments.add_argument("--debug", action='store_true', help="Echo output instead of sending to appveyor")
 
     return parser.parse_args()
 
@@ -31,7 +31,6 @@ def find_csv_header_index(csvFile):
 
     raise Exception('No header found! [File={}]'.format(csvFile))
 
-# TODO: Clean (it will likely not handle all the cases)
 def get_input_from_name(name):
     # <input>
     templateInputStart = name.find('<')
@@ -59,12 +58,12 @@ def get_testname_from_name(name):
     testname = name[name.index('_') + 1:].replace('Benchmark', '')
     placeHolder1 = testname.find('<')
     placeHolder2 = testname.find('/')
-    if (placeHolder1 != -1):
-        if (placeHolder2 != -1):
-            return testname[:min(placeHolder1, placeHolder2)]
-        else:
-            return testname[:placeHolder1]
-    elif (placeHolder2 != -1):
+
+    if (-1 != placeHolder1) and (-1 != placeHolder2):
+        return testname[:min(placeHolder1, placeHolder2)]
+    elif (-1 != placeHolder1):
+        return testname[:placeHolder1]
+    elif (-1 != placeHolder2):
         return testname[:placeHolder2]
     else:
         return testname
@@ -83,6 +82,7 @@ if __name__ == "__main__":
     categories = df['category'].unique()
     categories.sort()
 
+    # TODO: Use MultiIndex instead
     for category in categories:
         category_df = df[df['category'] == category][['testname', 'real_time']]
         category_df
@@ -105,4 +105,4 @@ if __name__ == "__main__":
 
         filename = os.path.join(os.getcwd(), 'googlebenchmark_graph_{}.png'.format(category))
         fig.savefig(filename)
-        subprocess.call('appveyor PushArtifact {}'.format(filename), shell=True)
+        subprocess.call('{} appveyor PushArtifact {}'.format('echo ' if args.debug else '', filename), shell=True)
