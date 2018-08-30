@@ -110,7 +110,7 @@ test_script:
   - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
   - mkdir coverage
   - genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage_report/
-  - zip -r coverage_report.zip ${PWD}/coverage_report/
+  - zip -r coverage_report.zip coverage_report/
   - appveyor PushArtifact coverage_report.zip
   - cd -
 
