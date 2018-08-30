@@ -104,7 +104,7 @@ test_script:
   # Run Coverage after test
   # TODOOOOOOOO
   # Quick & Dirty for testing
-  - cd build/experimental/tests/CMakeFiles/test_experimental.dir/tests
+  - cd experimental/tests/CMakeFiles/test_experimental.dir/tests
   - ls -l
   - lcov -c -d ${PWD} -o ${LCOV_OUTPUT_FILE}
   - lcov --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
