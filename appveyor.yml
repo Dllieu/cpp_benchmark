@@ -44,10 +44,7 @@ install:
   - |
     if [ "${COMPILER}" == "gcc" ]; then
       git clone https://github.com/linux-test-project/lcov.git
-      cd lcov
-      sudo make install
-      cd ..
-      rm -rf lcov
+      cd lcov && sudo make install && cd .. && rm -rf lcov
     fi
 
   # Static analysis
@@ -109,14 +106,14 @@ after_test:
   # Coverage
   - |
     if [ "${CONFIGURATION}" == "Debug" ] && [ "${COMPILER}" == "gcc" ]; then
-      - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD}/${LCOV_TEST_DIRECTORY}/ -o ${LCOV_OUTPUT_FILE}
-      - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
+      lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD}/${LCOV_TEST_DIRECTORY}/ -o ${LCOV_OUTPUT_FILE}
+      lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
 
-      - mkdir coverage_report
-      - genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage_report/
-      - zip -r coverage_report.zip coverage_report/
+      mkdir coverage_report
+      genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage_report/
+      zip -r coverage_report.zip coverage_report/
 
-      - appveyor PushArtifact coverage_report.zip
+      appveyor PushArtifact coverage_report.zip
     fi
 
   # Benchmark
