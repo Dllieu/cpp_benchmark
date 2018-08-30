@@ -41,8 +41,8 @@ install:
 
   # Install Static analysis + coverage
   # TODO: GCC ONLY
-  - sudo rm /usr/bin/gcov
-  - sudo ln -s /usr/bin/gcov-${COMPILER_VERSION} /usr/bin/gcov
+  # - sudo rm /usr/bin/gcov
+  # - sudo ln -s /usr/bin/gcov-${COMPILER_VERSION} /usr/bin/gcov
   - git clone https://github.com/linux-test-project/lcov.git
   - cd lcov
   - sudo make install
@@ -106,11 +106,12 @@ test_script:
   # Quick & Dirty for testing
   - cd experimental/tests/CMakeFiles/test_experimental.dir/tests
   - ls -l
-  - lcov -c -d ${PWD} -o ${LCOV_OUTPUT_FILE}
-  - lcov --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
+  - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD} -o ${LCOV_OUTPUT_FILE}
+  - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
   - mkdir coverage
-  - genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage/
-  - appveyor PushArtifact ${PWD}/coverage
+  - genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage_report/
+  - zip -r coverage_report.zip ${PWD}/coverage_report/
+  - appveyor PushArtifact coverage_report.zip
   - cd -
 
 after_test:
