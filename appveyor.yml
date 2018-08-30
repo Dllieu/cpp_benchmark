@@ -7,7 +7,7 @@ matrix:
 
 configuration:
   - Debug
-  - Release
+  # - Release
 
 environment:
   CLANG_VERSION: 6.0
@@ -20,9 +20,9 @@ environment:
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
   matrix:
-    - COMPILER: gcc
-      COMPILER_CPP: g++
-      COMPILER_VERSION: 8
+    # - COMPILER: gcc
+    #   COMPILER_CPP: g++
+    #   COMPILER_VERSION: 8
 
     - COMPILER: clang
       COMPILER_CPP: clang++
@@ -105,15 +105,23 @@ test_script:
 after_test:
   # Coverage
   - |
-    if [ "Debug" == "${CONFIGURATION}" ] && [ "gcc" == "${COMPILER}" ]; then
-      lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD}/${LCOV_TEST_DIRECTORY}/ -o ${LCOV_OUTPUT_FILE}
-      lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
+    if [ "Debug" == "${CONFIGURATION}" ]; then
+      if [ "gcc" == "${COMPILER}" ]; then
+        lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD}/${LCOV_TEST_DIRECTORY}/ -o ${LCOV_OUTPUT_FILE}
+        lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
 
-      mkdir coverage_report
-      genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage_report/
-      zip -r coverage_report.zip coverage_report/
+        mkdir gcov_report
+        genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/gcov_report/
+        zip -r gcov_report.zip gcov_report/
 
-      appveyor PushArtifact coverage_report.zip
+        appveyor PushArtifact gcov_report.zip
+      elif [ "clang" == "${COMPILER}" ]; then
+        llvm-profdata-${CLANG_VERSION} merge -output=llvm-cov.profdata ${PWD}/experimental/tests/default.profraw
+        llvm-cov show -format=html -instr-profile=llvm-cov.profdata ./bin/test_experimental > llvm-cov_report.html
+        zip llvm-cov_report.zip llvm-cov_report.html
+
+        appveyor PushArtifact llvm-cov_report.zip
+      fi
     fi
 
   # Benchmark

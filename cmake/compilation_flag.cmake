@@ -26,10 +26,7 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # (Not interested by llvm libc++ at the moment)
     set(COMPILER_FLAG_STANDARD "${COMPILER_FLAG_STANDARD} -stdlib=libstdc++")
 
-    # llvm-cov gcov need -fprofile-arcs -ftest-coverage (or --coverage)
-    # llvm-cov show need -fprofile-instr-generate -fcoverage-mapping
-    # Cannot activate the gcov flag otherwise it won't be compatible with the flag required by show
-    # llvm-cov show / PGO
+    # Do not mix with --coverage flags
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-instr-generate -fcoverage-mapping")
 endif()
 
