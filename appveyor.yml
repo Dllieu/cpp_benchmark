@@ -7,13 +7,14 @@ matrix:
 
 configuration:
   - Debug
-  - Release
+  #- Release
 
 environment:
   CLANG_VERSION: 6.0
   CPP_CHECK_OUTPUT_FILE: cppcheck_output.xml
   GTEST_OUTPUT_FILE: gtest_output.xml
   GOOGLEBENCHMARK_OUTPUT_FILE: googlebenchmark_output.csv
+  LCOV_OUTPUT_FILE: test_lcov.info
   PYTHON_MAJOR_VERSION: 3
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
@@ -22,9 +23,9 @@ environment:
       COMPILER_CPP: g++
       COMPILER_VERSION: 8
 
-    - COMPILER: clang
-      COMPILER_CPP: clang++
-      COMPILER_VERSION: ${CLANG_VERSION}
+    # - COMPILER: clang
+    #   COMPILER_CPP: clang++
+    #   COMPILER_VERSION: ${CLANG_VERSION}
 
 install:
   # Compilers
@@ -39,10 +40,14 @@ install:
   - pip${PYTHON_MAJOR_VERSION} install matplotlib
 
   # Install Static analysis + coverage
-  # TODO: IF GCC ONLY
-  # - sudo apt-get install gcovr -y
-  # - sudo rm /usr/bin/gcov
-  # - sudo ln -s /usr/bin/gcov-${COMPILER_VERSION} /usr/bin/gcov
+  # TODO: GCC ONLY
+  - sudo rm /usr/bin/gcov
+  - sudo ln -s /usr/bin/gcov-${COMPILER_VERSION} /usr/bin/gcov
+  - git clone https://github.com/linux-test-project/lcov.git
+  - cd lcov
+  - sudo make install
+  - cd ..
+  - rm -rf lcov
 
   - sudo apt-get install cppcheck -y
   - sudo apt-get install clang-tidy-${CLANG_VERSION} -y
@@ -96,6 +101,18 @@ test_script:
   - appveyor PushArtifact ${PWD}/${GTEST_OUTPUT_FILE}
   - appveyor AddMessage 'Tests succeed!' -Category Information
 
+  # Run Coverage after test
+  # TODOOOOOOOO
+  # Quick & Dirty for testing
+  - cd build/experimental/tests/CMakeFiles/test_experimental.dir/tests
+  - ls -l
+  - lcov -c -d ${PWD} -o ${LCOV_OUTPUT_FILE}
+  - lcov --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
+  - mkdir coverage
+  - genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage/
+  - appveyor PushArtifact ${PWD}/coverage
+  - cd -
+
 after_test:
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
@@ -109,9 +126,3 @@ after_test:
 # - TODO:
 # add benchmark from the presentation
 # lto release (on hold until 18.04 release on appveyor)
-
-
-# 1 Ensure only gcov-8 is used
-# - run gcov-8 on a *.gcda file (e.g. after running the tests, if not running test -> no gcda -> 0 coverage)
-# - gcov-8 ../build/experimental/tests/CMakeFiles/test_experimental.dir/tests/test_message_layout.cpp.gcda
-# 2 Install lcov
