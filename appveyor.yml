@@ -7,14 +7,15 @@ matrix:
 
 configuration:
   - Debug
-  #- Release
+  - Release
 
 environment:
   CLANG_VERSION: 6.0
   CPP_CHECK_OUTPUT_FILE: cppcheck_output.xml
   GTEST_OUTPUT_FILE: gtest_output.xml
   GOOGLEBENCHMARK_OUTPUT_FILE: googlebenchmark_output.csv
-  LCOV_OUTPUT_FILE: test_lcov.info
+  LCOV_OUTPUT_FILE: lcov.info
+  LCOV_TEST_DIRECTORY: experimental/tests/CMakeFiles/test_experimental.dir/tests
   PYTHON_MAJOR_VERSION: 3
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
@@ -23,9 +24,9 @@ environment:
       COMPILER_CPP: g++
       COMPILER_VERSION: 8
 
-    # - COMPILER: clang
-    #   COMPILER_CPP: clang++
-    #   COMPILER_VERSION: ${CLANG_VERSION}
+    - COMPILER: clang
+      COMPILER_CPP: clang++
+      COMPILER_VERSION: ${CLANG_VERSION}
 
 install:
   # Compilers
@@ -39,16 +40,17 @@ install:
   - pip${PYTHON_MAJOR_VERSION} install pandas
   - pip${PYTHON_MAJOR_VERSION} install matplotlib
 
-  # Install Static analysis + coverage
-  # TODO: GCC ONLY
-  # - sudo rm /usr/bin/gcov
-  # - sudo ln -s /usr/bin/gcov-${COMPILER_VERSION} /usr/bin/gcov
-  - git clone https://github.com/linux-test-project/lcov.git
-  - cd lcov
-  - sudo make install
-  - cd ..
-  - rm -rf lcov
+  # Coverage
+  - |
+    if [ "${COMPILER}" == "gcc" ]; then
+      git clone https://github.com/linux-test-project/lcov.git
+      cd lcov
+      sudo make install
+      cd ..
+      rm -rf lcov
+    fi
 
+  # Static analysis
   - sudo apt-get install cppcheck -y
   - sudo apt-get install clang-tidy-${CLANG_VERSION} -y
   - sudo ln -s  /usr/bin/clang-tidy-${CLANG_VERSION} /usr/bin/clang-tidy
@@ -67,6 +69,7 @@ before_build:
   - cppcheck --version
   - env
 
+  # cmake
   - git submodule update --init --recursive
   - mkdir build && cd build
   - export GTEST_OUTPUT="xml:${PWD}/${GTEST_OUTPUT_FILE}"
@@ -87,8 +90,9 @@ after_build:
       echo "Formatting change required by clang-format!"
       exit 1
     fi
+
   - |
-    if [ "${COMPILER}" = "clang" ]; then
+    if [ "${COMPILER}" == "clang" ]; then
       make clang-tidy
     fi
 
@@ -101,20 +105,21 @@ test_script:
   - appveyor PushArtifact ${PWD}/${GTEST_OUTPUT_FILE}
   - appveyor AddMessage 'Tests succeed!' -Category Information
 
-  # Run Coverage after test
-  # TODOOOOOOOO
-  # Quick & Dirty for testing
-  - cd experimental/tests/CMakeFiles/test_experimental.dir/tests
-  - ls -l
-  - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD} -o ${LCOV_OUTPUT_FILE}
-  - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
-  - mkdir coverage
-  - genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage_report/
-  - zip -r coverage_report.zip coverage_report/
-  - appveyor PushArtifact coverage_report.zip
-  - cd -
-
 after_test:
+  # Coverage
+  - |
+    if [ "${CONFIGURATION}" == "Debug" ] && [ "${COMPILER}" == "gcc" ]; then
+      - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD}/${LCOV_TEST_DIRECTORY}/ -o ${LCOV_OUTPUT_FILE}
+      - lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
+
+      - mkdir coverage_report
+      - genhtml ${LCOV_OUTPUT_FILE} -o ${PWD}/coverage_report/
+      - zip -r coverage_report.zip coverage_report/
+
+      - appveyor PushArtifact coverage_report.zip
+    fi
+
+  # Benchmark
   - |
     if [ "${CONFIGURATION}" == "Release" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME} --benchmark_out=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE} --benchmark_out_format=csv
