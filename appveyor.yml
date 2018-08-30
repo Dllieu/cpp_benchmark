@@ -42,7 +42,7 @@ install:
 
   # Coverage
   - |
-    if [ "${COMPILER}" == "gcc" ]; then
+    if [ "gcc" == "${COMPILER}" ]; then
       git clone https://github.com/linux-test-project/lcov.git
       cd lcov && sudo make install && cd .. && rm -rf lcov
     fi
@@ -83,13 +83,13 @@ after_build:
   - |
     make clang-format-xml | grep "<replacement "
 
-    if [ $? -ne 1 ]; then
+    if [ 1 -ne $? ]; then
       echo "Formatting change required by clang-format!"
       exit 1
     fi
 
   - |
-    if [ "${COMPILER}" == "clang" ]; then
+    if [ "clang" == "${COMPILER}" ]; then
       make clang-tidy
     fi
 
@@ -105,7 +105,7 @@ test_script:
 after_test:
   # Coverage
   - |
-    if [ "${CONFIGURATION}" == "Debug" ] && [ "${COMPILER}" == "gcc" ]; then
+    if [ "Debug" == "${CONFIGURATION}" ] && [ "gcc" == "${COMPILER}" ]; then
       lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} -c -d ${PWD}/${LCOV_TEST_DIRECTORY}/ -o ${LCOV_OUTPUT_FILE}
       lcov --gcov-tool /usr/bin/gcov-${COMPILER_VERSION} --remove ${LCOV_OUTPUT_FILE} '/usr/include/*' '*/external/*' -o ${LCOV_OUTPUT_FILE}
 
@@ -118,7 +118,7 @@ after_test:
 
   # Benchmark
   - |
-    if [ "${CONFIGURATION}" == "Release" ]; then
+    if [ "Release" == "${CONFIGURATION}" ]; then
       ./bin/benchmark_${APPVEYOR_PROJECT_NAME} --benchmark_out=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE} --benchmark_out_format=csv
 
       python3 ../appveyor/upload_googlebenchmark_result.py --googlebenchmark_csv=${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE}
