@@ -101,6 +101,8 @@ if __name__ == "__main__":
         for testname in testnames:
             testname_df = category_df[category_df.testname == testname]['real_time']
             testname_df.plot(ax=ax, label=testname, legend=True)
+
+            # Seems completely broken (i.e. do not start with the right value, values shown are incorrect (lower bound subset)
             ax.set_xticklabels(testname_df.index)
 
         filename = os.path.join(os.getcwd(), 'googlebenchmark_graph_{}.png'.format(category))
