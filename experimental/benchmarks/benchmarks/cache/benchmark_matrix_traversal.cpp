@@ -103,52 +103,52 @@ namespace
         benchmark::DoNotOptimize(n);
     }
 
-    void CacheMatrixTraversal_FlatArrayColumnWiseBenchmark(benchmark::State& iState)
-    {
-        std::size_t dimension = iState.range(0);
-        auto flatArray = std::vector<std::int8_t>(dimension * dimension);
-        std::iota(std::begin(flatArray), std::end(flatArray), 0);
+    // void CacheMatrixTraversal_FlatArrayColumnWiseBenchmark(benchmark::State& iState)
+    // {
+    //     std::size_t dimension = iState.range(0);
+    //     auto flatArray = std::vector<std::int8_t>(dimension * dimension);
+    //     std::iota(std::begin(flatArray), std::end(flatArray), 0);
 
-        std::size_t n = 0;
-        for ([[maybe_unused]] auto handler : iState)
-        {
-            for (std::size_t column = 0; column < dimension; ++column)
-            {
-                for (std::size_t row = 0; row < dimension; ++row)
-                {
-                    benchmark::DoNotOptimize(n += flatArray[row * dimension + column]);
-                }
-            }
-        }
+    //     std::size_t n = 0;
+    //     for ([[maybe_unused]] auto handler : iState)
+    //     {
+    //         for (std::size_t column = 0; column < dimension; ++column)
+    //         {
+    //             for (std::size_t row = 0; row < dimension; ++row)
+    //             {
+    //                 benchmark::DoNotOptimize(n += flatArray[row * dimension + column]);
+    //             }
+    //         }
+    //     }
 
-        benchmark::DoNotOptimize(n);
-    }
+    //     benchmark::DoNotOptimize(n);
+    // }
 
-    void CacheMatrixTraversal_FlatArrayRowWiseBenchmark(benchmark::State& iState)
-    {
-        std::size_t dimension = iState.range(0);
-        auto flatArray = std::vector<std::int8_t>(dimension * dimension);
-        std::iota(std::begin(flatArray), std::end(flatArray), 0);
+    // void CacheMatrixTraversal_FlatArrayRowWiseBenchmark(benchmark::State& iState)
+    // {
+    //     std::size_t dimension = iState.range(0);
+    //     auto flatArray = std::vector<std::int8_t>(dimension * dimension);
+    //     std::iota(std::begin(flatArray), std::end(flatArray), 0);
 
-        std::size_t n = 0;
-        for ([[maybe_unused]] auto handler : iState)
-        {
-            for (std::size_t row = 0; row < dimension; ++row)
-            {
-                for (std::size_t column = 0; column < dimension; ++column)
-                {
-                    benchmark::DoNotOptimize(n += flatArray[row * dimension + column]);
-                }
-            }
-        }
+    //     std::size_t n = 0;
+    //     for ([[maybe_unused]] auto handler : iState)
+    //     {
+    //         for (std::size_t row = 0; row < dimension; ++row)
+    //         {
+    //             for (std::size_t column = 0; column < dimension; ++column)
+    //             {
+    //                 benchmark::DoNotOptimize(n += flatArray[row * dimension + column]);
+    //             }
+    //         }
+    //     }
 
-        benchmark::DoNotOptimize(n);
-    }
+    //     benchmark::DoNotOptimize(n);
+    // }
 }
 
-BENCHMARK(CacheMatrixTraversal_ArrayOfArrayColumnWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);                // NOLINT
-BENCHMARK(CacheMatrixTraversal_ArrayOfArrayRowWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);                   // NOLINT
-BENCHMARK(CacheMatrixTraversal_ArrayOfArrayHashComputationColumnWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB); // NOLINT
-BENCHMARK(CacheMatrixTraversal_ArrayOfArrayHashComputationRowWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);    // NOLINT
-BENCHMARK(CacheMatrixTraversal_FlatArrayColumnWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);                   // NOLINT
-BENCHMARK(CacheMatrixTraversal_FlatArrayRowWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);                      // NOLINT
+BENCHMARK(CacheMatrixTraversal_ArrayOfArrayColumnWiseBenchmark)->RangeMultiplier(2)->Range(64, 16_KB);                // NOLINT
+BENCHMARK(CacheMatrixTraversal_ArrayOfArrayRowWiseBenchmark)->RangeMultiplier(2)->Range(64, 16_KB);                   // NOLINT
+BENCHMARK(CacheMatrixTraversal_ArrayOfArrayHashComputationColumnWiseBenchmark)->RangeMultiplier(2)->Range(64, 16_KB); // NOLINT
+BENCHMARK(CacheMatrixTraversal_ArrayOfArrayHashComputationRowWiseBenchmark)->RangeMultiplier(2)->Range(64, 16_KB);    // NOLINT
+// BENCHMARK(CacheMatrixTraversal_FlatArrayColumnWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);                   // NOLINT
+// BENCHMARK(CacheMatrixTraversal_FlatArrayRowWiseBenchmark)->RangeMultiplier(2)->Range(64, 8_KB);                      // NOLINT
