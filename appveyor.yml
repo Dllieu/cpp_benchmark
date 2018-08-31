@@ -6,7 +6,7 @@ matrix:
   fast_finish: true
 
 configuration:
-  - Debug
+  #- Debug
   - Release
 
 environment:
@@ -24,9 +24,9 @@ environment:
       COMPILER_CPP: g++
       COMPILER_VERSION: 8
 
-    - COMPILER: clang
-      COMPILER_CPP: clang++
-      COMPILER_VERSION: ${CLANG_VERSION}
+    # - COMPILER: clang
+    #   COMPILER_CPP: clang++
+    #   COMPILER_VERSION: ${CLANG_VERSION}
 
 install:
   # Compilers
