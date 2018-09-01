@@ -103,7 +103,9 @@ if __name__ == "__main__":
 
         for testname in testnames:
             testname_df = category_df[category_df.testname == testname]['real_time']
-            testname_df.plot(ax=ax, label=testname, legend=True, logx=True, logy=True)
+            testname_df.plot(ax=ax, label=testname, legend=True)
+            ax.set_xscale('log', basex=2)
+            ax.set_yscale('log', basey=2)
 
         filename = os.path.join(os.getcwd(), 'googlebenchmark_graph_{}.png'.format(category))
         fig.savefig(filename)
