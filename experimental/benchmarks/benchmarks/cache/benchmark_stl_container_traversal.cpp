@@ -95,7 +95,7 @@ namespace
 
     void StlCacheContainerTraversal_Arguments(benchmark::internal::Benchmark* iBenchmark)
     {
-        for (std::size_t i = 200_B; i <= 3_KB; i += 200_B)
+        for (std::size_t i = 2_KB; i <= 22_KB; i += 2_KB)
         {
             iBenchmark->Arg(i);
         }
