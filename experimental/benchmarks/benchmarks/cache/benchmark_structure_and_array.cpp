@@ -6,138 +6,122 @@
 
 namespace
 {
-    struct NakedStructure
+    template <typename F>
+    void CacheStructureAndArray_RunBenchmark(benchmark::State& iState, F&& iFunctor)
     {
-        NakedStructure()
-            : m_X(0)
-            , m_Y(0)
-            , m_Z(0)
+        std::size_t size = iState.range(0);
+
+        for ([[maybe_unused]] auto handler : iState)
         {
+            std::size_t n = 0;
+
+            for (std::size_t i = 0; i < size; ++i)
+            {
+                benchmark::DoNotOptimize(n += iFunctor(i));
+            }
         }
+    }
 
-        std::size_t m_X, m_Y, m_Z;
-    };
-
-    // 64 / ( 6 / 3 ) / sizeof( std::uint8_t ) = 32 useful values per fetch average (6 / 3 as we only need x, y, z)
     void CacheStructureAndArray_ArrayOfStructure(benchmark::State& iState)
     {
-        std::size_t size = iState.range(0);
-        std::vector<NakedStructure> arrayOfStructure(size);
-
-        for ([[maybe_unused]] auto handler : iState)
+        struct Structure
         {
-            std::size_t n = 0;
-
-            for (std::size_t i = 0; i < size; ++i)
+            Structure()
+                : m_X(0)
+                , m_Y(0)
+                , m_Z(0)
             {
-                benchmark::DoNotOptimize(n += arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z);
             }
 
-            benchmark::DoNotOptimize(n);
-        }
+            std::int64_t m_X;
+            std::int64_t m_Y;
+            std::int64_t m_Z;
+        };
+
+        std::vector<Structure> arrayOfStructure(iState.range(0));
+        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z; });
     }
 
-    struct NakedStructureWithUnusedMembers
-    {
-        NakedStructureWithUnusedMembers()
-            : m_X(0)
-            , m_Y(0)
-            , m_Z(0)
-            , m_DX(0)
-            , m_DY(0)
-            , m_DZ(0)
-        {
-        }
-
-        std::size_t m_X, m_Y, m_Z, m_DX, m_DY, m_DZ;
-    };
-
-    // 64 / ( 6 / 3 ) / sizeof( std::uint8_t ) = 32 useful values per fetch average (6 / 3 as we only need x, y, z)
+    // Half ot the fetched data is wasted due to the unused members
     void CacheStructureAndArray_ArrayOfStructureWithUnusedMembers(benchmark::State& iState)
     {
-        std::size_t size = iState.range(0);
-        std::vector<NakedStructureWithUnusedMembers> arrayOfStructure(size);
-
-        for ([[maybe_unused]] auto handler : iState)
+        struct StructureWithUnusedMembers
         {
-            std::size_t n = 0;
-
-            for (std::size_t i = 0; i < size; ++i)
+            StructureWithUnusedMembers()
+                : m_X(0)
+                , m_Y(0)
+                , m_Z(0)
+                , m_DX(0)
+                , m_DY(0)
+                , m_DZ(0)
             {
-                benchmark::DoNotOptimize(n += arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z);
             }
 
-            benchmark::DoNotOptimize(n);
-        }
+            std::int64_t m_X;
+            std::int64_t m_Y;
+            std::int64_t m_Z;
+            std::int64_t m_DX;
+            std::int64_t m_DY;
+            std::int64_t m_DZ;
+        };
+
+        std::vector<StructureWithUnusedMembers> arrayOfStructure(iState.range(0));
+        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z; });
     }
 
-    struct StructureOfArrays
-    {
-        explicit StructureOfArrays(std::size_t n)
-            : m_X(n)
-            , m_Y(n)
-            , m_Z(n)
-        {
-        }
-
-        std::vector<std::size_t> m_X, m_Y, m_Z;
-    };
-
-    // 64 useful values per fetch
     void CacheStructureAndArray_StructureOfArrays(benchmark::State& iState)
     {
-        std::size_t size = iState.range(0);
-        StructureOfArrays structureOfArrays(size);
-
-        for ([[maybe_unused]] auto handler : iState)
+        struct StructureOfArrays
         {
-            std::size_t n = 0;
-
-            for (std::size_t i = 0; i < size; ++i)
+            explicit StructureOfArrays(std::size_t n)
+                : m_X(n)
+                , m_Y(n)
+                , m_Z(n)
             {
-                benchmark::DoNotOptimize(n += structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]);
             }
 
-            benchmark::DoNotOptimize(n);
-        }
+            std::vector<std::int64_t> m_X;
+            std::vector<std::int64_t> m_Y;
+            std::vector<std::int64_t> m_Z;
+        } structureOfArrays(iState.range(0));
+        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]; });
     }
 
-    struct StructureOfArraysWithUnusedMembers
-    {
-        explicit StructureOfArraysWithUnusedMembers(std::size_t n)
-            : m_X(n)
-            , m_Y(n)
-            , m_Z(n)
-            , m_DX(n)
-            , m_DY(n)
-            , m_DZ(n)
-        {
-        }
-
-        std::vector<std::size_t> m_X, m_Y, m_Z, m_DX, m_DY, m_DZ;
-    };
-
-    // 64 useful values per fetch
+    // Unused member do not affect the fetching
     void CacheStructureAndArray_StructureOfArraysWithUnusedMembers(benchmark::State& iState)
     {
-        std::size_t size = iState.range(0);
-        StructureOfArraysWithUnusedMembers structureOfArrays(size);
-
-        for ([[maybe_unused]] auto handler : iState)
+        struct StructureOfArraysWithUnusedMembers
         {
-            std::size_t n = 0;
-
-            for (std::size_t i = 0; i < size; ++i)
+            explicit StructureOfArraysWithUnusedMembers(std::size_t n)
+                : m_X(n)
+                , m_Y(n)
+                , m_Z(n)
+                , m_DX(n)
+                , m_DY(n)
+                , m_DZ(n)
             {
-                benchmark::DoNotOptimize(n += structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]);
             }
 
-            benchmark::DoNotOptimize(n);
+            std::vector<std::int64_t> m_X;
+            std::vector<std::int64_t> m_Y;
+            std::vector<std::int64_t> m_Z;
+            std::vector<std::int64_t> m_DX;
+            std::vector<std::int64_t> m_DY;
+            std::vector<std::int64_t> m_DZ;
+        } structureOfArrays(iState.range(0));
+        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]; });
+    }
+
+    void CacheStructureAndArray_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    {
+        for (std::size_t i = 1_KB; i <= 20_KB; i += 1_KB)
+        {
+            iBenchmark->Arg(i);
         }
     }
 }
 
-BENCHMARK(CacheStructureAndArray_ArrayOfStructure)->Range(2_KB, 8_MB);                   // NOLINT
-BENCHMARK(CacheStructureAndArray_ArrayOfStructureWithUnusedMembers)->Range(2_KB, 8_MB);  // NOLINT
-BENCHMARK(CacheStructureAndArray_StructureOfArrays)->Range(2_KB, 8_MB);                  // NOLINT
-BENCHMARK(CacheStructureAndArray_StructureOfArraysWithUnusedMembers)->Range(2_KB, 8_MB); // NOLINT
+BENCHMARK(CacheStructureAndArray_ArrayOfStructure)->Apply(CacheStructureAndArray_Arguments);                   // NOLINT
+BENCHMARK(CacheStructureAndArray_ArrayOfStructureWithUnusedMembers)->Apply(CacheStructureAndArray_Arguments);  // NOLINT
+BENCHMARK(CacheStructureAndArray_StructureOfArrays)->Apply(CacheStructureAndArray_Arguments);                  // NOLINT
+BENCHMARK(CacheStructureAndArray_StructureOfArraysWithUnusedMembers)->Apply(CacheStructureAndArray_Arguments); // NOLINT

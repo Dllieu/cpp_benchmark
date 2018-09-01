@@ -16,6 +16,11 @@ constexpr force_inline std::size_t operator""_AlphaNumeric(const char* iString, 
     return result;
 }
 
+constexpr force_inline auto operator""_B(unsigned long long int iValue) // NOLINT
+{
+    return iValue;
+}
+
 constexpr force_inline auto operator""_KB(unsigned long long int iValue) // NOLINT
 {
     return iValue * 1'024;

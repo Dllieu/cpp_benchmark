@@ -8,14 +8,14 @@ namespace
 {
     void CacheAssociativity_CacheAssociativityBenchmark(benchmark::State& iState)
     {
-        std::vector<std::int8_t> v(32_MB);
+        std::vector<std::int8_t> dynamicContiguousArray(32_MB);
         std::size_t step = iState.range(0);
 
         for ([[maybe_unused]] auto handler : iState)
         {
-            for (std::size_t repeat = 0, i = 0; repeat < 10000; ++repeat)
+            for (std::size_t repeat = 0, i = 0; repeat < 10'000; ++repeat)
             {
-                v[i]++;
+                ++dynamicContiguousArray[i];
                 i = (i + step) % 32_MB;
             }
         }

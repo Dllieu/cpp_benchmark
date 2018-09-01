@@ -114,61 +114,40 @@ namespace
         }
     }
 
-    template <std::size_t N>
-    void Atoi_AtollBenchmark(benchmark::State& state)
+    template <typename F>
+    void Atoi_RunBenchmark(benchmark::State& iState, std::size_t iStringLength, F&& iFunctor)
     {
-        // std::string numberAsString = GetNumberAsString(state.range(0));
-        std::string numberAsString = GetNumberAsString(N);
+        std::string numberAsString = GetNumberAsString(iStringLength);
 
         std::size_t n = 0;
-        for ([[maybe_unused]] auto handler : state)
+        for ([[maybe_unused]] auto handler : iState)
         {
-            benchmark::DoNotOptimize(n += std::atoll(numberAsString.c_str())); // NOLINT
-        }
-
-        benchmark::DoNotOptimize(n);
+            benchmark::DoNotOptimize(n += iFunctor(numberAsString.c_str()));
+        };
     }
 
     template <std::size_t N>
-    void Atoi_StaticSizeNaiveBenchmark(benchmark::State& state)
+    void Atoi_AtollBenchmark(benchmark::State& iState)
     {
-        std::string numberAsString = GetNumberAsString(N);
-
-        std::size_t n = 0;
-        for ([[maybe_unused]] auto handler : state)
-        {
-            benchmark::DoNotOptimize(n += AtoiNaive<N>(numberAsString.c_str()));
-        }
-
-        benchmark::DoNotOptimize(n);
+        Atoi_RunBenchmark(iState, N, [](const char* iString) { return std::atoll(iString); }); // NOLINT
     }
 
     template <std::size_t N>
-    void Atoi_StaticSizeVectorizationBenchmark(benchmark::State& state)
+    void Atoi_StaticSizeNaiveBenchmark(benchmark::State& iState)
     {
-        std::string numberAsString = GetNumberAsString(N);
-
-        std::size_t n = 0;
-        for ([[maybe_unused]] auto handler : state)
-        {
-            benchmark::DoNotOptimize(n += AtoiVectorization<N>(numberAsString.c_str()));
-        }
-
-        benchmark::DoNotOptimize(n);
+        Atoi_RunBenchmark(iState, N, [](const char* iString) { return AtoiNaive<N>(iString); });
     }
 
     template <std::size_t N>
-    void Atoi_StaticSizeVectorizationExplicitUnrollBenchmark(benchmark::State& state)
+    void Atoi_StaticSizeVectorizationBenchmark(benchmark::State& iState)
     {
-        std::string numberAsString = GetNumberAsString(N);
+        Atoi_RunBenchmark(iState, N, [](const char* iString) { return AtoiVectorization<N>(iString); });
+    }
 
-        std::size_t n = 0;
-        for ([[maybe_unused]] auto handler : state)
-        {
-            benchmark::DoNotOptimize(n += AtoiVectorizationExplicitUnroll<N>(numberAsString.c_str()));
-        }
-
-        benchmark::DoNotOptimize(n);
+    template <std::size_t N>
+    void Atoi_StaticSizeVectorizationExplicitUnrollBenchmark(benchmark::State& iState)
+    {
+        Atoi_RunBenchmark(iState, N, [](const char* iString) { return AtoiVectorizationExplicitUnroll<N>(iString); });
     }
 }
 
