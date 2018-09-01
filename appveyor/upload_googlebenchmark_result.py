@@ -32,27 +32,28 @@ def find_csv_header_index(csvFile):
     raise Exception('No header found! [File={}]'.format(csvFile))
 
 def get_input_from_name(name):
-    # <input>
+    #<input>
     templateInputStart = name.find('<')
     if (-1 != templateInputStart):
         return name[templateInputStart + 1:name.find('>')]
-
-    # /input (but can have /threads:n or /input/threads:n)
+    
+    #/input (but can have /threads:n or /input/threads:n)
     argInputStart = name.find('/')
     if (-1 != argInputStart):
         normalizedResult = name[argInputStart + 1:]
         argInputStart = normalizedResult.find('/')
-
+        #return normalizedResult
+        
         if (normalizedResult.startswith('threads')):
-            return np.nan
-
+            return ""
+        
         argInputStart = normalizedResult.find('/')
         if (-1 != argInputStart):
             return normalizedResult[:argInputStart]
         else:
             return normalizedResult
-
-    return np.nan
+            
+    return ""
 
 def get_testname_from_name(name):
     testname = name[name.index('_') + 1:].replace('Benchmark', '')
@@ -75,16 +76,18 @@ if __name__ == "__main__":
 
     # CATEGORY_TESTNAMEBenchmark[<input>][/input][/more info]
     df['category'] = df.name.map(lambda x: x[:x.index('_')])
-    df['data_size'] = df.name.map(lambda x: get_input_from_name(x))
     df['testname'] = df.name.map(lambda x: get_testname_from_name(x))
+    
+    df['data_size'] = df.name.map(lambda x: get_input_from_name(x))
     df.set_index('data_size', inplace=True)
+    df.index = df.index.astype(int)
 
-    categories = df['category'].unique()
+    categories = df.category.unique()
     categories.sort()
 
     # TODO: Use MultiIndex instead
     for category in categories:
-        category_df = df[df['category'] == category][['testname', 'real_time']]
+        category_df = df[df.category == category][['testname', 'real_time']]
         category_df
 
         testnames = category_df.testname.unique()
@@ -100,11 +103,7 @@ if __name__ == "__main__":
 
         for testname in testnames:
             testname_df = category_df[category_df.testname == testname]['real_time']
-            testname_df.plot(ax=ax, label=testname, legend=True)
-
-            xLabels = list(str(testname_df.index.values[0]))
-            xLabels.extend(testname_df.index.values)
-            ax.set_xticklabels(xLabels)
+            testname_df.plot(ax=ax, label=testname, legend=True, logx=True, logy=True)
 
         filename = os.path.join(os.getcwd(), 'googlebenchmark_graph_{}.png'.format(category))
         fig.savefig(filename)
