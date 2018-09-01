@@ -76,21 +76,13 @@ if __name__ == "__main__":
     # CATEGORY_TESTNAMEBenchmark[<input>][/input][/more info]
     df['category'] = df.name.map(lambda x: x[:x.index('_')])
     df['testname'] = df.name.map(lambda x: get_testname_from_name(x))
-
     df['data_size'] = df.name.map(lambda x: get_input_from_name(x))
     df.set_index('data_size', inplace=True)
     df.index = df.index.astype(int)
-
-    categories = df.category.unique()
-    categories.sort()
-
-    # TODO: Use MultiIndex instead
-    for category in categories:
+    
+    for category in df.category.unique():
         category_df = df[df.category == category][['testname', 'real_time']]
         category_df
-
-        testnames = category_df.testname.unique()
-        testnames.sort()
 
         fig, ax = plt.subplots()
 
@@ -98,13 +90,13 @@ if __name__ == "__main__":
         fig.set_figwidth(11)
 
         ax.set_title(''.join([' {}'.format(c) if c.isupper() else c for c in category]))
+        ax.set_xscale('log', basex=2)
+        ax.set_yscale('log', basey=2)
         ax.set_ylabel('real_time')
-
-        for testname in testnames:
+        
+        for testname in category_df.testname.unique():
             testname_df = category_df[category_df.testname == testname]['real_time']
             testname_df.plot(ax=ax, label=testname, legend=True)
-            ax.set_xscale('log', basex=2)
-            ax.set_yscale('log', basey=2)
 
         filename = os.path.join(os.getcwd(), 'googlebenchmark_graph_{}.png'.format(category))
         fig.savefig(filename)
