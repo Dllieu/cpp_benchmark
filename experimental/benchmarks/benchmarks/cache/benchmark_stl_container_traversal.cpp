@@ -27,7 +27,7 @@ namespace
         std::uniform_int_distribution<> randomDistribution(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
         std::mt19937 generator;
 
-        ContainerT<T> container(iSize);
+        ContainerT<T> container(iSize / sizeof(T));
         std::generate(std::begin(container), std::end(container), [&randomDistribution, &generator] { return randomDistribution(generator); });
 
         return container;
@@ -42,7 +42,7 @@ namespace
         ContainerT<T> container;
 
         // Quick and dirty
-        while (container.size() != iSize)
+        while (container.size() != iSize / sizeof(T))
         {
             container.emplace(randomDistribution(generator));
         }
@@ -80,12 +80,12 @@ namespace
 
     void StlCacheContainerTraversal_SetInt32Benchmark(benchmark::State& iState)
     {
-        StlCacheContainerTraversal_RunBenchmark(iState, MakeSetWithRandomValues<std::set, std::int32_t>(iState.range(0) / 4));
+        StlCacheContainerTraversal_RunBenchmark(iState, MakeSetWithRandomValues<std::set, std::int32_t>(iState.range(0)));
     }
 
     void StlCacheContainerTraversal_UnorderedSetInt32Benchmark(benchmark::State& iState)
     {
-        StlCacheContainerTraversal_RunBenchmark(iState, MakeSetWithRandomValues<std::unordered_set, std::int32_t>(iState.range(0) / 4));
+        StlCacheContainerTraversal_RunBenchmark(iState, MakeSetWithRandomValues<std::unordered_set, std::int32_t>(iState.range(0)));
     }
 
     void StlCacheContainerTraversal_VectorBenchmark(benchmark::State& iState)
