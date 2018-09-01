@@ -79,7 +79,7 @@ if __name__ == "__main__":
     df['data_size'] = df.name.map(lambda x: get_input_from_name(x))
     df.set_index('data_size', inplace=True)
     df.index = df.index.astype(int)
-    
+
     for category in df.category.unique():
         category_df = df[df.category == category][['testname', 'real_time']]
         category_df
@@ -93,7 +93,7 @@ if __name__ == "__main__":
         ax.set_xscale('log', basex=2)
         ax.set_yscale('log', basey=2)
         ax.set_ylabel('real_time')
-        
+
         for testname in category_df.testname.unique():
             testname_df = category_df[category_df.testname == testname]['real_time']
             testname_df.plot(ax=ax, label=testname, legend=True)
