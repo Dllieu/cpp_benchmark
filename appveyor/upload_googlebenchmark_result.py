@@ -95,7 +95,7 @@ if __name__ == "__main__":
         fig.set_figheight(7)
         fig.set_figwidth(11)
 
-        ax.set_title(category)
+        ax.set_title(''.join([' {}'.format(c) if c.isupper() else c for c in category]))
         ax.set_ylabel('real_time')
 
         for testname in testnames:
