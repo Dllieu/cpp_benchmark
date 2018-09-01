@@ -114,7 +114,7 @@ namespace
 
     void CacheStructureAndArray_Arguments(benchmark::internal::Benchmark* iBenchmark)
     {
-        for (std::size_t i = 1_KB; i <= 20_KB; i += 1_KB)
+        for (std::size_t i = 2_KB; i <= 40_KB; i += 2_KB)
         {
             iBenchmark->Arg(i);
         }

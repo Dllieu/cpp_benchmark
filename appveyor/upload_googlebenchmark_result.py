@@ -36,23 +36,22 @@ def get_input_from_name(name):
     templateInputStart = name.find('<')
     if (-1 != templateInputStart):
         return name[templateInputStart + 1:name.find('>')]
-    
+
     #/input (but can have /threads:n or /input/threads:n)
     argInputStart = name.find('/')
     if (-1 != argInputStart):
         normalizedResult = name[argInputStart + 1:]
         argInputStart = normalizedResult.find('/')
-        #return normalizedResult
-        
+
         if (normalizedResult.startswith('threads')):
             return "0"
-        
+
         argInputStart = normalizedResult.find('/')
         if (-1 != argInputStart):
             return normalizedResult[:argInputStart]
         else:
             return normalizedResult
-            
+
     return "0"
 
 def get_testname_from_name(name):
@@ -77,7 +76,7 @@ if __name__ == "__main__":
     # CATEGORY_TESTNAMEBenchmark[<input>][/input][/more info]
     df['category'] = df.name.map(lambda x: x[:x.index('_')])
     df['testname'] = df.name.map(lambda x: get_testname_from_name(x))
-    
+
     df['data_size'] = df.name.map(lambda x: get_input_from_name(x))
     df.set_index('data_size', inplace=True)
     df.index = df.index.astype(int)
