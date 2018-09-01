@@ -62,17 +62,17 @@ namespace
 
     void StlCacheContainerTraversal_DequeBenchmark(benchmark::State& iState)
     {
-        StlCacheContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::deque, std::int8_t>(iState.range(0)));
+        StlCacheContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::deque, std::int32_t>(iState.range(0)));
     }
 
     void StlCacheContainerTraversal_ListBenchmark(benchmark::State& iState)
     {
-        StlCacheContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::list, std::int8_t>(iState.range(0)));
+        StlCacheContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::list, std::int32_t>(iState.range(0)));
     }
 
     void StlCacheContainerTraversal_ListShuffleBenchmark(benchmark::State& iState)
     {
-        auto sl = MakeContainerWithRandomValues<std::list, std::int8_t>(iState.range(0));
+        auto sl = MakeContainerWithRandomValues<std::list, std::int32_t>(iState.range(0));
         sl.sort();
 
         StlCacheContainerTraversal_RunBenchmark(iState, sl);
@@ -90,7 +90,7 @@ namespace
 
     void StlCacheContainerTraversal_VectorBenchmark(benchmark::State& iState)
     {
-        StlCacheContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::vector, std::int8_t>(iState.range(0)));
+        StlCacheContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::vector, std::int32_t>(iState.range(0)));
     }
 
     void StlCacheContainerTraversal_Arguments(benchmark::internal::Benchmark* iBenchmark)
