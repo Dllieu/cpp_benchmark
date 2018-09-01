@@ -45,7 +45,7 @@ def get_input_from_name(name):
         #return normalizedResult
         
         if (normalizedResult.startswith('threads')):
-            return ""
+            return "0"
         
         argInputStart = normalizedResult.find('/')
         if (-1 != argInputStart):
@@ -53,7 +53,7 @@ def get_input_from_name(name):
         else:
             return normalizedResult
             
-    return ""
+    return "0"
 
 def get_testname_from_name(name):
     testname = name[name.index('_') + 1:].replace('Benchmark', '')
