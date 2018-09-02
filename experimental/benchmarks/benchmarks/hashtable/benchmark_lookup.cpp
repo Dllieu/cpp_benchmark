@@ -3,9 +3,9 @@
 #pragma GCC diagnostic ignored "-Wshadow"
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #include <flat_hash_map.hpp>
+#include <sparsehash/dense_hash_map>
 #pragma GCC diagnostic pop
 #include <random>
-#include <sparsehash/dense_hash_map>
 #include <unordered_map>
 #include <utils/macros.h>
 #include <vector>
