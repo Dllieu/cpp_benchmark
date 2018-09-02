@@ -6,6 +6,7 @@
 #include <flat_hash_map.hpp>
 #pragma GCC diagnostic pop
 #include <random>
+#include <sparsehash/dense_hash_map>
 #include <unordered_map>
 #include <utils/cache_information.h>
 #include <utils/macros.h>
@@ -14,8 +15,8 @@
 
 namespace
 {
-    template <typename HashTableT>
-    HashTableT CreateHashTable(std::size_t iNumberElements)
+    template <typename HashTableT, typename PostInitF>
+    HashTableT CreateHashTable(std::size_t iNumberElements, PostInitF&& iPostInitFunctor)
     {
         using T = typename HashTableT::key_type;
 
@@ -23,6 +24,8 @@ namespace
         std::mt19937_64 generator;
 
         HashTableT hashTable;
+        iPostInitFunctor(hashTable);
+
         while (hashTable.size() != iNumberElements)
         {
             hashTable.emplace(randomDistribution(generator), hashTable.size());
@@ -37,12 +40,12 @@ namespace
         return std::max(std::size_t(2), (3u * experimental::enum_cast(experimental::CacheSize::L3)) / (sizeof(T) * iNumberOfElements));
     }
 
-    template <typename HashTableT>
-    std::vector<HashTableT> CreateContainerHashTable(std::size_t iNumberElements)
+    template <typename HashTableT, typename PostInitF>
+    std::vector<HashTableT> CreateContainerHashTable(std::size_t iNumberElements, PostInitF&& iPostInitFunctor)
     {
         std::size_t numberOfContainerToOverflowL3Cache = NumberOfContainerToOverflowL3Cache<typename HashTableT::value_type>(iNumberElements);
         std::vector<HashTableT> hashTables;
-        HashTableT hashTable = CreateHashTable<HashTableT>(iNumberElements);
+        HashTableT hashTable = CreateHashTable<HashTableT>(iNumberElements, iPostInitFunctor);
 
         for (std::size_t i = 0; i < numberOfContainerToOverflowL3Cache; ++i)
         {
@@ -52,10 +55,10 @@ namespace
         return hashTables;
     }
 
-    template <typename HashTableT>
-    void HashTableLookupWithCacheMiss_RunBenchmark(benchmark::State& iState)
+    template <typename HashTableT, typename PostInitF>
+    void HashTableLookupWithCacheMiss_RunBenchmark(benchmark::State& iState, PostInitF&& iPostInitFunctor)
     {
-        std::vector<HashTableT> hashTables = CreateContainerHashTable<HashTableT>(iState.range(0));
+        std::vector<HashTableT> hashTables = CreateContainerHashTable<HashTableT>(iState.range(0), iPostInitFunctor);
 
         std::vector<typename HashTableT::key_type> dataToLookup;
         dataToLookup.reserve(hashTables.front().size());
@@ -86,6 +89,17 @@ namespace
         }
     }
 
+    template <typename HashTableT>
+    void HashTableLookupWithCacheMiss_RunBenchmark(benchmark::State& iState)
+    {
+        return HashTableLookupWithCacheMiss_RunBenchmark<HashTableT>(iState, [](HashTableT& iHashTable) {});
+    }
+
+    void HashTableLookupWithCacheMiss_DenseHashMapBenchmark(benchmark::State& iState)
+    {
+        HashTableLookupWithCacheMiss_RunBenchmark<google::dense_hash_map<std::int64_t, std::int64_t>>(iState, [](auto& iHashTable) { iHashTable.set_empty_key(-1); });
+    }
+
     void HashTableLookupWithCacheMiss_FlatHashMapBenchmark(benchmark::State& iState)
     {
         HashTableLookupWithCacheMiss_RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t>>(iState);
@@ -113,5 +127,6 @@ namespace
 // Another thing that we notice is that all the graphs are essentially flat on the left half of the screen.
 // This is because the table fits entirely into the cache. Only when we get to the point where the data doesn’t fit into the L3 cache do we see the different graphs really diverge.
 // You will only get the numbers on the left if the element you’re looking for is already in the cache.
+BENCHMARK(HashTableLookupWithCacheMiss_DenseHashMapBenchmark)->Apply(HashTableLookupWithCacheMiss_Arguments); // NOLINT
 BENCHMARK(HashTableLookupWithCacheMiss_FlatHashMapBenchmark)->Apply(HashTableLookupWithCacheMiss_Arguments);  // NOLINT
 BENCHMARK(HashTableLookupWithCacheMiss_UnorderedMapBenchmark)->Apply(HashTableLookupWithCacheMiss_Arguments); // NOLINT

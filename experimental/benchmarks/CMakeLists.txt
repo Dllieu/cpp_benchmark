@@ -11,8 +11,9 @@ if (NOT TARGET lib_experimental)
 endif()
 
 include_directories(${PATH_LIB_EXPERIMENTAL})
-include_directories("${PATH_GOOGLE_BENCHMARK}/include")
 include_directories(${PATH_FLAT_HASH_MAP})
+include_directories("${PATH_GOOGLE_BENCHMARK}/include")
+include_directories(${PATH_GOOGLE_SPARSEHASH})
 
 aux_source_directory(benchmarks SRC_BENCHMARKS)
 aux_source_directory(benchmarks/cache SRC_CACHE)

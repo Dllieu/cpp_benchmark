@@ -5,14 +5,15 @@
 #include <flat_hash_map.hpp>
 #pragma GCC diagnostic pop
 #include <random>
+#include <sparsehash/dense_hash_map>
 #include <unordered_map>
 #include <utils/macros.h>
 #include <vector>
 
 namespace
 {
-    template <typename HashTableT>
-    HashTableT CreateHashTable(std::size_t iNumberElements)
+    template <typename HashTableT, typename PostInitF>
+    HashTableT CreateHashTable(std::size_t iNumberElements, PostInitF&& iPostInitFunctor)
     {
         using T = typename HashTableT::key_type;
 
@@ -20,6 +21,8 @@ namespace
         std::mt19937_64 generator;
 
         HashTableT hashTable;
+        iPostInitFunctor(hashTable);
+
         while (hashTable.size() != iNumberElements)
         {
             hashTable.emplace(randomDistribution(generator), hashTable.size());
@@ -28,10 +31,10 @@ namespace
         return hashTable;
     }
 
-    template <typename HashTableT>
-    void HashTableLookup_RunBenchmark(benchmark::State& iState)
+    template <typename HashTableT, typename PostInitF>
+    void HashTableLookup_RunBenchmark(benchmark::State& iState, PostInitF&& iPostInitFunctor)
     {
-        HashTableT hashTable = CreateHashTable<HashTableT>(iState.range(0));
+        HashTableT hashTable = CreateHashTable<HashTableT>(iState.range(0), std::forward<PostInitF>(iPostInitFunctor));
 
         std::vector<typename HashTableT::key_type> dataToLookup;
         dataToLookup.reserve(hashTable.size());
@@ -55,6 +58,17 @@ namespace
         }
     }
 
+    template <typename HashTableT>
+    void HashTableLookup_RunBenchmark(benchmark::State& iState)
+    {
+        return HashTableLookup_RunBenchmark<HashTableT>(iState, [](HashTableT& iHashTable) {});
+    }
+
+    void HashTableLookup_DenseHashMapBenchmark(benchmark::State& iState)
+    {
+        HashTableLookup_RunBenchmark<google::dense_hash_map<std::int64_t, std::int64_t>>(iState, [](auto& iHashTable) { iHashTable.set_empty_key(-1); });
+    }
+
     void HashTableLookup_FlatHashMapBenchmark(benchmark::State& iState)
     {
         HashTableLookup_RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t>>(iState);
@@ -67,7 +81,7 @@ namespace
 
     void HashTableLookup_Arguments(benchmark::internal::Benchmark* iBenchmark)
     {
-        for (double i = 10; i <= 120'000; i *= 1.2) // NOLINT
+        for (double i = 10; i <= 120'000; i *= 12) // NOLINT
         {
             iBenchmark->Arg(i);
         }
@@ -82,5 +96,6 @@ namespace
 // Another thing that we notice is that all the graphs are essentially flat on the left half of the screen.
 // This is because the table fits entirely into the cache. Only when we get to the point where the data doesn’t fit into the L3 cache do we see the different graphs really diverge.
 // You will only get the numbers on the left if the element you’re looking for is already in the cache.
+BENCHMARK(HashTableLookup_DenseHashMapBenchmark)->Apply(HashTableLookup_Arguments); // NOLINT
 BENCHMARK(HashTableLookup_FlatHashMapBenchmark)->Apply(HashTableLookup_Arguments);  // NOLINT
 BENCHMARK(HashTableLookup_UnorderedMapBenchmark)->Apply(HashTableLookup_Arguments); // NOLINT
