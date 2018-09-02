@@ -90,8 +90,7 @@ if __name__ == "__main__":
         fig.set_figwidth(11)
 
         ax.set_title(''.join([' {}'.format(c) if c.isupper() else c for c in category]))
-        ax.set_xscale('log', basex=2)
-        ax.set_yscale('log', basey=2)
+        ax.set_xscale('log', basex=10)
         ax.set_ylabel('real_time')
 
         for testname in category_df.testname.unique():

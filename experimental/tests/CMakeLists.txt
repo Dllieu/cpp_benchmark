@@ -12,7 +12,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/tests)
 include_directories(${PATH_LIB_EXPERIMENTAL})
 include_directories("${PATH_GOOGLE_TEST}/googletest/include")
 include_directories("${PATH_GOOGLE_TEST}/googlemock/include")
-include_directories("${PATH_FLAT_HASH_MAP}")
+include_directories(${PATH_FLAT_HASH_MAP})
 
 aux_source_directory(tests SRC_TESTS)
 aux_source_directory(tests/libstd SRC_LIBSTD_TESTS)
