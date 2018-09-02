@@ -82,7 +82,7 @@ namespace
 
     void HashTableLookup_Arguments(benchmark::internal::Benchmark* iBenchmark)
     {
-        for (double i = 10; i <= 120'000; i *= 12) // NOLINT
+        for (double i = 10; i <= 120'000; i *= 1.2) // NOLINT
         {
             iBenchmark->Arg(i);
         }
