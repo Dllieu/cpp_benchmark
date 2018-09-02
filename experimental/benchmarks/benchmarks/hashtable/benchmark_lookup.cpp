@@ -1,10 +1,11 @@
-#include <benchmark/benchmark.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #include <flat_hash_map.hpp>
 #include <sparsehash/dense_hash_map>
 #pragma GCC diagnostic pop
+#include <algorithm>
+#include <benchmark/benchmark.h>
 #include <random>
 #include <unordered_map>
 #include <utils/macros.h>
