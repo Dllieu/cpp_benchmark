@@ -1,11 +1,12 @@
-#include <benchmark/benchmark.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #include <flat_hash_map.hpp>
-#pragma GCC diagnostic pop
-#include <random>
 #include <sparsehash/dense_hash_map>
+#pragma GCC diagnostic pop
+#include <algorithm>
+#include <benchmark/benchmark.h>
+#include <random>
 #include <unordered_map>
 #include <utils/macros.h>
 #include <vector>
@@ -81,7 +82,7 @@ namespace
 
     void HashTableLookup_Arguments(benchmark::internal::Benchmark* iBenchmark)
     {
-        for (double i = 10; i <= 120'000; i *= 12) // NOLINT
+        for (double i = 10; i <= 120'000; i *= 1.2) // NOLINT
         {
             iBenchmark->Arg(i);
         }
