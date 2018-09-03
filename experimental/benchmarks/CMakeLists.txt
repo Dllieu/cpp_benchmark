@@ -18,8 +18,9 @@ include_directories(${PATH_GOOGLE_SPARSEHASH})
 aux_source_directory(benchmarks SRC_BENCHMARKS)
 aux_source_directory(benchmarks/cache SRC_CACHE)
 aux_source_directory(benchmarks/hashtable SRC_HASHTABLE)
+aux_source_directory(benchmarks/threading SRC_THREADING)
 
-add_executable(benchmark_experimental ${SRC_BENCHMARKS} ${SRC_CACHE} ${SRC_HASHTABLE})
+add_executable(benchmark_experimental ${SRC_BENCHMARKS} ${SRC_CACHE} ${SRC_HASHTABLE} ${SRC_THREADING})
 find_package(Threads REQUIRED)
 target_link_libraries(benchmark_experimental
                       LINK_PRIVATE Threads::Threads

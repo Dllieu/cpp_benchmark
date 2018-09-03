@@ -26,4 +26,9 @@ Checks:          "*,\
 
 HeaderFilterRegex: 'experimental/experimental/.*'
 FormatStyle:     none
+CheckOptions:
+    - key:             hicpp-special-member-functions.AllowSoleDefaultDtor
+      value:           1
+    - key:             cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+      value:           1
 ...
