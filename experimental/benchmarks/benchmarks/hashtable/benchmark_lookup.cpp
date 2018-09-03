@@ -75,6 +75,11 @@ namespace
         HashTableLookup_RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t>>(iState);
     }
 
+    void HashTableLookup_FlatHashMapPower2Benchmark(benchmark::State& iState)
+    {
+        HashTableLookup_RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t, ska::power_of_two_std_hash<std::int64_t>>>(iState);
+    }
+
     void HashTableLookup_UnorderedMapBenchmark(benchmark::State& iState)
     {
         HashTableLookup_RunBenchmark<std::unordered_map<std::int64_t, std::int64_t>>(iState);
@@ -82,7 +87,7 @@ namespace
 
     void HashTableLookup_Arguments(benchmark::internal::Benchmark* iBenchmark)
     {
-        for (double i = 10; i <= 120'000; i *= 1.2) // NOLINT
+        for (double i = 10; i <= 120'000; i *= 1.4) // NOLINT
         {
             iBenchmark->Arg(i);
         }
@@ -97,6 +102,7 @@ namespace
 // Another thing that we notice is that all the graphs are essentially flat on the left half of the screen.
 // This is because the table fits entirely into the cache. Only when we get to the point where the data doesn’t fit into the L3 cache do we see the different graphs really diverge.
 // You will only get the numbers on the left if the element you’re looking for is already in the cache.
-BENCHMARK(HashTableLookup_DenseHashMapBenchmark)->Apply(HashTableLookup_Arguments); // NOLINT
-BENCHMARK(HashTableLookup_FlatHashMapBenchmark)->Apply(HashTableLookup_Arguments);  // NOLINT
-BENCHMARK(HashTableLookup_UnorderedMapBenchmark)->Apply(HashTableLookup_Arguments); // NOLINT
+BENCHMARK(HashTableLookup_DenseHashMapBenchmark)->Apply(HashTableLookup_Arguments);      // NOLINT
+BENCHMARK(HashTableLookup_FlatHashMapBenchmark)->Apply(HashTableLookup_Arguments);       // NOLINT
+BENCHMARK(HashTableLookup_FlatHashMapPower2Benchmark)->Apply(HashTableLookup_Arguments); // NOLINT
+BENCHMARK(HashTableLookup_UnorderedMapBenchmark)->Apply(HashTableLookup_Arguments);      // NOLINT

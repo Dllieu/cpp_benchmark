@@ -59,7 +59,8 @@
         "dense_hash_set": "cpp",
         "sparse_hash_set": "cpp",
         "sparsetable": "cpp",
-        "traits": "cpp"
+        "traits": "cpp",
+        "random": "cpp"
     },
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cmake.configureOnOpen": true,
