@@ -97,6 +97,8 @@ if __name__ == "__main__":
             testname_df = category_df[category_df.testname == testname]['real_time']
             testname_df.plot(ax=ax, label=testname, legend=True)
 
+        ax.grid(b=True, which='major', color='black', alpha=0.2, linestyle='--')
+
         filename = os.path.join(os.getcwd(), 'googlebenchmark_graph_{}.png'.format(category))
         fig.savefig(filename)
         subprocess.call('{} appveyor PushArtifact {}'.format('echo ' if args.debug else '', filename), shell=True)
