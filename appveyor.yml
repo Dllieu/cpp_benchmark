@@ -64,6 +64,7 @@ before_build:
   - ${COMPILER_CPP} -v
   - cmake --version
   - cppcheck --version
+  - ulimit -a
   - env
 
   # cmake
