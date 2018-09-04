@@ -34,7 +34,7 @@ namespace
         }
     };
 
-    void BranchPrediction_RunBenchmark(benchmark::State& iState, const std::vector<Base*>& iBases)
+    void RunBenchmark(benchmark::State& iState, const std::vector<Base*>& iBases)
     {
         std::size_t n = 0;
         for ([[maybe_unused]] auto handler : iState)
@@ -46,7 +46,7 @@ namespace
         }
     }
 
-    void BranchPrediction_ShuffledVTableBenchmark(benchmark::State& iState)
+    void BranchPrediction_ShuffledVTable(benchmark::State& iState)
     {
         auto baseElement = std::make_unique<Base>();
         auto derived1Element = std::make_unique<Derived1>();
@@ -62,10 +62,10 @@ namespace
         std::mt19937 g(rd());
         std::shuffle(std::begin(v), std::end(v), g);
 
-        BranchPrediction_RunBenchmark(iState, v);
+        RunBenchmark(iState, v);
     }
 
-    void BranchPrediction_SortedVTableBenchmark(benchmark::State& iState)
+    void BranchPrediction_SortedVTable(benchmark::State& iState)
     {
         auto baseElement = std::make_unique<Base>();
         auto derived1Element = std::make_unique<Derived1>();
@@ -77,14 +77,14 @@ namespace
         std::fill_n(std::back_inserter(v), iState.range(0), derived1Element.get());
         std::fill_n(std::back_inserter(v), iState.range(0), derived2Element.get());
 
-        BranchPrediction_RunBenchmark(iState, v);
+        RunBenchmark(iState, v);
     }
 
-    void BranchPrediction_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         iBenchmark->RangeMultiplier(10)->Range(1, 10'000);
     }
 }
 
-BENCHMARK(BranchPrediction_ShuffledVTableBenchmark)->Apply(BranchPrediction_Arguments); // NOLINT
-BENCHMARK(BranchPrediction_SortedVTableBenchmark)->Apply(BranchPrediction_Arguments);   // NOLINT
+BENCHMARK(BranchPrediction_ShuffledVTable)->Apply(BenchmarkArguments); // NOLINT
+BENCHMARK(BranchPrediction_SortedVTable)->Apply(BenchmarkArguments);   // NOLINT

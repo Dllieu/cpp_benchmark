@@ -55,7 +55,7 @@ def get_input_from_name(name):
     return "0"
 
 def get_testname_from_name(name):
-    testname = name[name.index('_') + 1:].replace('Benchmark', '')
+    testname = name[name.index('_') + 1:]
     placeHolder1 = testname.find('<')
     placeHolder2 = testname.find('/')
 

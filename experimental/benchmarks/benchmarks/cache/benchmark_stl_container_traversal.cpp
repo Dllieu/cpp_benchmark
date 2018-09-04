@@ -55,7 +55,7 @@ namespace
     }
 
     template <typename T>
-    void StlContainerTraversal_RunBenchmark(benchmark::State& iState, T&& iContainer)
+    void RunBenchmark(benchmark::State& iState, T&& iContainer)
     {
         std::size_t n = 0;
         for ([[maybe_unused]] auto handler : iState)
@@ -64,40 +64,40 @@ namespace
         }
     }
 
-    void StlContainerTraversal_DequeBenchmark(benchmark::State& iState)
+    void StlContainerTraversal_Deque(benchmark::State& iState)
     {
-        StlContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::deque<std::int32_t>>(iState.range(0)));
+        RunBenchmark(iState, MakeContainerWithRandomValues<std::deque<std::int32_t>>(iState.range(0)));
     }
 
-    void StlContainerTraversal_ListBenchmark(benchmark::State& iState)
+    void StlContainerTraversal_List(benchmark::State& iState)
     {
-        StlContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::list<std::int32_t>>(iState.range(0)));
+        RunBenchmark(iState, MakeContainerWithRandomValues<std::list<std::int32_t>>(iState.range(0)));
     }
 
-    void StlContainerTraversal_ListShuffleBenchmark(benchmark::State& iState)
+    void StlContainerTraversal_ListShuffle(benchmark::State& iState)
     {
         auto sl = MakeContainerWithRandomValues<std::list<std::int32_t>>(iState.range(0));
         sl.sort();
 
-        StlContainerTraversal_RunBenchmark(iState, sl);
+        RunBenchmark(iState, sl);
     }
 
-    void StlContainerTraversal_SetBenchmark(benchmark::State& iState)
+    void StlContainerTraversal_Set(benchmark::State& iState)
     {
-        StlContainerTraversal_RunBenchmark(iState, MakeSetWithRandomValues<std::set<std::int32_t>>(iState.range(0)));
+        RunBenchmark(iState, MakeSetWithRandomValues<std::set<std::int32_t>>(iState.range(0)));
     }
 
-    void StlContainerTraversal_UnorderedSetBenchmark(benchmark::State& iState)
+    void StlContainerTraversal_UnorderedSet(benchmark::State& iState)
     {
-        StlContainerTraversal_RunBenchmark(iState, MakeSetWithRandomValues<std::unordered_set<std::int32_t>>(iState.range(0)));
+        RunBenchmark(iState, MakeSetWithRandomValues<std::unordered_set<std::int32_t>>(iState.range(0)));
     }
 
-    void StlContainerTraversal_VectorBenchmark(benchmark::State& iState)
+    void StlContainerTraversal_Vector(benchmark::State& iState)
     {
-        StlContainerTraversal_RunBenchmark(iState, MakeContainerWithRandomValues<std::vector<std::int32_t>>(iState.range(0)));
+        RunBenchmark(iState, MakeContainerWithRandomValues<std::vector<std::int32_t>>(iState.range(0)));
     }
 
-    void StlContainerTraversal_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         for (std::size_t i = 2_KB; i <= 22_KB; i += 2_KB)
         {
@@ -106,9 +106,9 @@ namespace
     }
 }
 
-BENCHMARK(StlContainerTraversal_DequeBenchmark)->Apply(StlContainerTraversal_Arguments);        // NOLINT
-BENCHMARK(StlContainerTraversal_ListBenchmark)->Apply(StlContainerTraversal_Arguments);         // NOLINT
-BENCHMARK(StlContainerTraversal_ListShuffleBenchmark)->Apply(StlContainerTraversal_Arguments);  // NOLINT
-BENCHMARK(StlContainerTraversal_SetBenchmark)->Apply(StlContainerTraversal_Arguments);          // NOLINT
-BENCHMARK(StlContainerTraversal_UnorderedSetBenchmark)->Apply(StlContainerTraversal_Arguments); // NOLINT
-BENCHMARK(StlContainerTraversal_VectorBenchmark)->Apply(StlContainerTraversal_Arguments);       // NOLINT
+BENCHMARK(StlContainerTraversal_Deque)->Apply(BenchmarkArguments);        // NOLINT
+BENCHMARK(StlContainerTraversal_List)->Apply(BenchmarkArguments);         // NOLINT
+BENCHMARK(StlContainerTraversal_ListShuffle)->Apply(BenchmarkArguments);  // NOLINT
+BENCHMARK(StlContainerTraversal_Set)->Apply(BenchmarkArguments);          // NOLINT
+BENCHMARK(StlContainerTraversal_UnorderedSet)->Apply(BenchmarkArguments); // NOLINT
+BENCHMARK(StlContainerTraversal_Vector)->Apply(BenchmarkArguments);       // NOLINT

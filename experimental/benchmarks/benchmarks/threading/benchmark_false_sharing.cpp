@@ -4,7 +4,7 @@
 
 namespace
 {
-    void FalseSharing_RunBenchmark(benchmark::State& iState, std::atomic<std::int64_t>& iAtomicA, std::atomic<std::int64_t>& iAtomicB, std::atomic<std::int64_t>& iAtomicC, std::atomic<std::int64_t>& iAtomicD)
+    void RunBenchmark(benchmark::State& iState, std::atomic<std::int64_t>& iAtomicA, std::atomic<std::int64_t>& iAtomicB, std::atomic<std::int64_t>& iAtomicC, std::atomic<std::int64_t>& iAtomicD)
     {
         std::size_t numberIterations = iState.range(0);
 
@@ -41,7 +41,7 @@ namespace
         std::atomic<std::int64_t> c{0};
         std::atomic<std::int64_t> d{0};
 
-        FalseSharing_RunBenchmark(iState, a, b, c, d);
+        RunBenchmark(iState, a, b, c, d);
     }
 
     void FalseSharing_Padding64(benchmark::State& iState)
@@ -51,14 +51,14 @@ namespace
         alignas(64) std::atomic<std::int64_t> c{0};
         alignas(64) std::atomic<std::int64_t> d{0};
 
-        FalseSharing_RunBenchmark(iState, a, b, c, d);
+        RunBenchmark(iState, a, b, c, d);
     }
 
-    void FalseSharing_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         iBenchmark->RangeMultiplier(10)->Range(1, 10'000);
     }
 }
 
-BENCHMARK(FalseSharing_FalseSharing)->Apply(FalseSharing_Arguments); // NOLINT
-BENCHMARK(FalseSharing_Padding64)->Apply(FalseSharing_Arguments);    // NOLINT
+BENCHMARK(FalseSharing_FalseSharing)->Apply(BenchmarkArguments); // NOLINT
+BENCHMARK(FalseSharing_Padding64)->Apply(BenchmarkArguments);    // NOLINT

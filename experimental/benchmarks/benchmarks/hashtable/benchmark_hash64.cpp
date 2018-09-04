@@ -9,7 +9,7 @@
 namespace
 {
     template <typename HashT>
-    void Hash64_RunBenchmark(benchmark::State& iState)
+    void RunBenchmark(benchmark::State& iState)
     {
         using HashTableT = std::unordered_map<std::int64_t, std::int64_t, HashT>;
 
@@ -27,7 +27,7 @@ namespace
         }
     }
 
-    void Hash64_Murmur3MixerBenchmark(benchmark::State& iState)
+    void Hash64_Murmur3Mixer(benchmark::State& iState)
     {
         struct Murmur3MixerHash
         {
@@ -43,15 +43,15 @@ namespace
             }
         };
 
-        Hash64_RunBenchmark<Murmur3MixerHash>(iState);
+        RunBenchmark<Murmur3MixerHash>(iState);
     }
 
-    void Hash64_StdHashBenchmark(benchmark::State& iState)
+    void Hash64_StdHash(benchmark::State& iState)
     {
-        Hash64_RunBenchmark<std::hash<std::int64_t>>(iState);
+        RunBenchmark<std::hash<std::int64_t>>(iState);
     }
 
-    void Hash64_ThomasWangHashBenchmark(benchmark::State& iState)
+    void Hash64_ThomasWangHash(benchmark::State& iState)
     {
         struct ThomasWangHash
         {
@@ -69,10 +69,10 @@ namespace
             }
         };
 
-        Hash64_RunBenchmark<ThomasWangHash>(iState);
+        RunBenchmark<ThomasWangHash>(iState);
     }
 
-    void Hash64_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         for (double i = 10; i <= 200'000; i *= 2.4) // NOLINT
         {
@@ -81,6 +81,6 @@ namespace
     }
 }
 
-BENCHMARK(Hash64_Murmur3MixerBenchmark)->Apply(Hash64_Arguments);   // NOLINT
-BENCHMARK(Hash64_StdHashBenchmark)->Apply(Hash64_Arguments);        // NOLINT
-BENCHMARK(Hash64_ThomasWangHashBenchmark)->Apply(Hash64_Arguments); // NOLINT
+BENCHMARK(Hash64_Murmur3Mixer)->Apply(BenchmarkArguments);   // NOLINT
+BENCHMARK(Hash64_StdHash)->Apply(BenchmarkArguments);        // NOLINT
+BENCHMARK(Hash64_ThomasWangHash)->Apply(BenchmarkArguments); // NOLINT

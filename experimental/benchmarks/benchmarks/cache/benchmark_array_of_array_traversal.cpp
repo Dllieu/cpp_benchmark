@@ -24,7 +24,7 @@ namespace
         }
     }
 
-    void CacheArrayOfArrayTraversal_ColumnWiseBenchmark(benchmark::State& iState)
+    void CacheArrayOfArrayTraversal_ColumnWise(benchmark::State& iState)
     {
         RunBenchmark(iState, [](std::vector<std::vector<std::int8_t>>& iArrayOfArray, std::size_t iDimension) {
             for (std::size_t column = 0; column < iDimension; ++column)
@@ -37,7 +37,7 @@ namespace
         });
     }
 
-    void CacheArrayOfArrayTraversal_RowWiseBenchmark(benchmark::State& iState)
+    void CacheArrayOfArrayTraversal_RowWise(benchmark::State& iState)
     {
         RunBenchmark(iState, [](std::vector<std::vector<std::int8_t>>& iArrayOfArray, std::size_t iDimension) {
             for (std::size_t row = 0; row < iDimension; ++row)
@@ -50,7 +50,7 @@ namespace
         });
     }
 
-    void CacheArrayOfArrayTraversal_ColumnWiseHashComputationBenchmark(benchmark::State& iState)
+    void CacheArrayOfArrayTraversal_ColumnWiseHashComputation(benchmark::State& iState)
     {
         RunBenchmark(iState, [](std::vector<std::vector<std::int8_t>>& iArrayOfArray, std::size_t iDimension) {
             for (std::size_t column = 0; column < iDimension; ++column)
@@ -63,7 +63,7 @@ namespace
         });
     }
 
-    void CacheArrayOfArrayTraversal_RowWiseHashComputationBenchmark(benchmark::State& iState)
+    void CacheArrayOfArrayTraversal_RowWiseHashComputation(benchmark::State& iState)
     {
         RunBenchmark(iState, [](std::vector<std::vector<std::int8_t>>& iArrayOfArray, std::size_t iDimension) {
             for (std::size_t row = 0; row < iDimension; ++row)
@@ -76,7 +76,7 @@ namespace
         });
     }
 
-    void CacheArrayOfArrayTraversal_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         for (std::size_t i = 2_MB; i <= 10_MB; i += 100_KB)
         {
@@ -85,7 +85,7 @@ namespace
     }
 }
 
-BENCHMARK(CacheArrayOfArrayTraversal_ColumnWiseBenchmark)->Apply(CacheArrayOfArrayTraversal_Arguments);                // NOLINT
-BENCHMARK(CacheArrayOfArrayTraversal_ColumnWiseHashComputationBenchmark)->Apply(CacheArrayOfArrayTraversal_Arguments); // NOLINT
-BENCHMARK(CacheArrayOfArrayTraversal_RowWiseBenchmark)->Apply(CacheArrayOfArrayTraversal_Arguments);                   // NOLINT
-BENCHMARK(CacheArrayOfArrayTraversal_RowWiseHashComputationBenchmark)->Apply(CacheArrayOfArrayTraversal_Arguments);    // NOLINT
+BENCHMARK(CacheArrayOfArrayTraversal_ColumnWise)->Apply(BenchmarkArguments);                // NOLINT
+BENCHMARK(CacheArrayOfArrayTraversal_ColumnWiseHashComputation)->Apply(BenchmarkArguments); // NOLINT
+BENCHMARK(CacheArrayOfArrayTraversal_RowWise)->Apply(BenchmarkArguments);                   // NOLINT
+BENCHMARK(CacheArrayOfArrayTraversal_RowWiseHashComputation)->Apply(BenchmarkArguments);    // NOLINT

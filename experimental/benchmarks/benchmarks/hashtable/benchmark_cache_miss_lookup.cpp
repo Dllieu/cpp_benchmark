@@ -17,7 +17,7 @@
 namespace
 {
     template <typename HashTableT, typename PostInitF>
-    void HashTableCacheMissLookup_RunBenchmark(benchmark::State& iState, PostInitF&& iPostInitFunctor)
+    void RunBenchmark(benchmark::State& iState, PostInitF&& iPostInitFunctor)
     {
         std::vector<HashTableT> hashTables = benchmarks::CreateHashTablesWithRandomElementsToOverflowL3Cache<HashTableT>(iState.range(0), iPostInitFunctor);
         std::vector<typename HashTableT::key_type> dataToLookup = benchmarks::CreateVectorFromHashTableKeysShuffled(hashTables.front());
@@ -41,32 +41,32 @@ namespace
     }
 
     template <typename HashTableT>
-    void HashTableCacheMissLookup_RunBenchmark(benchmark::State& iState)
+    void RunBenchmark(benchmark::State& iState)
     {
-        return HashTableCacheMissLookup_RunBenchmark<HashTableT>(iState, [](HashTableT& iHashTable) {});
+        return RunBenchmark<HashTableT>(iState, [](HashTableT& iHashTable) {});
     }
 
-    void HashTableCacheMissLookup_DenseHashMapBenchmark(benchmark::State& iState)
+    void HashTableCacheMissLookup_DenseHashMap(benchmark::State& iState)
     {
-        HashTableCacheMissLookup_RunBenchmark<google::dense_hash_map<std::int64_t, std::int64_t>>(iState, [](auto& iHashTable) { iHashTable.set_empty_key(-1); });
+        RunBenchmark<google::dense_hash_map<std::int64_t, std::int64_t>>(iState, [](auto& iHashTable) { iHashTable.set_empty_key(-1); });
     }
 
-    void HashTableCacheMissLookup_FlatHashMapBenchmark(benchmark::State& iState)
+    void HashTableCacheMissLookup_FlatHashMap(benchmark::State& iState)
     {
-        HashTableCacheMissLookup_RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t>>(iState);
+        RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t>>(iState);
     }
 
-    void HashTableCacheMissLookup_FlatHashMapPower2Benchmark(benchmark::State& iState)
+    void HashTableCacheMissLookup_FlatHashMapPower2(benchmark::State& iState)
     {
-        HashTableCacheMissLookup_RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t, ska::power_of_two_std_hash<std::int64_t>>>(iState);
+        RunBenchmark<ska::flat_hash_map<std::int64_t, std::int64_t, ska::power_of_two_std_hash<std::int64_t>>>(iState);
     }
 
-    void HashTableCacheMissLookup_UnorderedMapBenchmark(benchmark::State& iState)
+    void HashTableCacheMissLookup_UnorderedMap(benchmark::State& iState)
     {
-        HashTableCacheMissLookup_RunBenchmark<std::unordered_map<std::int64_t, std::int64_t>>(iState);
+        RunBenchmark<std::unordered_map<std::int64_t, std::int64_t>>(iState);
     }
 
-    void HashTableCacheMissLookup_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         for (double i = 10; i <= 120'000; i *= 1.4) // NOLINT
         {
@@ -75,7 +75,7 @@ namespace
     }
 }
 
-BENCHMARK(HashTableCacheMissLookup_DenseHashMapBenchmark)->Apply(HashTableCacheMissLookup_Arguments);      // NOLINT
-BENCHMARK(HashTableCacheMissLookup_FlatHashMapBenchmark)->Apply(HashTableCacheMissLookup_Arguments);       // NOLINT
-BENCHMARK(HashTableCacheMissLookup_FlatHashMapPower2Benchmark)->Apply(HashTableCacheMissLookup_Arguments); // NOLINT
-BENCHMARK(HashTableCacheMissLookup_UnorderedMapBenchmark)->Apply(HashTableCacheMissLookup_Arguments);      // NOLINT
+BENCHMARK(HashTableCacheMissLookup_DenseHashMap)->Apply(BenchmarkArguments);      // NOLINT
+BENCHMARK(HashTableCacheMissLookup_FlatHashMap)->Apply(BenchmarkArguments);       // NOLINT
+BENCHMARK(HashTableCacheMissLookup_FlatHashMapPower2)->Apply(BenchmarkArguments); // NOLINT
+BENCHMARK(HashTableCacheMissLookup_UnorderedMap)->Apply(BenchmarkArguments);      // NOLINT

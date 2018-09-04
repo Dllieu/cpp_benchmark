@@ -5,7 +5,7 @@
 
 namespace
 {
-    void CacheAssociativity_CacheAssociativityBenchmark(benchmark::State& iState)
+    void CacheAssociativity_CacheAssociativity(benchmark::State& iState)
     {
         std::vector<std::int8_t> dynamicContiguousArray(32_MB);
         std::size_t step = iState.range(0);
@@ -20,7 +20,7 @@ namespace
         }
     }
 
-    void CacheAssociativity_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         std::size_t cacheLineSize = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
         assert(64u == cacheLineSize);
@@ -40,4 +40,4 @@ namespace
 // if the address are a multiple of 16 appart, all those values will use the same slot position in the set
 // although there's 8 set of 16 KB, if the address is a multiple of 2, we will only be able to store the cache line in a single slot per set (so only 8 cache line can be stored)
 // That's the worst situation possible as it will inccur massive cache misses
-BENCHMARK(CacheAssociativity_CacheAssociativityBenchmark)->Apply(CacheAssociativity_Arguments); // NOLINT
+BENCHMARK(CacheAssociativity_CacheAssociativity)->Apply(BenchmarkArguments); // NOLINT

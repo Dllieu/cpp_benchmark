@@ -115,7 +115,7 @@ namespace
     }
 
     template <typename F>
-    void Atoi_RunBenchmark(benchmark::State& iState, std::size_t iStringLength, F&& iFunctor)
+    void RunBenchmark(benchmark::State& iState, std::size_t iStringLength, F&& iFunctor)
     {
         std::string numberAsString = GetNumberAsString(iStringLength);
 
@@ -127,35 +127,35 @@ namespace
     }
 
     template <std::size_t N>
-    void Atoi_AtollBenchmark(benchmark::State& iState)
+    void Atoi_Atoll(benchmark::State& iState)
     {
-        Atoi_RunBenchmark(iState, N, [](const char* iString) { return std::atoll(iString); }); // NOLINT
+        RunBenchmark(iState, N, [](const char* iString) { return std::atoll(iString); }); // NOLINT
     }
 
     template <std::size_t N>
-    void Atoi_StaticSizeNaiveBenchmark(benchmark::State& iState)
+    void Atoi_StaticSizeNaive(benchmark::State& iState)
     {
-        Atoi_RunBenchmark(iState, N, [](const char* iString) { return AtoiNaive<N>(iString); });
+        RunBenchmark(iState, N, [](const char* iString) { return AtoiNaive<N>(iString); });
     }
 
     template <std::size_t N>
-    void Atoi_StaticSizeVectorizationBenchmark(benchmark::State& iState)
+    void Atoi_StaticSizeVectorization(benchmark::State& iState)
     {
-        Atoi_RunBenchmark(iState, N, [](const char* iString) { return AtoiVectorization<N>(iString); });
+        RunBenchmark(iState, N, [](const char* iString) { return AtoiVectorization<N>(iString); });
     }
 
     template <std::size_t N>
-    void Atoi_StaticSizeVectorizationExplicitUnrollBenchmark(benchmark::State& iState)
+    void Atoi_StaticSizeVectorizationExplicitUnroll(benchmark::State& iState)
     {
-        Atoi_RunBenchmark(iState, N, [](const char* iString) { return AtoiVectorizationExplicitUnroll<N>(iString); });
+        RunBenchmark(iState, N, [](const char* iString) { return AtoiVectorizationExplicitUnroll<N>(iString); });
     }
 }
 
-#define DECLARE_ATOI_BENCHMARK(N)                                 \
-    BENCHMARK_TEMPLATE(Atoi_AtollBenchmark, N);                   \
-    BENCHMARK_TEMPLATE(Atoi_StaticSizeNaiveBenchmark, N);         \
-    BENCHMARK_TEMPLATE(Atoi_StaticSizeVectorizationBenchmark, N); \
-    BENCHMARK_TEMPLATE(Atoi_StaticSizeVectorizationExplicitUnrollBenchmark, N);
+#define DECLARE_ATOI_BENCHMARK(N)                        \
+    BENCHMARK_TEMPLATE(Atoi_Atoll, N);                   \
+    BENCHMARK_TEMPLATE(Atoi_StaticSizeNaive, N);         \
+    BENCHMARK_TEMPLATE(Atoi_StaticSizeVectorization, N); \
+    BENCHMARK_TEMPLATE(Atoi_StaticSizeVectorizationExplicitUnroll, N);
 
 CALL_MACRO_FOR_EACH(DECLARE_ATOI_BENCHMARK, 4, 6, 8, 10, 12, 16, 32, 64) // NOLINT
 

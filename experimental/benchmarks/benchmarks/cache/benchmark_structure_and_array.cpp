@@ -7,7 +7,7 @@
 namespace
 {
     template <typename F>
-    void CacheStructureAndArray_RunBenchmark(benchmark::State& iState, F&& iFunctor)
+    void RunBenchmark(benchmark::State& iState, F&& iFunctor)
     {
         std::size_t size = iState.range(0);
 
@@ -39,7 +39,7 @@ namespace
         };
 
         std::vector<Structure> arrayOfStructure(iState.range(0));
-        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z; });
+        RunBenchmark(iState, [&](std::size_t i) { return arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z; });
     }
 
     // Half ot the fetched data is wasted due to the unused members
@@ -66,7 +66,7 @@ namespace
         };
 
         std::vector<StructureWithUnusedMembers> arrayOfStructure(iState.range(0));
-        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z; });
+        RunBenchmark(iState, [&](std::size_t i) { return arrayOfStructure[i].m_X + arrayOfStructure[i].m_Y + arrayOfStructure[i].m_Z; });
     }
 
     void CacheStructureAndArray_StructureOfArrays(benchmark::State& iState)
@@ -84,7 +84,7 @@ namespace
             std::vector<std::int64_t> m_Y;
             std::vector<std::int64_t> m_Z;
         } structureOfArrays(iState.range(0));
-        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]; });
+        RunBenchmark(iState, [&](std::size_t i) { return structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]; });
     }
 
     // Unused member do not affect the fetching
@@ -109,10 +109,10 @@ namespace
             std::vector<std::int64_t> m_DY;
             std::vector<std::int64_t> m_DZ;
         } structureOfArrays(iState.range(0));
-        CacheStructureAndArray_RunBenchmark(iState, [&](std::size_t i) { return structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]; });
+        RunBenchmark(iState, [&](std::size_t i) { return structureOfArrays.m_X[i] + structureOfArrays.m_Y[i] + structureOfArrays.m_Z[i]; });
     }
 
-    void CacheStructureAndArray_Arguments(benchmark::internal::Benchmark* iBenchmark)
+    void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         for (std::size_t i = 2_KB; i <= 40_KB; i += 2_KB)
         {
@@ -121,7 +121,7 @@ namespace
     }
 }
 
-BENCHMARK(CacheStructureAndArray_ArrayOfStructure)->Apply(CacheStructureAndArray_Arguments);                   // NOLINT
-BENCHMARK(CacheStructureAndArray_ArrayOfStructureWithUnusedMembers)->Apply(CacheStructureAndArray_Arguments);  // NOLINT
-BENCHMARK(CacheStructureAndArray_StructureOfArrays)->Apply(CacheStructureAndArray_Arguments);                  // NOLINT
-BENCHMARK(CacheStructureAndArray_StructureOfArraysWithUnusedMembers)->Apply(CacheStructureAndArray_Arguments); // NOLINT
+BENCHMARK(CacheStructureAndArray_ArrayOfStructure)->Apply(BenchmarkArguments);                   // NOLINT
+BENCHMARK(CacheStructureAndArray_ArrayOfStructureWithUnusedMembers)->Apply(BenchmarkArguments);  // NOLINT
+BENCHMARK(CacheStructureAndArray_StructureOfArrays)->Apply(BenchmarkArguments);                  // NOLINT
+BENCHMARK(CacheStructureAndArray_StructureOfArraysWithUnusedMembers)->Apply(BenchmarkArguments); // NOLINT
