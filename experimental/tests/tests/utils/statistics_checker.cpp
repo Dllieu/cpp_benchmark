@@ -1,6 +1,6 @@
 #include <cstddef>
 #include <gtest/gtest.h>
-#include <utils/statistics_checker.h>
+#include <tests/utils/statistics_checker.h>
 
 namespace tests
 {

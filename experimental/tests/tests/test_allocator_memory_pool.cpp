@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <gtest/gtest.h>
 #include <list>
-#include <utils/allocator_statistics_checker.h>
+#include <tests/utils/allocator_statistics_checker.h>
 
 namespace pmr = std::experimental::fundamentals_v2::pmr;
 

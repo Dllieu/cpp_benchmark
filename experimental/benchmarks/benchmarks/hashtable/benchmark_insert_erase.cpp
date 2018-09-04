@@ -6,6 +6,7 @@
 #pragma GCC diagnostic pop
 #include <algorithm>
 #include <benchmark/benchmark.h>
+#include <benchmarks/hashtable/hashtable_utils.h>
 #include <random>
 #include <unordered_map>
 #include <utils/macros.h>
@@ -14,43 +15,21 @@
 namespace
 {
     template <typename HashTableT, typename PostInitF>
-    HashTableT CreateHashTable(std::size_t iNumberElements, PostInitF&& iPostInitFunctor)
-    {
-        using T = typename HashTableT::key_type;
-
-        std::uniform_int_distribution<T> randomDistribution(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-        std::mt19937_64 generator;
-
-        HashTableT hashTable;
-        iPostInitFunctor(hashTable);
-
-        while (hashTable.size() != iNumberElements)
-        {
-            hashTable.emplace(randomDistribution(generator), hashTable.size());
-        }
-
-        return hashTable;
-    }
-
-    template <typename HashTableT, typename PostInitF>
     void HashTableInsertErase_RunBenchmark(benchmark::State& iState, PostInitF&& iPostInitFunctor)
     {
-        HashTableT hashTable = CreateHashTable<HashTableT>(iState.range(0), std::forward<PostInitF>(iPostInitFunctor));
+        HashTableT hashTable = benchmarks::CreateHashTableWithRandomElements<HashTableT>(iState.range(0), std::forward<PostInitF>(iPostInitFunctor));
 
-        std::size_t numberReplicateElements = 1 + (2 * 7);
-
+        constexpr std::size_t numberReplicateElements = 15;
         std::vector<typename HashTableT::key_type> dataToLookup(hashTable.size() * numberReplicateElements);
         auto dataToLookupIterator = std::begin(dataToLookup);
-        auto keySelector = [](const auto& iPair) { return iPair.first; };
 
         for (std::size_t i = 0; i < numberReplicateElements; ++i)
         {
-            dataToLookupIterator = std::transform(std::begin(hashTable), std::end(hashTable), dataToLookupIterator, keySelector);
+            dataToLookupIterator = std::transform(std::begin(hashTable), std::end(hashTable), dataToLookupIterator, [](const auto& iPair) { return iPair.first; });
         }
 
         std::mt19937_64 randomGenerator(235432876);
         std::shuffle(std::begin(dataToLookup), std::end(dataToLookup), randomGenerator);
-
         hashTable.clear();
 
         std::size_t i = 0;

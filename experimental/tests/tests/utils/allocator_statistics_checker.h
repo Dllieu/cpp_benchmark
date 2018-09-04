@@ -2,7 +2,7 @@
 
 #include <allocators/allocator_statistics.h>
 #include <allocators/memory_resource_statistics.h>
-#include <utils/statistics_checker.h>
+#include <tests/utils/statistics_checker.h>
 
 namespace tests
 {

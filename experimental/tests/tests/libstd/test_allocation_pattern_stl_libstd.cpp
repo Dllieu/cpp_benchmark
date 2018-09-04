@@ -7,8 +7,8 @@
 #include <numeric>
 #include <queue>
 #include <string>
+#include <tests/utils/allocator_statistics_checker.h>
 #include <unordered_map>
-#include <utils/allocator_statistics_checker.h>
 #include <vector>
 
 TEST(AllocationPatternStlLibstdTest, Vector) // NOLINT

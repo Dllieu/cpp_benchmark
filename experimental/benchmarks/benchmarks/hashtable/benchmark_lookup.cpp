@@ -6,6 +6,7 @@
 #pragma GCC diagnostic pop
 #include <algorithm>
 #include <benchmark/benchmark.h>
+#include <benchmarks/hashtable/hashtable_utils.h>
 #include <random>
 #include <unordered_map>
 #include <utils/macros.h>
@@ -14,39 +15,10 @@
 namespace
 {
     template <typename HashTableT, typename PostInitF>
-    HashTableT CreateHashTable(std::size_t iNumberElements, PostInitF&& iPostInitFunctor)
-    {
-        using T = typename HashTableT::key_type;
-
-        std::uniform_int_distribution<T> randomDistribution(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-        std::mt19937_64 generator;
-
-        HashTableT hashTable;
-        iPostInitFunctor(hashTable);
-
-        while (hashTable.size() != iNumberElements)
-        {
-            hashTable.emplace(randomDistribution(generator), hashTable.size());
-        }
-
-        return hashTable;
-    }
-
-    template <typename HashTableT, typename PostInitF>
     void HashTableLookup_RunBenchmark(benchmark::State& iState, PostInitF&& iPostInitFunctor)
     {
-        HashTableT hashTable = CreateHashTable<HashTableT>(iState.range(0), std::forward<PostInitF>(iPostInitFunctor));
-
-        std::vector<typename HashTableT::key_type> dataToLookup;
-        dataToLookup.reserve(hashTable.size());
-
-        for (const auto& element : hashTable)
-        {
-            dataToLookup.emplace_back(element.first);
-        }
-
-        std::mt19937_64 randomGenerator(235432876);
-        std::shuffle(std::begin(dataToLookup), std::end(dataToLookup), randomGenerator);
+        HashTableT hashTable = benchmarks::CreateHashTableWithRandomElements<HashTableT>(iState.range(0), std::forward<PostInitF>(iPostInitFunctor));
+        std::vector<typename HashTableT::key_type> dataToLookup = benchmarks::CreateVectorFromHashTableKeysShuffled(hashTable);
 
         std::size_t i = 0;
         for ([[maybe_unused]] auto handler : iState)

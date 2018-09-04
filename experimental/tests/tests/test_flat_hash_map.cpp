@@ -1,12 +1,11 @@
-#include <gtest/gtest.h>
-#include <utils/allocator_statistics_checker.h>
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #include <flat_hash_map.hpp>
 #pragma GCC diagnostic pop
 #include <cstddef>
-#include <iostream>
+#include <gtest/gtest.h>
+#include <tests/utils/allocator_statistics_checker.h>
 
 namespace
 {

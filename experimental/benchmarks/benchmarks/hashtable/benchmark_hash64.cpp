@@ -1,4 +1,5 @@
 #include <benchmark/benchmark.h>
+#include <benchmarks/hashtable/hashtable_utils.h>
 #include <cstddef>
 #include <functional>
 #include <random>
@@ -7,41 +8,13 @@
 
 namespace
 {
-    template <typename HashTableT>
-    HashTableT CreateHashTable(std::size_t iNumberElements)
-    {
-        using T = typename HashTableT::key_type;
-
-        std::uniform_int_distribution<T> randomDistribution(std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-        std::mt19937_64 generator;
-
-        HashTableT hashTable;
-
-        while (hashTable.size() != iNumberElements)
-        {
-            hashTable.emplace(randomDistribution(generator), hashTable.size());
-        }
-
-        return hashTable;
-    }
-
     template <typename HashT>
     void Hash64_RunBenchmark(benchmark::State& iState)
     {
         using HashTableT = std::unordered_map<std::int64_t, std::int64_t, HashT>;
 
-        HashTableT hashTable = CreateHashTable<HashTableT>(iState.range(0));
-
-        std::vector<typename HashTableT::key_type> dataToLookup;
-        dataToLookup.reserve(hashTable.size());
-
-        for (const auto& element : hashTable)
-        {
-            dataToLookup.emplace_back(element.first);
-        }
-
-        std::mt19937_64 randomGenerator(235432876);
-        std::shuffle(std::begin(dataToLookup), std::end(dataToLookup), randomGenerator);
+        HashTableT hashTable = benchmarks::CreateHashTableWithRandomElements<HashTableT>(iState.range(0), [](const auto&) {});
+        std::vector<typename HashTableT::key_type> dataToLookup = benchmarks::CreateVectorFromHashTableKeysShuffled(hashTable);
 
         std::size_t i = 0;
         for ([[maybe_unused]] auto handler : iState)
