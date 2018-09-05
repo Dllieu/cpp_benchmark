@@ -23,7 +23,7 @@ namespace
     void BenchmarkArguments(benchmark::internal::Benchmark* iBenchmark)
     {
         std::size_t cacheLineSize = sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
-        assert(64u == cacheLineSize);
+        assert(64u == cacheLineSize); // NOLINT
 
         for (std::size_t i = cacheLineSize; i <= cacheLineSize * 66; i += cacheLineSize)
         {
