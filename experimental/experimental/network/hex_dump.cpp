@@ -18,12 +18,12 @@ namespace experimental
 
         for (std::size_t i = 0; i < iLength; i += Step)
         {
-            std::string hexValues(' ', Step * 2);
+            std::string hexValues(Step * 2, ' ');
             std::string asciiValues;
 
             for (std::size_t j = 0; j < Step && i + j < iLength; ++j)
             {
-                std::uint8_t c = static_cast<std::uint8_t>(iBuffer[i + j]);
+                char c = static_cast<char>(iBuffer[i + j]);
 
                 hexValues[j * 2] = HexCharacters[c >> 4];
                 hexValues[j * 2 + 1] = HexCharacters[c & 0xf];

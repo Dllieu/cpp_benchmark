@@ -7,7 +7,7 @@ namespace experimental
     template <typename T, bool TLengthIncludeSizeOfT>
     struct ArrayVariableSizePropertyIterator
     {
-        ArrayVariableSizePropertyIterator(const std::byte* iBuffer);
+        explicit ArrayVariableSizePropertyIterator(const std::byte* iBuffer);
 
         std::tuple<const T*, const std::byte*, std::size_t> operator*() const;
         ArrayVariableSizePropertyIterator& operator++();

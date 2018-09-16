@@ -10,6 +10,7 @@ Checks:          "*,\
                   -google-readability-namespace-comments,\
                   -google-readability-todo,\
                   -google-runtime-references,\
+                  -hicpp-no-assembler,\
                   -hicpp-signed-bitwise,\
                   -hicpp-use-auto,\
                   -hicpp-vararg,\

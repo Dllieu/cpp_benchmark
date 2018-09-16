@@ -77,13 +77,13 @@ public:                                                                   \
         VA_FOR_EACH(VA_DECLARE_PROPERTIES __VA_ARGS__) \
     };
 
-#define DEFINE_LAYOUT_STREAM(LAYOUT_NAME, LAYOUT_SIZE, ...)                                                      \
-    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const LAYOUT_NAME##Layout& iMessageLayout) \
-    {                                                                                                            \
-        iOStream << #LAYOUT_NAME " [" VA_FOR_EACH(VA_STREAM __VA_ARGS__) << "]";                                 \
-        return iOStream;                                                                                         \
-    }                                                                                                            \
-                                                                                                                 \
+#define DEFINE_LAYOUT_STREAM(LAYOUT_NAME, LAYOUT_SIZE, ...)                                                             \
+    [[maybe_unused]] inline std::ostream& operator<<(std::ostream& iOStream, const LAYOUT_NAME##Layout& iMessageLayout) \
+    {                                                                                                                   \
+        iOStream << #LAYOUT_NAME " [" VA_FOR_EACH(VA_STREAM __VA_ARGS__) << "]";                                        \
+        return iOStream;                                                                                                \
+    }                                                                                                                   \
+                                                                                                                        \
     static_assert(true == experimental::EnsureEqual<LAYOUT_SIZE, sizeof(LAYOUT_NAME##Layout)>())
 
 #define DECLARE_MESSAGE_LAYOUT_PACKED(LAYOUT_NAME, LAYOUT_SIZE, ...) \

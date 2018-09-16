@@ -15,7 +15,7 @@ namespace experimental
         const T* pValue = reinterpret_cast<const T*>(this->m_Buffer);
         std::size_t length = pValue->GetLength();
 
-        if constexpr (true == TLengthIncludeSizeOfT)
+        if constexpr (true == TLengthIncludeSizeOfT) // NOLINT
         {
             return std::make_tuple(pValue, this->m_Buffer + sizeof(T), length - sizeof(T));
         }
@@ -30,7 +30,7 @@ namespace experimental
     {
         std::size_t length = reinterpret_cast<const T*>(this->m_Buffer)->GetLength();
 
-        if constexpr (true == TLengthIncludeSizeOfT)
+        if constexpr (true == TLengthIncludeSizeOfT) // NOLINT
         {
             std::advance(this->m_Buffer, length);
         }

@@ -26,7 +26,7 @@ namespace experimental
         std::byte m_Value;
     };
 
-    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const VersionWithInternetHeaderLength& iVersionWithInternetHeaderLength)
+    [[maybe_unused]] inline std::ostream& operator<<(std::ostream& iOStream, const VersionWithInternetHeaderLength& iVersionWithInternetHeaderLength)
     {
         return iOStream << "[Version=" << iVersionWithInternetHeaderLength.GetVersion() << " ; InternetHeaderLength=" << iVersionWithInternetHeaderLength.GetInternetHeaderLength() << "]";
     }

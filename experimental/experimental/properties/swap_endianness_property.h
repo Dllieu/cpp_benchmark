@@ -12,7 +12,7 @@ namespace experimental
     struct SwapEndiannessProperty
     {
         [[nodiscard]] force_inline T Get() const {
-            if constexpr (2 == sizeof(T))
+            if constexpr (2 == sizeof(T)) // NOLINT
             {
                 return static_cast<T>(__bswap_16(static_cast<std::uint16_t>(this->m_T)));
             }
@@ -36,7 +36,7 @@ namespace experimental
     template <typename T>
     [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const SwapEndiannessProperty<T>& iSwapEndiannessProperty)
     {
-        if constexpr (true == std::is_enum_v<T>)
+        if constexpr (true == std::is_enum_v<T>) // NOLINT
         {
             return iOStream << enum_underlying_cast(iSwapEndiannessProperty.Get());
         }

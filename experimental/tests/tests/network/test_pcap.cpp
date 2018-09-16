@@ -57,10 +57,10 @@ TEST_F(PcapTest, EthernetStack) // NOLINT
 {
     this->LoadFile("/tests/data/udp.pcap");
 
-    auto [pPcapHeader, recordHeaders] = Pcap::ReadPackets(this->m_RawData.data(), this->m_RawData.size());
+    auto [pPcapHeader, recordHeaders] = Pcap::ReadPackets(this->m_RawData.data(), this->m_RawData.size()); // NOLINT
     this->SanityCheckPcapHeader(pPcapHeader);
 
-    for (auto [pRecordHeader, pPacket, packetSize] : recordHeaders)
+    for (auto [pRecordHeader, pPacket, packetSize] : recordHeaders) // NOLINT
     {
         auto* pEthernetFrame = reinterpret_cast<const EthernetFrame*>(pPacket);
 
@@ -72,10 +72,6 @@ TEST_F(PcapTest, EthernetStack) // NOLINT
         EXPECT_EQ(4u, pIPv4Header->GetVersionWithInternetHeaderLength().Get().GetVersion());
         EXPECT_EQ(experimental::IPProtocol::UDP, pIPv4Header->GetProtocol());
 
-        auto* pUDPHeader = pIPv4Header->GetPayload<UDPHeaderLayout>();
-
-        std::cout << (*pUDPHeader) << std::endl;
+        [[maybe_unused]] auto* pUDPHeader = pIPv4Header->GetPayload<UDPHeaderLayout>();
     }
-
-    EXPECT_TRUE(false);
 }

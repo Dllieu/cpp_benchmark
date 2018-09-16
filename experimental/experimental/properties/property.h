@@ -44,7 +44,7 @@ namespace experimental
     template <typename T, std::size_t N>
     struct Property<T, N, property_tag_enum>
     {
-        [[nodiscard]] force_inline operator T() const
+        [[nodiscard]] force_inline operator T() const // NOLINT
         {
             return this->m_T;
         }
@@ -61,7 +61,7 @@ namespace experimental
     template <typename T, std::size_t N>
     struct Property<T, N, property_tag_single>
     {
-        [[nodiscard]] force_inline operator const T&() const
+        [[nodiscard]] force_inline operator const T&() const // NOLINT
         {
             return this->m_T;
         }
