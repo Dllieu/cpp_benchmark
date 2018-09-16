@@ -2,6 +2,7 @@
 
 #include <bits/byteswap.h>
 #include <iostream>
+#include <memory>
 #include <type_traits>
 #include <utils/macros.h>
 #include <utils/traits.h>
@@ -14,15 +15,18 @@ namespace experimental
         [[nodiscard]] force_inline T Get() const {
             if constexpr (2 == sizeof(T)) // NOLINT
             {
-                return static_cast<T>(__bswap_16(static_cast<std::uint16_t>(this->m_T)));
+                std::uint16_t value = __bswap_16(*reinterpret_cast<const std::uint16_t*>(std::addressof(this->m_T)));
+                return *reinterpret_cast<T*>(std::addressof(value));
             }
             else if constexpr (4 == sizeof(T))
             {
-                return static_cast<T>(__bswap_32(static_cast<std::uint16_t>(this->m_T)));
+                std::uint32_t value = __bswap_32(*reinterpret_cast<const std::uint32_t*>(std::addressof(this->m_T)));
+                return *reinterpret_cast<T*>(std::addressof(value));
             }
             else if constexpr (8 == sizeof(T))
             {
-                return static_cast<T>(__bswap_64(static_cast<std::uint16_t>(this->m_T)));
+                std::uint64_t value = __bswap_64(*reinterpret_cast<const std::uint64_t*>(std::addressof(this->m_T)));
+                return *reinterpret_cast<T*>(std::addressof(value));
             }
             else
             {

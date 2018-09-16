@@ -15,20 +15,20 @@ namespace experimental
     {
         force_inline std::uint8_t GetVersion() const
         {
-            return static_cast<std::uint8_t>(this->m_Value) >> 4;
+            return this->m_Value >> 4;
         }
 
         force_inline std::size_t GetInternetHeaderLength() const
         {
-            return static_cast<std::uint8_t>(this->m_Value) & 0xf;
+            return 0xf & this->m_Value;
         }
 
-        std::byte m_Value;
+        std::uint8_t m_Value;
     };
 
     [[maybe_unused]] inline std::ostream& operator<<(std::ostream& iOStream, const VersionWithInternetHeaderLength& iVersionWithInternetHeaderLength)
     {
-        return iOStream << "[Version=" << iVersionWithInternetHeaderLength.GetVersion() << " ; InternetHeaderLength=" << iVersionWithInternetHeaderLength.GetInternetHeaderLength() << "]";
+        return iOStream << "[Version=" << iVersionWithInternetHeaderLength.GetVersion() << " | InternetHeaderLength=" << iVersionWithInternetHeaderLength.GetInternetHeaderLength() << "]";
     }
 
     enum class IPProtocol : std::uint8_t

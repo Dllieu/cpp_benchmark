@@ -6,11 +6,13 @@
 #include <network/hex_dump.h>
 #include <network/ipv4_header.h>
 #include <network/pcap_header.h>
+#include <network/tcp_header.h>
 #include <network/udp_header.h>
 
 using experimental::EthernetFrame;
 using experimental::IPv4Header;
 using experimental::Pcap;
+using experimental::TCPHeaderLayout;
 using experimental::UDPHeaderLayout;
 
 namespace
@@ -53,7 +55,34 @@ namespace
     };
 }
 
-TEST_F(PcapTest, EthernetStack) // NOLINT
+TEST_F(PcapTest, IPv4_TCP) // NOLINT
+{
+    this->LoadFile("/tests/data/tcp.pcap");
+
+    auto [pPcapHeader, recordHeaders] = Pcap::ReadPackets(this->m_RawData.data(), this->m_RawData.size()); // NOLINT
+    this->SanityCheckPcapHeader(pPcapHeader);
+
+    for (auto [pRecordHeader, pPacket, packetSize] : recordHeaders) // NOLINT
+    {
+        auto* pEthernetFrame = reinterpret_cast<const EthernetFrame*>(pPacket);
+
+        EXPECT_EQ(experimental::EthernetType::IPv4, pEthernetFrame->GetEthernetType().Get());
+
+        auto* pIPv4Header = pEthernetFrame->GetPayload<IPv4Header>();
+
+        EXPECT_EQ(5u, pIPv4Header->GetVersionWithInternetHeaderLength().Get().GetInternetHeaderLength());
+        EXPECT_EQ(4u, pIPv4Header->GetVersionWithInternetHeaderLength().Get().GetVersion());
+        EXPECT_EQ(experimental::IPProtocol::TCP, pIPv4Header->GetProtocol());
+
+        auto* pTCPHeader = pIPv4Header->GetPayload<TCPHeaderLayout>();
+
+        EXPECT_EQ(8u, pTCPHeader->GetDataOffSetWithFlags().Get().GetDataOffset());
+        EXPECT_EQ(761199867u, pTCPHeader->GetSequenceNumber().Get());
+        EXPECT_EQ(363u, pTCPHeader->GetWindowSize().Get());
+    }
+}
+
+TEST_F(PcapTest, IPv4_UDP) // NOLINT
 {
     this->LoadFile("/tests/data/udp.pcap");
 
@@ -73,5 +102,6 @@ TEST_F(PcapTest, EthernetStack) // NOLINT
         EXPECT_EQ(experimental::IPProtocol::UDP, pIPv4Header->GetProtocol());
 
         [[maybe_unused]] auto* pUDPHeader = pIPv4Header->GetPayload<UDPHeaderLayout>();
+        std::cout << (*pUDPHeader) << std::endl;
     }
 }
