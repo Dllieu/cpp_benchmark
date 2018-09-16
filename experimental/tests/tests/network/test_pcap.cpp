@@ -55,12 +55,14 @@ namespace
     };
 }
 
-TEST_F(PcapTest, IPv4_TCP) // NOLINT
+TEST_F(PcapTest, SingleIPv4TCPPacket) // NOLINT
 {
     this->LoadFile("/tests/data/tcp.pcap");
 
     auto [pPcapHeader, recordHeaders] = Pcap::ReadPackets(this->m_RawData.data(), this->m_RawData.size()); // NOLINT
     this->SanityCheckPcapHeader(pPcapHeader);
+
+    std::size_t packetsRead = 0;
 
     for (auto [pRecordHeader, pPacket, packetSize] : recordHeaders) // NOLINT
     {
@@ -79,15 +81,21 @@ TEST_F(PcapTest, IPv4_TCP) // NOLINT
         EXPECT_EQ(8u, pTCPHeader->GetDataOffSetWithFlags().Get().GetDataOffset());
         EXPECT_EQ(761199867u, pTCPHeader->GetSequenceNumber().Get());
         EXPECT_EQ(363u, pTCPHeader->GetWindowSize().Get());
+
+        ++packetsRead;
     }
+
+    EXPECT_EQ(1u, packetsRead);
 }
 
-TEST_F(PcapTest, IPv4_UDP) // NOLINT
+TEST_F(PcapTest, DualIPv4UDPPacket) // NOLINT
 {
     this->LoadFile("/tests/data/udp.pcap");
 
     auto [pPcapHeader, recordHeaders] = Pcap::ReadPackets(this->m_RawData.data(), this->m_RawData.size()); // NOLINT
     this->SanityCheckPcapHeader(pPcapHeader);
+
+    std::size_t packetsRead = 0;
 
     for (auto [pRecordHeader, pPacket, packetSize] : recordHeaders) // NOLINT
     {
@@ -101,7 +109,13 @@ TEST_F(PcapTest, IPv4_UDP) // NOLINT
         EXPECT_EQ(4u, pIPv4Header->GetVersionWithInternetHeaderLength().Get().GetVersion());
         EXPECT_EQ(experimental::IPProtocol::UDP, pIPv4Header->GetProtocol());
 
-        [[maybe_unused]] auto* pUDPHeader = pIPv4Header->GetPayload<UDPHeaderLayout>();
-        std::cout << (*pUDPHeader) << std::endl;
+        auto* pUDPHeader = pIPv4Header->GetPayload<UDPHeaderLayout>();
+
+        EXPECT_EQ(44132u, pUDPHeader->GetSourcePort().Get());
+        EXPECT_EQ(443u, pUDPHeader->GetDestinationPort().Get());
+
+        ++packetsRead;
     }
+
+    EXPECT_EQ(2u, packetsRead);
 }
