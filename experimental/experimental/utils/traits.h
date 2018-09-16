@@ -35,8 +35,20 @@ namespace experimental
     }
 
     template <typename EnumT>
-    constexpr auto enum_cast(EnumT v)
+    constexpr auto enum_underlying_cast(EnumT v)
     {
         return static_cast<std::underlying_type_t<EnumT>>(v);
     }
+
+    template <typename T>
+    struct remove_parentheses;
+
+    template <typename T, typename U>
+    struct remove_parentheses<T(U)>
+    {
+        using type = U;
+    };
+
+    template <typename T>
+    using remove_parentheses_t = typename remove_parentheses<T>::type;
 }

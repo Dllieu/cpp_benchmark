@@ -9,17 +9,17 @@ namespace experimental
     {
         auto byteSize = numberElements * sizeof(T);
 
-        if (byteSize <= experimental::enum_cast(CacheSize::L1))
+        if (byteSize <= experimental::enum_underlying_cast(CacheSize::L1))
         {
             return CacheSize::L1;
         }
 
-        if (byteSize <= experimental::enum_cast(CacheSize::L2))
+        if (byteSize <= experimental::enum_underlying_cast(CacheSize::L2))
         {
             return CacheSize::L2;
         }
 
-        if (byteSize <= experimental::enum_cast(CacheSize::L3))
+        if (byteSize <= experimental::enum_underlying_cast(CacheSize::L3))
         {
             return CacheSize::L3;
         }

@@ -28,7 +28,7 @@ namespace benchmarks
     template <typename T>
     std::size_t NumberOfContainerToOverflowL3Cache(std::size_t iNumberOfElements)
     {
-        return std::max(std::size_t(2), (3u * experimental::enum_cast(experimental::CacheSize::L3)) / (sizeof(T) * iNumberOfElements));
+        return std::max(std::size_t(2), (3u * experimental::enum_underlying_cast(experimental::CacheSize::L3)) / (sizeof(T) * iNumberOfElements));
     }
 
     template <typename HashTableT, typename PostInitF>

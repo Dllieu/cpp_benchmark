@@ -60,7 +60,10 @@
         "sparse_hash_set": "cpp",
         "sparsetable": "cpp",
         "traits": "cpp",
-        "random": "cpp"
+        "random": "cpp",
+        "codecvt": "cpp",
+        "filesystem": "cpp",
+        "cinttypes": "cpp"
     },
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cmake.configureOnOpen": true,

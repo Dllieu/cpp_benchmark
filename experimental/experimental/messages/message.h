@@ -6,21 +6,21 @@
 #include <utils/macros.h>
 #include <utils/traits.h>
 
-#define PROPERTY(PROPERTY_TYPE, PROPERTY_NAME)                   \
-public:                                                          \
-    force_inline const PROPERTY_TYPE& Get##PROPERTY_NAME() const \
-    {                                                            \
-        return this->m_##PROPERTY_NAME;                          \
-    }                                                            \
-                                                                 \
-    template <typename T>                                        \
-    force_inline void Set##PROPERTY_NAME(T&& iValue)             \
-    {                                                            \
-        this->m_##PROPERTY_NAME = std::forward<T>(iValue);       \
-    }                                                            \
-                                                                 \
-protected:                                                       \
-    PROPERTY_TYPE m_##PROPERTY_NAME;
+#define PROPERTY(PROPERTY_TYPE, PROPERTY_NAME)                                                             \
+public:                                                                                                    \
+    force_inline const experimental::remove_parentheses_t<void(PROPERTY_TYPE)>& Get##PROPERTY_NAME() const \
+    {                                                                                                      \
+        return this->m_##PROPERTY_NAME;                                                                    \
+    }                                                                                                      \
+                                                                                                           \
+    template <typename T>                                                                                  \
+    force_inline void Set##PROPERTY_NAME(T&& iValue)                                                       \
+    {                                                                                                      \
+        this->m_##PROPERTY_NAME = std::forward<T>(iValue);                                                 \
+    }                                                                                                      \
+                                                                                                           \
+protected:                                                                                                 \
+    experimental::remove_parentheses_t<void(PROPERTY_TYPE)> m_##PROPERTY_NAME;
 
 #define PROPERTY_ALIAS(PROPERTY_TYPE, PROPERTY_NAME, PROPERTY_ALIAS_NAME) \
 public:                                                                   \
