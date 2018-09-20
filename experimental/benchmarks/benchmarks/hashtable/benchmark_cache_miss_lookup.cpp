@@ -24,6 +24,7 @@ namespace
 
         std::size_t hashTableIndex = 0;
         std::size_t i = 0;
+
         for ([[maybe_unused]] auto handler : iState)
         {
             benchmark::DoNotOptimize(hashTables[hashTableIndex].find(dataToLookup[i]));

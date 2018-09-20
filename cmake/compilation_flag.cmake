@@ -15,9 +15,10 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     # gcov
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fprofile-arcs -ftest-coverage")
 
+    # TODO: -flto -fno-fat-lto-objects -flto-odr-type-merging -Wno-odr (benchmark generate ODR violations)
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -fdevirtualize-at-ltrans -floop-interchange -floop-strip-mine -floop-block \
-                                                            -fgraphite-identity -funsafe-loop-optimizations -static-libstdc++ \
-                                                            -flto -fno-fat-lto-objects -Wno-odr")
+                                                            -fgraphite-identity -funsafe-loop-optimizations \
+                                                            -static-libgcc -static-libstdc++")
     if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
             SET(BENCHMARK_ENABLE_LTO ON CACHE BOOL "Build google benchmark with lto")
     endif()
