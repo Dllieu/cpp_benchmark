@@ -1,6 +1,6 @@
 version: '1.0.{build}'
 
-image: ubuntu
+image: ubuntu1804
 
 matrix:
   fast_finish: true
@@ -135,7 +135,3 @@ after_test:
       appveyor PushArtifact ${PWD}/${GOOGLEBENCHMARK_OUTPUT_FILE}
       appveyor AddMessage 'Benchmark succeed!' -Category Information
     fi
-
-# - TODO:
-# add benchmark from the presentation
-# lto release (on hold until 18.04 release on appveyor)
