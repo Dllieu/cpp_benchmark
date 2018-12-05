@@ -63,7 +63,8 @@
         "random": "cpp",
         "codecvt": "cpp",
         "filesystem": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "regex": "cpp"
     },
     "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
     "cmake.configureOnOpen": true,

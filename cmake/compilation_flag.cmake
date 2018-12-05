@@ -1,6 +1,6 @@
 set(COMPILER_FLAGS_STANDARD "-std=c++2a -g -D_REENTRANT -fPIC -m64 -fmessage-length=0")
 set(COMPILER_FLAGS_WARNING "-Werror -Wall -Wextra -Wno-deprecated-declarations -Wstrict-aliasing -Wshadow -Wpedantic -Wdouble-promotion \
-                            -Wdeprecated-declarations -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wabi -Wcast-qual \
+                            -Wdeprecated-declarations -Wnon-virtual-dtor -Wcast-align -Woverloaded-virtual -Wcast-qual \
                             -Wno-unused-local-typedefs -Wno-unused-parameter")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -D_DEBUG -fno-inline \
@@ -20,7 +20,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
                                                             -fgraphite-identity -funsafe-loop-optimizations \
                                                             -static-libgcc -static-libstdc++")
     if (${CMAKE_BUILD_TYPE} STREQUAL "Release")
-            SET(BENCHMARK_ENABLE_LTO ON CACHE BOOL "Build google benchmark with lto")
+        SET(BENCHMARK_ENABLE_LTO ON CACHE BOOL "Build google benchmark with lto")
     endif()
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # Clang is only used for additionals warnings and usage of the sanitizers
