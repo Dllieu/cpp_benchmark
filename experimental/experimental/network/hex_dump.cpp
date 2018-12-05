@@ -25,8 +25,8 @@ namespace experimental
             {
                 char c = static_cast<char>(iBuffer[i + j]);
 
-                hexValues[j * 2] = HexCharacters[c >> 4];
-                hexValues[j * 2 + 1] = HexCharacters[c & 0xf];
+                hexValues[j * 2] = HexCharacters[(c & 0xf0) >> 4];
+                hexValues[j * 2 + 1] = HexCharacters[c & 0x0f];
 
                 asciiValues += 0 != std::isprint(c) ? c : '.';
             }
