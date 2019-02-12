@@ -5,5 +5,5 @@
 
 namespace experimental
 {
-    [[maybe_unused]] no_inline void HexDump(const std::byte* iBuffer, std::size_t iLength);
+    no_inline void HexDump(const std::byte* iBuffer, std::size_t iLength);
 }
