@@ -10,7 +10,7 @@ configuration:
   - Release
 
 environment:
-  CLANG_VERSION: 6.0
+  CLANG_VERSION: 7
   CPP_CHECK_OUTPUT_FILE: cppcheck_output.xml
   GTEST_OUTPUT_FILE: gtest_output.xml
   GOOGLEBENCHMARK_OUTPUT_FILE: googlebenchmark_output.csv
