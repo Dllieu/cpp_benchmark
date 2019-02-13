@@ -33,8 +33,11 @@ install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -y
   - sudo apt-get install ${COMPILER}-${COMPILER_VERSION} ${COMPILER_CPP}-${COMPILER_VERSION} -y
-  - sudo update-alternatives --remove-all ${COMPILER}
-  - sudo update-alternatives --remove-all ${COMPILER_CPP}
+  - |
+    if [ "clang" == "${COMPILER}" ]; then
+      sudo update-alternatives --remove-all ${COMPILER}
+      sudo update-alternatives --remove-all ${COMPILER_CPP}
+    fi
   - sudo update-alternatives --install /usr/bin/${COMPILER} ${COMPILER} /usr/bin/${COMPILER}-${COMPILER_VERSION} ${UPDATE_ALTERNATIVE_PRIORITY} --slave /usr/bin/${COMPILER_CPP} ${COMPILER_CPP} /usr/bin/${COMPILER_CPP}-${COMPILER_VERSION}
 
   # Python
