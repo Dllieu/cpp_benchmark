@@ -20,9 +20,9 @@ environment:
   UPDATE_ALTERNATIVE_PRIORITY: 9999
 
   matrix:
-    # - COMPILER: gcc
-    #   COMPILER_CPP: g++
-    #   COMPILER_VERSION: 8
+    - COMPILER: gcc
+      COMPILER_CPP: g++
+      COMPILER_VERSION: 8
 
     - COMPILER: clang
       COMPILER_CPP: clang++
