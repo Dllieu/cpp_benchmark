@@ -22,10 +22,10 @@ namespace
     struct Foo
     {
     public:
-        [[maybe_unused]] int memberA{};
+        std::string memberA;
 
     private:
-        [[maybe_unused]] int memberB{};
+        std::string memberB;
     };
 
     DECLARE_HAS_MEMBER(memberA);
