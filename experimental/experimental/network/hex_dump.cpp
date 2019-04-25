@@ -8,8 +8,7 @@
 
 namespace experimental
 {
-    [[maybe_unused]] void HexDump(const std::byte* iBuffer, std::size_t iLength)
-    {
+    [[maybe_unused]] void HexDump(const std::byte* iBuffer, std::size_t iLength) {
         constexpr const char HexCharacters[] = "0123456789abcdef";
         constexpr const std::size_t Step = 16;
 

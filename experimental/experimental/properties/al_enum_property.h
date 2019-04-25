@@ -7,8 +7,7 @@ namespace experimental
     template <typename T>
     struct AlphaNumericEnumProperty : public Property<T>
     {
-        [[maybe_unused]] std::ostream& Stream(std::ostream& iOStream) const
-        {
+        [[maybe_unused]] std::ostream& Stream(std::ostream& iOStream) const {
             for (std::size_t i = 0; i < sizeof(T); ++i)
             {
                 iOStream << reinterpret_cast<const char*>(std::addressof(this->m_T))[i];

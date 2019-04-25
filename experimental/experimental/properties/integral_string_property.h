@@ -35,7 +35,10 @@ namespace experimental
                 }
             }
 
-            constexpr T operator[](std::size_t i) const { return this->m_Array[i]; }
+            constexpr T operator[](std::size_t i) const
+            {
+                return this->m_Array[i];
+            }
 
             T m_Array[N];
         };
@@ -44,10 +47,9 @@ namespace experimental
     template <std::size_t N, typename T = std::uint64_t>
     struct IntegralStringProperty : public Property<char, N>
     {
-        static constexpr const auto powerOf10 = detail::PowerOf10Generator<N, T>();
+        static constexpr const auto powerOf10 = detail::PowerOf10Generator<N, T>(); // NOLINT
 
-        [[nodiscard]] T Get() const
-        {
+        [[nodiscard]] T Get() const {
             T result = 0;
             std::size_t i = 0;
 

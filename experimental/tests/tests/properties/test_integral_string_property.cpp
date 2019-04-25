@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-TEST(IntegralStringPropertyTest, Zero)
+TEST(IntegralStringPropertyTest, Zero) // NOLINT
 {
     const char* s = "00000";
     auto p = reinterpret_cast<const experimental::IntegralStringProperty<5>*>(s);
@@ -11,7 +11,7 @@ TEST(IntegralStringPropertyTest, Zero)
     EXPECT_EQ(p->Get(), 0u);
 }
 
-TEST(IntegralStringPropertyTest, Default)
+TEST(IntegralStringPropertyTest, Default) // NOLINT
 {
     const char* s = "12345";
     auto p = reinterpret_cast<const experimental::IntegralStringProperty<5>*>(s);
@@ -19,7 +19,7 @@ TEST(IntegralStringPropertyTest, Default)
     EXPECT_EQ(p->Get(), 12345u);
 }
 
-TEST(IntegralStringPropertyTest, Truncate)
+TEST(IntegralStringPropertyTest, Truncate) // NOLINT
 {
     const char* s = "12345";
     auto p = reinterpret_cast<const experimental::IntegralStringProperty<3>*>(s);
