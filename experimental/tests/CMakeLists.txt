@@ -17,9 +17,10 @@ include_directories(${PATH_LIB_EXPERIMENTAL})
 aux_source_directory(tests SRC_TESTS)
 aux_source_directory(tests/libstd SRC_LIBSTD_TESTS)
 aux_source_directory(tests/network SRC_NETWORK_TESTS)
+aux_source_directory(tests/properties SRC_PROPERTIES_TESTS)
 aux_source_directory(tests/utils SRC_UTILS_TESTS)
 
-add_executable(test_experimental ${SRC_TESTS} ${SRC_LIBSTD_TESTS} ${SRC_NETWORK_TESTS} ${SRC_UTILS_TESTS})
+add_executable(test_experimental ${SRC_TESTS} ${SRC_LIBSTD_TESTS} ${SRC_PROPERTIES_TESTS} ${SRC_NETWORK_TESTS} ${SRC_UTILS_TESTS})
 find_package(Threads REQUIRED)
 target_link_libraries(test_experimental
                       LINK_PRIVATE Threads::Threads

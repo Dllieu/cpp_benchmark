@@ -30,10 +30,19 @@ namespace experimental
 
             [[maybe_unused]] no_inline std::ostream& Stream(std::ostream& iOStream) const
         {
-            for (const T& t : this->m_Ts)
+            iOStream << "[";
+
+            for (std::size_t i = 0; i < N; ++i)
             {
-                iOStream << t;
+                iOStream << this->m_Ts[i];
+
+                if (N - 1 != i)
+                {
+                    iOStream << ";";
+                }
             }
+
+            iOStream << "]";
 
             return iOStream;
         }

@@ -10,7 +10,7 @@ constexpr force_inline std::size_t operator""_AlphaNumeric(const char* iString, 
 
     for (std::size_t i = 0; i < iSize; ++i)
     {
-        result = (result << 8) | iString[i]; // NOLINT
+        result = (result << 8) | iString[iSize - 1 - i]; // NOLINT
     }
 
     return result;
