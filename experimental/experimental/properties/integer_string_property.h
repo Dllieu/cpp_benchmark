@@ -45,7 +45,7 @@ namespace experimental
     }
 
     template <std::size_t N, typename T = std::uint64_t>
-    struct IntegralStringProperty : public Property<char, N>
+    struct IntegerStringProperty : public Property<char, N>
     {
         static constexpr const auto powerOf10 = detail::PowerOf10Generator<N, T>(); // NOLINT
 
@@ -73,7 +73,7 @@ namespace experimental
     };
 
     template <std::size_t N, typename T>
-    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const IntegralStringProperty<N, T>& iProperty)
+    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const IntegerStringProperty<N, T>& iProperty)
     {
         return iOStream << iProperty.Get();
     }
