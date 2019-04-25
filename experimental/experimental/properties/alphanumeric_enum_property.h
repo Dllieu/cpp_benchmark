@@ -5,7 +5,7 @@
 namespace experimental
 {
     template <typename T>
-    struct AlphaNumericEnumProperty : public Property<T>
+    struct AlphanumericEnumProperty : public Property<T>
     {
         [[maybe_unused]] std::ostream& Stream(std::ostream& iOStream) const {
             for (std::size_t i = 0; i < sizeof(T); ++i)
@@ -18,7 +18,7 @@ namespace experimental
     };
 
     template <typename T>
-    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const AlphaNumericEnumProperty<T>& iProperty)
+    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const AlphanumericEnumProperty<T>& iProperty)
     {
         return iProperty.Stream(iOStream);
     }
