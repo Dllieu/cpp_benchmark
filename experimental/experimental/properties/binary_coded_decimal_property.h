@@ -22,7 +22,7 @@ namespace experimental
             T result = 0;
             std::size_t i = 0;
 
-           for (; i + 4 < N; i += 4)
+            for (; i + 4 < N; i += 4)
             {
                 T v0 = this->ComputeByte(i);
                 T v1 = this->ComputeByte(i + 1);
