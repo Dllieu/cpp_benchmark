@@ -3,51 +3,14 @@
 #include <cstddef>
 #include <iostream>
 #include <properties/property.h>
+#include <utils/power_of_10_generator.h>
 
 namespace experimental
 {
-    namespace detail
-    {
-        template <typename T>
-        constexpr T PowerOf10(size_t iN)
-        {
-            T result = 1;
-
-            while (iN--)
-            {
-                result *= 10;
-            }
-
-            return result;
-        }
-
-        template <std::size_t N, typename T>
-        struct PowerOf10Generator
-        {
-            static_assert(N <= std::numeric_limits<T>::digits10);
-
-            constexpr PowerOf10Generator()
-                : m_Array{}
-            {
-                for (std::size_t i = 0; i < N; ++i)
-                {
-                    m_Array[N - 1 - i] = PowerOf10<T>(i);
-                }
-            }
-
-            constexpr T operator[](std::size_t i) const
-            {
-                return this->m_Array[i];
-            }
-
-            T m_Array[N];
-        };
-    }
-
     template <std::size_t N, typename T = std::uint64_t>
     struct IntegerStringProperty : public Property<char, N>
     {
-        static constexpr const auto powerOf10 = detail::PowerOf10Generator<N, T>(); // NOLINT
+        static constexpr const auto powerOf10 = PowerOf10Generator<N, T>(); // NOLINT
 
         [[nodiscard]] T Get() const {
             T result = 0;

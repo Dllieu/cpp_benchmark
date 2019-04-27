@@ -6,7 +6,7 @@ TEST(FloatingPointStringPropertyTest, Zero) // NOLINT
     const char* s = "00000";
     auto p = reinterpret_cast<const experimental::FloatingPointStringProperty<5, 2>*>(s);
 
-    EXPECT_NEAR(p->Get(), 0u, 1e-6);
+    EXPECT_NEAR(0u, p->Get(), 1e-6);
 }
 
 TEST(FloatingPointStringPropertyTest, Default) // NOLINT
@@ -14,7 +14,7 @@ TEST(FloatingPointStringPropertyTest, Default) // NOLINT
     const char* s = "12345";
     auto p = reinterpret_cast<const experimental::FloatingPointStringProperty<5, 2>*>(s);
 
-    EXPECT_NEAR(p->Get(), 123.45, 1e-6);
+    EXPECT_NEAR(123.45, p->Get(), 1e-6);
 }
 
 TEST(FloatingPointStringPropertyTest, Truncate) // NOLINT
@@ -22,5 +22,5 @@ TEST(FloatingPointStringPropertyTest, Truncate) // NOLINT
     const char* s = "12345";
     auto p = reinterpret_cast<const experimental::FloatingPointStringProperty<3, 2>*>(s);
 
-    EXPECT_NEAR(p->Get(), 1.23, 1e-6);
+    EXPECT_NEAR(1.23, p->Get(), 1e-6);
 }
