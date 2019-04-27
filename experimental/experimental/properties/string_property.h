@@ -21,11 +21,11 @@ namespace experimental
 
             if constexpr (StringPropertyType::LeftJustified == SPType)
             {
-                std::size_t endIndex = result.find_last_not_of(ValueToSkip);
+                std::size_t endPosition = result.find_last_not_of(ValueToSkip);
 
-                if (likely(std::string_view::npos != endIndex))
+                if (likely(std::string_view::npos != endPosition))
                 {
-                    result.remove_suffix(N - 1 - endIndex);
+                    result.remove_suffix(N - 1 - endPosition);
                 }
                 else
                 {
@@ -34,11 +34,11 @@ namespace experimental
             }
             else if constexpr (StringPropertyType::RightJustified == SPType)
             {
-                std::size_t startIndex = result.find_first_not_of(ValueToSkip);
+                std::size_t startPosition = result.find_first_not_of(ValueToSkip);
 
-                if (likely(std::string_view::npos != startIndex))
+                if (likely(std::string_view::npos != startPosition))
                 {
-                    result.remove_prefix(startIndex);
+                    result.remove_prefix(startPosition);
                 }
                 else
                 {
@@ -50,8 +50,8 @@ namespace experimental
         }
     };
 
-    template <std::size_t N, StringPropertyType SPT, char ValueToSkip>
-    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const StringProperty<N>& iProperty)
+    template <std::size_t N, StringPropertyType SPType, char ValueToSkip>
+    [[maybe_unused]] std::ostream& operator<<(std::ostream& iOStream, const StringProperty<N, SPType, ValueToSkip>& iProperty)
     {
         return iOStream << iProperty.Get();
     }
