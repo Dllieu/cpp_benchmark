@@ -30,7 +30,7 @@ TEST(StringPropertyTest, LeftJustified_Empty) // NOLINT
     const char s[] = "     ";
     auto p = reinterpret_cast<const experimental::StringProperty<5, experimental::StringPropertyType::LeftJustified, ' '>*>(s);
 
-    EXPECT_EQ("", p->Get());
+    EXPECT_TRUE(p->Get().empty());
 }
 
 TEST(StringPropertyTest, RightJustified_Default) // NOLINT
@@ -54,5 +54,5 @@ TEST(StringPropertyTest, RightJustified_Empty) // NOLINT
     const char s[] = "     ";
     auto p = reinterpret_cast<const experimental::StringProperty<5, experimental::StringPropertyType::RightJustified, ' '>*>(s);
 
-    EXPECT_EQ("", p->Get());
+    EXPECT_TRUE(p->Get().empty());
 }
