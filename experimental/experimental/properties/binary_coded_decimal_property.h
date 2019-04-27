@@ -1,8 +1,8 @@
 #pragma once
 
+#include <cmath>
 #include <properties/property.h>
 #include <utils/power_of_10_generator.h>
-#include <cmath>
 
 namespace experimental
 {
@@ -45,11 +45,11 @@ namespace experimental
         {
             std::uint8_t byte;
 
-            if constexpr(1u == N)
+            if constexpr (1u == N)
             {
                 byte = this->m_T;
             }
-            else if constexpr(1u != N)
+            else if constexpr (1u != N)
             {
                 byte = this->m_Ts[iBytePosition];
             }
@@ -59,9 +59,7 @@ namespace experimental
                 std::uint8_t leastSignificantNibble = byte >> 4;
                 std::uint8_t mostSignificantNibble = byte & 0x0F;
 
-                return this->powerOf10[iBytePosition]
-                    * this->powerOf10[iBytePosition]
-                    * (leastSignificantNibble * 10 + mostSignificantNibble);
+                return this->powerOf10[iBytePosition] * this->powerOf10[iBytePosition] * (leastSignificantNibble * 10 + mostSignificantNibble);
             }
             else if constexpr (BinaryCodedDecimalType::Unpacked == BCDType)
             {
