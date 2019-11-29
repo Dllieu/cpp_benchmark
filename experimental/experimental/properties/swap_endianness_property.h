@@ -12,7 +12,8 @@ namespace experimental
     template <typename T>
     struct SwapEndiannessProperty
     {
-        [[nodiscard]] force_inline T Get() const {
+        [[nodiscard]] force_inline T Get() const
+        {
             if constexpr (2 == sizeof(T)) // NOLINT
             {
                 std::uint16_t value = __bswap_16(*reinterpret_cast<const std::uint16_t*>(std::addressof(this->m_T)));

@@ -26,9 +26,12 @@ namespace experimental
     template <typename T, std::size_t N>
     struct Property<T, N, property_tag_array>
     {
-        [[nodiscard]] force_inline const std::array<T, N>& Get() const { return this->m_Ts; }
+        [[nodiscard]] force_inline const std::array<T, N>& Get() const
+        {
+            return this->m_Ts;
+        }
 
-            [[maybe_unused]] no_inline std::ostream& Stream(std::ostream& iOStream) const
+        [[maybe_unused]] no_inline std::ostream& Stream(std::ostream& iOStream) const
         {
             iOStream << "[";
 
@@ -57,9 +60,13 @@ namespace experimental
         {
             return this->m_T;
         }
-        [[nodiscard]] force_inline T Get() const { return this->m_T; }
 
-            [[maybe_unused]] no_inline std::ostream& Stream(std::ostream& iOStream) const
+        [[nodiscard]] force_inline T Get() const
+        {
+            return this->m_T;
+        }
+
+        [[maybe_unused]] no_inline std::ostream& Stream(std::ostream& iOStream) const
         {
             return iOStream << experimental::enum_underlying_cast(this->m_T);
         }
@@ -74,9 +81,12 @@ namespace experimental
         {
             return this->m_T;
         }
-        [[nodiscard]] force_inline const T& Get() const { return this->m_T; }
+        [[nodiscard]] force_inline const T& Get() const
+        {
+            return this->m_T;
+        }
 
-            [[maybe_unused]] no_inline std::ostream& Stream(std::ostream& iOStream) const
+        [[maybe_unused]] no_inline std::ostream& Stream(std::ostream& iOStream) const
         {
             return iOStream << this->m_T;
         }

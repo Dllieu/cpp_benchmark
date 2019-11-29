@@ -12,7 +12,8 @@ namespace experimental
     {
         static constexpr const auto powerOf10 = PowerOf10Generator<N, T>(); // NOLINT
 
-        [[nodiscard]] T Get() const {
+        [[nodiscard]] T Get() const
+        {
             T result = 0;
             std::size_t i = 0;
 
