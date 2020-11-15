@@ -14,7 +14,7 @@ namespace experimental
 
     template <typename T, std::size_t BlockSize, typename DefaultAllocator>
     template <typename U>
-    AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize, typename std::allocator_traits<DefaultAllocator>::template rebind_alloc<U>>& iAllocatorMemoryPoolFixedSize) noexcept
+    AllocatorMemoryPoolFixedSize<T, BlockSize, DefaultAllocator>::AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize, rebind_alloc<U>>& iAllocatorMemoryPoolFixedSize) noexcept
         : DefaultAllocator(iAllocatorMemoryPoolFixedSize)
         , m_MemoryPool(iAllocatorMemoryPoolFixedSize.m_MemoryPool)
     {
