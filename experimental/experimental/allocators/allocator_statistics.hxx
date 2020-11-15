@@ -10,7 +10,7 @@ namespace experimental
 
     template <typename T, typename StatisticsHandler, typename DefaultAllocator>
     template <typename U>
-    AllocatorStatistics<T, StatisticsHandler, DefaultAllocator>::AllocatorStatistics(const AllocatorStatistics<U, StatisticsHandler, typename DefaultAllocator::template rebind<U>::other>& iAllocatorStatistics) noexcept
+    AllocatorStatistics<T, StatisticsHandler, DefaultAllocator>::AllocatorStatistics(const AllocatorStatistics<U, StatisticsHandler, typename std::allocator_traits<DefaultAllocator>::template rebind_alloc<U>>& iAllocatorStatistics) noexcept
         : m_StatisticsHandler(iAllocatorStatistics.m_StatisticsHandler)
     {
     }

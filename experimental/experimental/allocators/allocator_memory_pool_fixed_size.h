@@ -25,11 +25,11 @@ namespace experimental
         template <typename U>
         struct rebind
         {
-            using other = AllocatorMemoryPoolFixedSize<U, BlockSize, typename DefaultAllocator::template rebind<U>::other>;
+            using other = AllocatorMemoryPoolFixedSize<U, BlockSize, typename std::allocator_traits<DefaultAllocator>::template rebind_alloc<U>>;
         };
 
         template <typename U>
-        AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize, typename DefaultAllocator::template rebind<U>::other>& iAllocatorMemoryPoolFixedSize) noexcept; // NOLINT
+        AllocatorMemoryPoolFixedSize(const AllocatorMemoryPoolFixedSize<U, BlockSize, typename std::allocator_traits<DefaultAllocator>::template rebind_alloc<U>>& iAllocatorMemoryPoolFixedSize) noexcept; // NOLINT
 
         void ResetMemoryPool(std::size_t iNumberOfBlocks);
 

@@ -22,11 +22,11 @@ namespace experimental
         template <typename U>
         struct rebind
         {
-            using other = AllocatorStatistics<U, StatisticsHandler, typename DefaultAllocator::template rebind<U>::other>;
+            using other = AllocatorStatistics<U, StatisticsHandler, typename std::allocator_traits<DefaultAllocator>::template rebind_alloc<U>>;
         };
 
         template <typename U>
-        AllocatorStatistics(const AllocatorStatistics<U, StatisticsHandler, typename DefaultAllocator::template rebind<U>::other>& iAllocatorStatistics) noexcept; // NOLINT
+        AllocatorStatistics(const AllocatorStatistics<U, StatisticsHandler, typename std::allocator_traits<DefaultAllocator>::template rebind_alloc<U>>& iAllocatorStatistics) noexcept;
 
         value_type* allocate(std::size_t iNumberOfElements);
         void deallocate(value_type* iPointer, std::size_t iNumberOfElements) noexcept;
